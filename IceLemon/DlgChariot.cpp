@@ -28,7 +28,14 @@ void CDlgChariot::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CDlgChariot, CDialogEx)
+	ON_BN_CLICKED(IDC_CHECK3, &CDlgChariot::OnBnClickedCheck3)
 END_MESSAGE_MAP()
 
 
 // CDlgChariot 消息处理程序
+
+
+void CDlgChariot::OnBnClickedCheck3()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}

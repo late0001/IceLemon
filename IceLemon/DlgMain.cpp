@@ -28,7 +28,15 @@ void CDlgMain::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CDlgMain, CDialogEx)
+	ON_BN_CLICKED(IDC_BTN_RUN, &CDlgMain::OnBnClickedBtnRun)
 END_MESSAGE_MAP()
 
 
 // CDlgMain 消息处理程序
+
+
+void CDlgMain::OnBnClickedBtnRun()
+{
+	// TODO: 在此添加控件通知处理程序代码
+
+}
