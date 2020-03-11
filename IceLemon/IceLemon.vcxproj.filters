@@ -39,6 +39,15 @@
     <ClInclude Include="DlgChariot.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="xcommon.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StatusDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Ping.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IceLemon.cpp">
@@ -56,6 +65,21 @@
     <ClCompile Include="DlgChariot.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TestCheck.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Unit2.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="xcommon.CPP">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="StatusDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Ping.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="IceLemon.rc">
@@ -69,6 +93,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\IceLemon.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\icon1.ico">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>
