@@ -8,11 +8,11 @@ BOOL RunThread::InitInstance()
 	// TODO: 在此添加专用代码和/或调用基类
 
 	//return CWinThread::InitInstance();
-/*	ASSERT(::IsWindow(m_hParentWnd)); 
+	ASSERT(::IsWindow(m_hParentWnd)); 
 	CWnd *pParent = CWnd::FromHandle(m_hParentWnd);
 	CStatusDlg* pDlg = new CStatusDlg(pParent);
 	pDlg->Create(IDD_DIALOG1, pParent);
-	pDlg->ShowWindow(SW_SHOW);*/
+	pDlg->ShowWindow(SW_SHOW);
 	return TRUE;
 }
 

@@ -14,6 +14,25 @@ bool CIceLemonDlg::CheckCardSetting()
 {
 	return 1;
 }
+
+bool CIceLemonDlg::CheckEndpointIP()
+{
+	if (ChariotParameter.e1 == "" || ChariotParameter.e2 == "" )
+	{
+		sprintf_s(msg,"Endpoint must not be null!!\nPlease recheck!!");
+		MessageBox(msg, "Error", MB_OK | MB_ICONERROR);
+		DisplayPage(1);
+		m_page_chariot.GetDlgItem(IDC_CBO_ENTPOINT1)->SetFocus();
+		//ClearCardInitialState(); //Stop Rtllib, Socket, unload 8187DLL
+
+		m_page_main.m_redit.SetSel(-1,-1);
+		m_page_main.m_redit.ReplaceSel("<<<<<<<<<<<<<<<<< please input endpoint ip (Test Abort!!) >>>>>>>>>>>>>>>>>\r\n");
+
+		return 0;
+	}
+	return 1;
+}
+
 bool CIceLemonDlg::CheckTestDuration()
 {
 	ChariotParameter.testduration = (m_page_chariot.m_edit_hour*3600 + m_page_chariot.m_edit_min*60 + m_page_chariot.m_edit_sec);

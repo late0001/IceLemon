@@ -104,26 +104,40 @@ void CIceLemonDlg::InitTabCtrl()
 }
 void CIceLemonDlg::InitChariotPage()
 {
-	m_page_chariot.cbxEndpoint1.AddString("192.168.0.155");
-	m_page_chariot.cbxEndpoint2.AddString("192.168.0.161");
 	m_page_chariot.cbxProtocol.AddString("TCP");
 	m_page_chariot.cbxProtocol.AddString("UDP");
 	m_page_chariot.cbxProtocol.AddString("IPX");
 }
-void CIceLemonDlg::PrintlnToMemo(CString str)
+
+void CIceLemonDlg::PrintToMemo(CString str, int autoScrollToCur)
 {
+	if(autoScrollToCur) m_page_main.m_redit.LineScroll(m_page_main.m_redit.GetLineCount());
+	m_page_main.m_redit.SetSel(-1,-1);
+	m_page_main.m_redit.ReplaceSel(str);
+}
+
+void CIceLemonDlg::PrintlnToMemo(CString str, int autoScrollToCur)
+{
+	if(autoScrollToCur){
+		int lineCnt = m_page_main.m_redit.GetLineCount();
+		m_page_main.m_redit.LineScroll(lineCnt);
+	}
 	m_page_main.m_redit.SetSel(-1,-1);
 	m_page_main.m_redit.ReplaceSel(str+"\n");
+	
 }
 
 int CIceLemonDlg::PingCmd()
 {
 	CPing objPing;
 	CString str;
-	char *szDestIP = "127.0.0.1";
+	if(ChariotParameter.e2.IsEmpty()){
+		return -1;
+	}
+	char *szDestIP = ChariotParameter.e2.GetBuffer(ChariotParameter.e2.GetLength());
 	PingReply reply;
 	str.Format("Pinging %s with %d bytes of data:\n", szDestIP, DEF_PACKET_SIZE);
-	PrintlnToMemo(str);
+	PrintlnToMemo(str, 1);
 	int i =4;
 
 	while (i-- > 0)
@@ -161,6 +175,7 @@ void CIceLemonDlg::GetLocalIPInfo()
 	if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) == NO_ERROR) 
 	{ 
 		pAdapter = pAdapterInfo; 
+		PrintToMemo("",1);
 		while (pAdapter) 
 		{
 			PIP_ADDR_STRING pIPAddr;
@@ -168,6 +183,8 @@ void CIceLemonDlg::GetLocalIPInfo()
 			while (pIPAddr)
 			{
 				str.Format("%s\n IP: %s\tMask: %s\n",  pAdapter->Description, pIPAddr->IpAddress.String, pIPAddr->IpMask.String );
+				m_page_chariot.cbxEndpoint1.AddString(pIPAddr->IpAddress.String);
+				m_page_chariot.cbxEndpoint2.AddString(pIPAddr->IpAddress.String);
 				PrintlnToMemo(str);
 				pIPAddr = pIPAddr->Next;
 			}
@@ -178,13 +195,13 @@ void CIceLemonDlg::GetLocalIPInfo()
 }
 void CIceLemonDlg::OnClickedBtnScript()
 {
-	CString defaultDir = "E:\\";	//默认打开的文件路径
-	CString fileName = "";	//默认打开的文件名
-	CString filter = "文件 (*.doc; *.ppt; *.xls)|*.doc;*.ppt;*.xls;*.*||";	//文件过虑的类型
-	CFileDialog openFileDlg(TRUE, defaultDir, fileName, OFN_HIDEREADONLY|OFN_READONLY, filter, NULL);
+	CString defaultExt = "*.scr";	//默认打开的文件路径
+	CString fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\Scripts\\Throughput.scr";	//默认打开的文件名
+	CString filter = "文件 (*.scr; *.*)|*.scr;*.*||";	//文件过虑的类型
+	CFileDialog openFileDlg(TRUE, defaultExt, fileName, OFN_HIDEREADONLY|OFN_READONLY, filter, NULL);
 	//openFileDlg.GetOFN().lpstrInitialDir = "E:\\FileTest\\test.doc";
 	INT_PTR result = openFileDlg.DoModal();
-	CString filePath = defaultDir ;
+	CString filePath = fileName ;
 	if(result == IDOK) {
 		filePath = openFileDlg.GetPathName();
 	}
@@ -215,9 +232,9 @@ void CIceLemonDlg::OnClickedCkbSaveTst()
 	//return ;
 	if (m_page_chariot.ckbSaveChariotTest.GetCheck())
 	{
-		fileName = "test1";
+		fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\test_result\\test1";
 		CFileDialog openFileDlg(FALSE, NULL,fileName, OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT, "文件(*.tst)| *.tst||", NULL);
-		openFileDlg.GetOFN().lpstrInitialDir = strFilename +"\\test1.tst";
+		//openFileDlg.GetOFN().lpstrInitialDir = strFilename +"\\test1.tst";
 		INT_PTR result = openFileDlg.DoModal();
 		CString filePath = strFilename +"\\test1.tst";//defaultDir + "\\" + fileName;
 		if(result == IDOK) {
@@ -340,11 +357,15 @@ void CIceLemonDlg::UpdateIPAddressListItem()
 	UpdateData(TRUE);
 	int index = m_page_chariot.cbxEndpoint1.GetCurSel();
 	CString s;
-	m_page_chariot.cbxEndpoint1.GetLBText(index,s);
+	if(index >= 0 )
+		m_page_chariot.cbxEndpoint1.GetLBText(index,s);
+	else 
+		m_page_chariot.cbxEndpoint1.GetWindowText(s);
 	s1[0] = s;
 
 	for(i=1; i<=4; i++){
-		m_page_chariot.cbxEndpoint1.GetLBText(index,s);
+		if(i <= m_page_chariot.cbxEndpoint1.GetCount())
+			m_page_chariot.cbxEndpoint1.GetLBText(i-1,s);
 		s1[i] = s;
 	}
 	m_page_chariot.cbxEndpoint1.ResetContent();
@@ -354,11 +375,15 @@ void CIceLemonDlg::UpdateIPAddressListItem()
 		m_page_chariot.cbxEndpoint1.AddString(s1[i]);
 
 	index = m_page_chariot.cbxEndpoint2.GetCurSel();
-	m_page_chariot.cbxEndpoint1.GetLBText(index,s);
+	if(index >= 0 )
+		m_page_chariot.cbxEndpoint2.GetLBText(index,s);
+	else 
+		m_page_chariot.cbxEndpoint2.GetWindowText(s);
 	s2[0] =  s;
 
 	for(i=1; i<=4; i++){
-		m_page_chariot.cbxEndpoint2.GetLBText(index,s);
+		if(i <= m_page_chariot.cbxEndpoint2.GetCount())
+			m_page_chariot.cbxEndpoint2.GetLBText(i-1,s);
 		s2[i] = s;
 	}
 
@@ -441,6 +466,11 @@ void CIceLemonDlg::onBtnRun()
 				break;
 			case 5://******* Check test duration setting
 				if (CheckTestDuration() == false)
+				{
+					state = 99;
+					break;
+				}
+				if(CheckEndpointIP() == false)
 				{
 					state = 99;
 					break;
@@ -554,6 +584,9 @@ int CIceLemonDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	ChariotParameter.TwoWay = false;
 	// set pre run time
 	PreRunDuration = 5;
+	// the default max throughput for plot
+	maxThroughput = 30;
+
 	// Set save state to false
 	IsSave = false;
 	return 0;

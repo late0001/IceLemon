@@ -45,11 +45,13 @@ public:
 	void OnKillfocusCbxProtocol();
 	void OnClickedBtnScript();
 	void OnClickedCkbSaveTst();
-	void PrintlnToMemo(CString str);
+	void PrintToMemo(CString str, int autoScrollToCur = 0);
+	void PrintlnToMemo(CString str, int autoScrollToCur = 0);
 	int  PingCmd();
 	void GetLocalIPInfo();
 	void InitChariotPage();
 	bool CheckCardSetting();
+	bool CheckEndpointIP();
 	bool CheckTestDuration();
 	bool CheckTestDirection();
 	void CalculateLoopCount();
@@ -79,6 +81,8 @@ public:
 	int CurrentLoopCount;
 	int totalTestItem, totalTestTime;
 	int FinishChariotRoundCount;
+	double maxThroughput;
+
 	RunThread *MyRunThread;
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	

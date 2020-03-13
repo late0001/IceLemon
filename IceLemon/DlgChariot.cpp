@@ -67,6 +67,7 @@ BEGIN_MESSAGE_MAP(CDlgChariot, CDialogEx)
 	ON_CBN_KILLFOCUS(IDC_CBX_PROTOCOL, &CDlgChariot::OnKillfocusCbxProtocol)
 //	ON_BN_CLICKED(IDC_CKB_SAVETST, &CDlgChariot::OnBnClickedCkbSavetst)
 ON_BN_CLICKED(IDC_CKB_SAVETST, &CDlgChariot::OnClickedCkbSaveTst)
+ON_BN_CLICKED(IDC_BTN_UPD_CD, &CDlgChariot::OnClickedBtnUpdateChariotParamData)
 END_MESSAGE_MAP()
 
 
@@ -77,10 +78,7 @@ int CDlgChariot::setContext(CIceLemonDlg *context)
 	return (this->pIceLemonDlg != NULL);
 }
 
-void CDlgChariot::OnBnClickedCheck3()
-{
-	// TODO: 在此添加控件通知处理程序代码
-}
+
 
 
 void CDlgChariot::OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult)
@@ -188,4 +186,16 @@ void CDlgChariot::OnClickedCkbSaveTst()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	pIceLemonDlg->OnClickedCkbSaveTst();
+}
+
+
+void CDlgChariot::OnClickedBtnUpdateChariotParamData()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString ep1,ep2;
+	cbxEndpoint1.GetWindowText(ep1);
+	cbxEndpoint2.GetWindowText(ep2);
+	pIceLemonDlg->ChariotParameter.e1 = ep1;
+	pIceLemonDlg->ChariotParameter.e2 = ep2;
+	
 }

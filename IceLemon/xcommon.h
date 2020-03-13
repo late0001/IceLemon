@@ -40,12 +40,15 @@ private:
 	 struct SFlag Flag;
 	 unsigned long test, run, pair[15];
 	 bool IsError;
+	 double avg1, avg2, avg3, avg4,avg5, avg6;
 public:
 	 RunThread();
 	 RunThread(CIceLemonDlg *pDlg, bool CreateSuspended);
 	 void SetContext(CIceLemonDlg *pDlg);
 	 bool SetupChariot(int x, unsigned long TestDuration);
 	 CString GetChariotStatus(char x);
+	 void GetThroughput(int x, int h);
+	 void GetThroughput(int AttIndex, int x, int h);
 	 bool EndChariotTest();
 	 void Creat_Test();
 	 void Creat_Pair(unsigned int n);

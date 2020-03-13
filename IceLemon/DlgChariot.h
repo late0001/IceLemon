@@ -20,8 +20,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
 
 	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnBnClickedCheck3();
+
 
 public:
 	int setContext(CIceLemonDlg *pDlg);
@@ -59,4 +58,5 @@ public:
 	afx_msg void OnKillfocusCbxProtocol();
 //	afx_msg void OnBnClickedCkbSavetst();
 	afx_msg void OnClickedCkbSaveTst();
+	afx_msg void OnClickedBtnUpdateChariotParamData();
 };
