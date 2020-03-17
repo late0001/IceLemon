@@ -691,7 +691,7 @@ void RunThread::GetThroughput(int x, int h)
 // 			CHR_pair_delete(pair[k]);
 // 
 // 		CHR_test_delete(test);
-
+		th_curve.th_val = avg1;
 		break;
 	case 2:    //E2->E1
 		PairNum = pIceLemonDlg->m_page_chariot.E21PairCount;
@@ -724,7 +724,7 @@ void RunThread::GetThroughput(int x, int h)
 // 			CHR_pair_delete(pair[k]);
 // 
 // 		CHR_test_delete(test);
-
+		th_curve.th_val = avg2;
 		break;
 	case 3:  //E1<->E2
 		PairNum = pIceLemonDlg->m_page_chariot.E1221PairCount;
@@ -781,7 +781,150 @@ void RunThread::GetThroughput(int x, int h)
 // 			CHR_pair_delete(pair[k]);
 // 
 // 		CHR_test_delete(test);
+		th_curve.th_val = avg3+avg4;
+		break;
 
+	}  // end for "switch(ChariotParameter.Test_Direction[i])"
+	//pIceLemonDlg->SendMessage(WM_UPDATEUSERDATA, false, 0);
+}
+
+void RunThread::GetThroughputMax(int x, int h)
+{
+	CString DisplayWord;
+	int rc, PairNum, k;
+	unsigned long i;
+	double avg;
+	char tmp[128];
+	//pIceLemonDlg->SendMessage(WM_UPDATEUSERDATA, true, 0);
+	switch(x)
+	{
+	case 1:   //E1->E2
+		PairNum = pIceLemonDlg->m_page_chariot.E12PairCount;
+		avg1 = 0;
+
+		for (k=1; k<=PairNum; k++)
+		{
+			avg = 0;
+			rc = CHR_pair_results_get_maximum(pair[k], CHR_RESULTS_THROUGHPUT, &avg);
+
+			if (rc != CHR_OK){
+				avg = 0;
+				pIceLemonDlg->PrintlnToMemo("Error occur");
+			}
+			avg1 = avg1 + avg;
+		}
+
+		// 		if ( (avg1 < 0.0001) || (avg1 > 1000) )
+		// 		{
+		// 			avg1 = 0;
+		// 		}
+
+		if ((h != 1) || (ChariotParameter.Round_Count != 2))
+		{
+			pIceLemonDlg->PrintlnToMemo("");
+			DisplayWord.Format("Endpoint1 -> Endpoint2 throughput: %3.2f Mbps", avg1);
+			pIceLemonDlg->PrintlnToMemo(DisplayWord);
+		}
+
+		// set flag for throughput > MaxThroughput
+		if (avg1 > pIceLemonDlg->maxThroughput)
+		{
+			pIceLemonDlg->maxThroughput = avg1;
+		}
+
+		// 		for (k=1; k<=PairNum; k++)
+		// 			CHR_pair_delete(pair[k]);
+		// 
+		// 		CHR_test_delete(test);
+		th_curve.th_val_max = avg1;
+		break;
+	case 2:    //E2->E1
+		PairNum = pIceLemonDlg->m_page_chariot.E21PairCount;
+
+		avg2 = 0;
+
+		for (k=1; k<=PairNum; k++)
+		{
+			avg = 0;
+			rc = CHR_pair_results_get_maximum(pair[k], CHR_RESULTS_THROUGHPUT, &avg);
+			if (rc != CHR_OK)
+				avg = 0;
+
+			avg2 = avg2 + avg;
+		}
+
+
+		pIceLemonDlg->PrintlnToMemo("");
+		DisplayWord.Format("Endpoint2 -> Endpoint1 throughput: %3.2f Mbps", avg2);
+		pIceLemonDlg->PrintlnToMemo(DisplayWord);
+
+		// set flag for throughput > MaxThroughput
+		if (avg2 > pIceLemonDlg->maxThroughput)
+		{
+			pIceLemonDlg->maxThroughput = avg2;
+		}
+
+		// 		for (k=1; k<=PairNum; k++)
+		// 			CHR_pair_delete(pair[k]);
+		// 
+		// 		CHR_test_delete(test);
+		th_curve.th_val_max = avg2;
+		break;
+	case 3:  //E1<->E2
+		PairNum = pIceLemonDlg->m_page_chariot.E1221PairCount;
+
+		pIceLemonDlg->PrintlnToMemo("");
+		pIceLemonDlg->PrintlnToMemo("--- Down&Up Link test ---");
+
+		avg3 = 0;
+
+		for (k=1; k<=PairNum; k++)
+		{
+			avg = 0;
+			rc = CHR_pair_results_get_maximum(pair[k], CHR_RESULTS_THROUGHPUT, &avg);
+
+			if (rc != CHR_OK)
+				avg = 0;
+
+			avg3 = avg3 + avg;
+		}
+
+
+
+		pIceLemonDlg->PrintlnToMemo("");
+		DisplayWord.Format("Endpoint1 -> Endpoint2 throughput: %3.2f Mbps", avg3);
+		pIceLemonDlg->PrintlnToMemo(DisplayWord);
+
+		avg4 = 0;
+
+		for (k=PairNum+1; k<=PairNum*2; k++)
+		{
+			avg = 0;
+			rc = CHR_pair_results_get_maximum(pair[k], CHR_RESULTS_THROUGHPUT, &avg);
+			if (rc != CHR_OK)
+				avg = 0;
+
+			avg4 = avg4 + avg;
+		}
+
+		pIceLemonDlg->PrintlnToMemo("");
+		DisplayWord.Format("Endpoint2 -> Endpoint1 throughput: %3.2f Mbps", avg4);
+		pIceLemonDlg->PrintlnToMemo(DisplayWord);
+
+		pIceLemonDlg->PrintlnToMemo("");
+		DisplayWord.Format("Sum of Bi-direction throughput: %3.2f Mbps", avg3+avg4);
+		pIceLemonDlg->PrintlnToMemo(DisplayWord);
+
+		if ((avg3 + avg4) > pIceLemonDlg->maxThroughput)
+		{
+			pIceLemonDlg->maxThroughput = avg3 + avg4;
+		}
+
+		// 		for (k=1; k<=PairNum*2; k++)
+		// 			CHR_pair_delete(pair[k]);
+		// 
+		// 		CHR_test_delete(test);
+		th_curve.th_val_max = avg3+avg4;
 		break;
 
 	}  // end for "switch(ChariotParameter.Test_Direction[i])"
@@ -906,6 +1049,9 @@ int RunThread::Run()
 				}else {
 					if(difftime(tNow,tStart) > tCntSec) {
 						GetThroughput(ChariotParameter.Test_Direction[i],h);
+						GetThroughputMax(ChariotParameter.Test_Direction[i],h);
+						th_curve.cur_idx = tCntSec;
+						pIceLemonDlg->SendMessage(WM_UPDATE_CHART,(WPARAM)&th_curve, NULL);
 						tCntSec++;
 					}
 					pIceLemonDlg->m_page_main.m_redit.SetSel(-1,-1);

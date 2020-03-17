@@ -44,6 +44,7 @@ BEGIN_MESSAGE_MAP(CDlgMain, CDialogEx)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_BTN_PING, &CDlgMain::OnBnClickedBtnPing)
 	ON_BN_CLICKED(IDC_BTN_IPCONF, &CDlgMain::OnBnClickedBtnIpconf)
+	ON_BN_CLICKED(IDC_BTN_CLEAR, &CDlgMain::OnBnClickedBtnClear)
 END_MESSAGE_MAP()
 
 
@@ -152,4 +153,11 @@ void CDlgMain::OnBnClickedBtnIpconf()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	pIceLemonDlg->GetLocalIPInfo();
+}
+
+
+void CDlgMain::OnBnClickedBtnClear()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_redit.SetWindowText("");
 }

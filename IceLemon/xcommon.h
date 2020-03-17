@@ -28,8 +28,18 @@ struct SFlag
 		Abort;
 };
 
-#define  WM_UPDATEUSERDATA (WM_USER + 1)
-#define WM_UPDATE_STEXT (WM_USER + 2 )
+typedef struct _Through_Curve_X{
+	int cnt;
+	int cur_idx;
+	double th_val;
+	double th_val_max;
+	POINT point[15];
+}Through_Curve_X, *PThrough_Curve_X;
+
+#define	WM_UPDATEUSERDATA	(WM_USER + 1)
+#define	WM_UPDATE_STEXT	(WM_USER + 2)
+#define	WM_UPDATE_CHART	(WM_USER + 3)
+
 class CIceLemonDlg;
 class RunThread :public CWinThread
 {
@@ -41,6 +51,7 @@ private:
 	 unsigned long test, run, pair[15];
 	 bool IsError;
 	 double avg1, avg2, avg3, avg4,avg5, avg6;
+	 Through_Curve_X th_curve;
 public:
 	 RunThread();
 	 RunThread(CIceLemonDlg *pDlg, bool CreateSuspended);
@@ -48,6 +59,7 @@ public:
 	 bool SetupChariot(int x, unsigned long TestDuration);
 	 CString GetChariotStatus(char x);
 	 void GetThroughput(int x, int h);
+	 void GetThroughputMax(int x, int h);
 	 void GetThroughput(int AttIndex, int x, int h);
 	 bool EndChariotTest();
 	 void Creat_Test();

@@ -7,6 +7,9 @@
 #include "DlgMain.h"
 #include "DlgChariot.h"
 #include "xcommon.h"
+#include "afxwin.h"
+#include <list>
+using namespace std;
 // CIceLemonDlg ¶Ô»°¿ò
 class CIceLemonDlg : public CDialogEx
 {
@@ -82,7 +85,9 @@ public:
 	int totalTestItem, totalTestTime;
 	int FinishChariotRoundCount;
 	double maxThroughput;
-
+	Through_Curve_X *th_Cx;
+	list<POINT> xl;
+	list<POINT> xl_max;
 	RunThread *MyRunThread;
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	
@@ -93,4 +98,8 @@ private:
 
 protected:
 	afx_msg LRESULT OnUpdateuserdata(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnUpdateChart(WPARAM wParam, LPARAM lParam);
+public:
+	CStatic m_chartPic;
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 };

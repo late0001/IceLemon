@@ -10,6 +10,7 @@
 #include "Ping.h"
 #include <IPHlpApi.h>
 
+using namespace std;
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -62,6 +63,7 @@ void CIceLemonDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_TAB1, m_tab);
+	DDX_Control(pDX, IDC_STATIC_T, m_chartPic);
 }
 
 BEGIN_MESSAGE_MAP(CIceLemonDlg, CDialogEx)
@@ -71,6 +73,8 @@ BEGIN_MESSAGE_MAP(CIceLemonDlg, CDialogEx)
 	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1, &CIceLemonDlg::OnTcnSelchangeTab1)
 	ON_WM_CREATE()
 	ON_MESSAGE(WM_UPDATEUSERDATA, &CIceLemonDlg::OnUpdateuserdata)
+	ON_MESSAGE(WM_UPDATE_CHART, &CIceLemonDlg::OnUpdateChart)
+	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 
@@ -296,6 +300,10 @@ void CIceLemonDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
+const int th_ulimit[5] = {
+	100, 200, 400, 800, 1000
+};
+
 // 如果向对话框添加最小化按钮，则需要下面的代码
 //  来绘制该图标。对于使用文档/视图模型的 MFC 应用程序，
 //  这将由框架自动完成。
@@ -323,6 +331,135 @@ void CIceLemonDlg::OnPaint()
 	{
 		CDialogEx::OnPaint();
 	}
+	//-----------------------------------
+
+#if 1	
+	CFont font;
+	int i; CString s;
+	font.CreateFont(13,0,0,0,FW_NORMAL,FALSE,FALSE,0,ANSI_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,DEFAULT_PITCH | FF_SWISS,NULL);
+	CWnd *pWnd=GetDlgItem(IDC_STATIC_T);
+	pWnd->Invalidate();
+	pWnd->UpdateWindow();
+	CFont *pOldFont;
+	//CBrush *pOldBrush;
+	CDC *pDC = pWnd->GetDC();
+	pDC->SetMapMode(MM_ANISOTROPIC);
+	pDC->SetViewportExt(1,1);
+	pDC->SetWindowExt(1,-1);
+	CRect rc;
+	pWnd->GetWindowRect(&rc);
+	pDC->SetViewportOrg(25,rc.bottom - rc.top - 20);
+	//CBrush *pBrush = new CBrush();
+	//pBrush->CreateSolidBrush(RGB(0,0,0));
+	
+	//pOldBrush = pDC->SelectObject(pBrush);
+	//pDC->SetBkColor(RGB(0,0,0));
+	pDC->Rectangle(-25, -25, 710, 310);
+
+	pOldFont=pDC->SelectObject(&font);   //换字体
+
+
+	CPen *pPenRed = new CPen(); //创建画笔对象
+	CPen *pPenGreen = new CPen(); //创建画笔对象
+	CPen *pPenBlack=new CPen;
+	pPenBlack->CreatePen(PS_DOT,1,RGB(0,0,0));
+	pPenRed ->CreatePen(PS_SOLID, 1, RGB(255, 0, 0)); //红色画笔
+	pPenGreen ->CreatePen(PS_SOLID, 1, RGB(0, 255, 0)); //绿色画笔
+	//选中当前红色画笔,并保存以前的画笔
+	CGdiObject *pOldPen = pDC ->SelectObject(pPenRed);
+	
+	//绘制坐标轴
+	pDC->MoveTo(0, 0);
+	pDC ->LineTo(0, 310); //竖起轴
+	pDC->MoveTo(0, 0);
+	pDC ->LineTo(700,0); //水平轴
+
+	pDC->MoveTo(0-5,310-7);//y轴箭头
+	pDC->LineTo(0,310);
+	pDC->LineTo(0+5,310-7);
+	pDC->MoveTo(700-7,0-5);//x轴箭头
+	pDC->LineTo(700,0);
+	pDC->LineTo(700-7,0+5);
+
+	pDC->TextOut(27,310,"吞吐量");
+	pDC->TextOut(27,300,"(MBps)");
+	pDC->TextOut(650,-7,"时间轴");
+	
+
+	for(i = 1; i <= 15; i++){ //横标
+		s.Format("%d", i);
+		pDC->MoveTo(i*40,0);
+		pDC->LineTo(i*40,5);
+		pDC->TextOut(i*40,-10, s);
+	}
+// 	    pDC->TextOut(7,50+0*40-5,"30");
+// 		pDC->TextOut(7,50+1*40-5,"25");
+// 		pDC->TextOut(7,50+2*40-5,"20");
+// 		pDC->TextOut(7,50+3*40-5,"15");
+// 		pDC->TextOut(7,50+4*40-5,"10");
+// 		pDC->TextOut(7,50+5*40-5,"5");
+// 		pDC->TextOut(7,50+6*40-5,"0");
+	int upper_limit=th_ulimit[0];
+	if(th_Cx != NULL){
+		for(i=0 ; i < 5; i++){
+			if(th_Cx->th_val_max<th_ulimit[i]){
+				upper_limit = th_ulimit[i];
+				break;
+			}
+		}
+	}
+	pDC->SelectObject(pPenBlack);    //换笔触
+	int y_fac = 4,
+		y_unit;
+	y_unit = 290*1.0/y_fac;
+	for(i = 0; i <= y_fac; i++){ //纵标
+		s.Format("%d", i*upper_limit/y_fac);
+		pDC->TextOut(-20,y_unit*i+5, s);
+	}
+	for (int i=1;i*y_unit<300;i++)  //行线
+	{
+		
+		pDC->MoveTo(0,y_unit*i);
+		pDC->LineTo(700,y_unit*i);
+	}
+	for(i = 1; i <= 15; i++){ //竖线
+		pDC->MoveTo(i*40,0);
+		pDC->LineTo(i*40,290);
+	}
+	pDC->SelectObject(pPenRed);    //换笔触
+	if(th_Cx != NULL){
+		// 			pDC->MoveTo(0,0);
+		 th_Cx->point[0].y =  th_Cx->th_val/upper_limit*290;
+		 th_Cx->point[0].x = th_Cx->cur_idx*40;
+		 th_Cx->point[1].y = th_Cx->th_val_max/upper_limit*290;
+		 th_Cx->point[1].x = th_Cx->cur_idx*40;
+
+		 xl.push_back(th_Cx->point[0]);
+		 xl_max.push_back(th_Cx->point[1]);
+		list<POINT>::iterator plist; 
+		plist = xl.begin();
+		pDC->MoveTo(*plist);
+		for(plist = xl.begin(); plist != xl.end(); plist++) {  
+			//POINT x = *plist; 
+			pDC->LineTo(*plist);
+		}
+		pDC->SelectObject(pPenGreen);    //换笔触
+		plist = xl_max.begin();
+		//pDC->MoveTo(0,0);
+		pDC->MoveTo(*plist);
+		for(plist = xl_max.begin(); plist != xl_max.end(); plist++) {  
+			//POINT x = *plist; 
+			pDC->LineTo(*plist);
+		}
+	}
+	//pDC->LineTo(x,y)
+	pDC->SelectObject(pOldFont);
+	pDC->SelectObject(pOldPen);
+	//pDC->SelectObject(pOldBrush);
+	delete pPenRed;
+	delete pPenGreen;
+	delete pPenBlack;
+#endif 
 }
 
 //当用户拖动最小化窗口时系统调用此函数取得光标
@@ -663,5 +800,39 @@ afx_msg LRESULT CIceLemonDlg::OnUpdateuserdata(WPARAM wParam, LPARAM lParam)
 	m_page_chariot.UpdateData(x);
 	return 0;
 }
+
+
+
+
+afx_msg LRESULT CIceLemonDlg::OnUpdateChart(WPARAM wParam, LPARAM lParam)
+{
+	Through_Curve_X *thCx =  (Through_Curve_X *)wParam;
+	th_Cx = thCx;
+	CRect rc;
+	m_chartPic.GetClientRect(&rc);
+	ScreenToClient(&rc);
+	//UpdateWindow();
+	InvalidateRect(&rc);
+	return 0;
+}
+
+
+BOOL CIceLemonDlg::OnEraseBkgnd(CDC* pDC)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	/*sint ret = CDialogEx::OnEraseBkgnd(pDC);
+	CWnd *pWnd=GetDlgItem(IDC_STATIC_T);
+	CDC *pSDC = pWnd->GetDC();
+	CBrush brush;
+	brush.CreateSolidBrush(RGB(255,0,0));
+	CRect rc;
+	pWnd->GetWindowRect(&rc);
+	pSDC->FillRect(rc, &brush);
+	
+	//return ret;
+	*/
+	return CDialogEx::OnEraseBkgnd(pDC);
+}
+
 
 

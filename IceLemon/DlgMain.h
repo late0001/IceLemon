@@ -41,4 +41,5 @@ public:
 	CButton mBtnAbort;
 	afx_msg void OnBnClickedBtnPing();
 	afx_msg void OnBnClickedBtnIpconf();
+	afx_msg void OnBnClickedBtnClear();
 };
