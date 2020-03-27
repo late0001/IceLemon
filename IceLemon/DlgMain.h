@@ -42,4 +42,9 @@ public:
 	afx_msg void OnBnClickedBtnPing();
 	afx_msg void OnBnClickedBtnIpconf();
 	afx_msg void OnBnClickedBtnClear();
+	CComboBox m_cb_WlInf;
+	afx_msg void OnBnClickedBtnConn();
+	afx_msg void OnKillfocusCbAdapter();
+	CComboBox m_cb_profile;
+	afx_msg void OnCbnSelchangeCbProfile();
 };

@@ -48,6 +48,9 @@
     <ClInclude Include="Ping.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="WlanOp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IceLemon.cpp">
@@ -78,6 +81,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Ping.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WlanOp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

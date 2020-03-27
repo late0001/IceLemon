@@ -9,6 +9,7 @@
 #include "xcommon.h"
 #include "afxwin.h"
 #include <list>
+#include "WlanOp.h"
 using namespace std;
 // CIceLemonDlg ¶Ô»°¿ò
 class CIceLemonDlg : public CDialogEx
@@ -41,6 +42,7 @@ public:
 	int m_curSelTab;
 	CDialogEx *pDlg[2];
 	afx_msg void OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	void DisplayPage(int i);
 public:
 	void InitTabCtrl();
@@ -50,6 +52,7 @@ public:
 	void OnClickedCkbSaveTst();
 	void PrintToMemo(CString str, int autoScrollToCur = 0);
 	void PrintlnToMemo(CString str, int autoScrollToCur = 0);
+	void PrintRtfToMemo(CString rtfStr);
 	int  PingCmd();
 	void GetLocalIPInfo();
 	void InitChariotPage();
@@ -64,7 +67,9 @@ public:
 	void CorrectTimeRemain(int h);
 	void SetTotalTestTime();
 	void UpdateProgress(int FinishRound);
-
+	int OnConnect();
+	int GetAvailableNetList();
+	DWORD GetProfileList();
 	void UpdateIPAddressListItem();
 	// Define Chariot struct varibles
 	struct Chariot ChariotParameter;
@@ -89,7 +94,8 @@ public:
 	list<POINT> xl;
 	list<POINT> xl_max;
 	RunThread *MyRunThread;
-	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	CWlanOp *pWlOp;
+	GUID *pGuid;
 	
 
 private:
@@ -102,4 +108,5 @@ protected:
 public:
 	CStatic m_chartPic;
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	afx_msg void OnDestroy();
 };

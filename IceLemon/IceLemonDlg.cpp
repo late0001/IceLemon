@@ -75,6 +75,7 @@ BEGIN_MESSAGE_MAP(CIceLemonDlg, CDialogEx)
 	ON_MESSAGE(WM_UPDATEUSERDATA, &CIceLemonDlg::OnUpdateuserdata)
 	ON_MESSAGE(WM_UPDATE_CHART, &CIceLemonDlg::OnUpdateChart)
 	ON_WM_ERASEBKGND()
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -115,11 +116,21 @@ void CIceLemonDlg::InitChariotPage()
 
 void CIceLemonDlg::PrintToMemo(CString str, int autoScrollToCur)
 {
-	if(autoScrollToCur) m_page_main.m_redit.LineScroll(m_page_main.m_redit.GetLineCount());
+	if(autoScrollToCur) {
+		int lineCnt = m_page_main.m_redit.GetLineCount();
+		m_page_main.m_redit.LineScroll(lineCnt);
+	}
 	m_page_main.m_redit.SetSel(-1,-1);
 	m_page_main.m_redit.ReplaceSel(str);
 }
 
+void CIceLemonDlg::PrintRtfToMemo(CString rtfStr)
+{
+	SETTEXTEX st;
+	st.codepage = 1200;
+	st.flags = ST_SELECTION | ST_KEEPUNDO ;
+	m_page_main.m_redit.SendMessage(EM_SETTEXTEX, (WPARAM)&st,(LPARAM)(LPCSTR)rtfStr);	
+}
 void CIceLemonDlg::PrintlnToMemo(CString str, int autoScrollToCur)
 {
 	if(autoScrollToCur){
@@ -251,6 +262,72 @@ void CIceLemonDlg::OnClickedCkbSaveTst()
 
 //	SetCurrentDir(Form1->WorkDictionary); 
 }
+UINT enum_wlaninf_func(LPVOID param)
+{
+	char desc[WLAN_MAX_NAME_LENGTH] ;
+	int nRet=0;
+	int i;
+	int count;
+	CIceLemonDlg *pIceLemonDlg = (CIceLemonDlg *)param;
+	CWlanOp *pWlop = new CWlanOp;
+	pIceLemonDlg->pWlOp = pWlop;
+	CComboBox *pCb = &pIceLemonDlg->m_page_main.m_cb_WlInf;
+	pWlop->setContext(pIceLemonDlg);
+	count = pWlop->GetNumberOfInterfaces();
+	//CString str;
+
+	for(i=0; i < count; i++){
+		nRet=WideCharToMultiByte(CP_OEMCP, 0, (LPCWCH)pWlop->GetDescription(i), -1, desc, 256, NULL, FALSE);
+		pCb->InsertString(i,desc);
+	}
+	return 0;
+}
+int CIceLemonDlg::GetAvailableNetList()
+{
+	int index = m_page_main.m_cb_WlInf.GetCurSel();
+	if(index == -1) index = 0;
+	pGuid = pWlOp->GetInterfaceGuid(index);
+	pWlOp->listAllNetwork(pGuid);
+	return 0;
+}
+
+DWORD CIceLemonDlg::GetProfileList()
+{
+	DWORD dwResult;
+	int i;
+	char profileName[WLAN_MAX_NAME_LENGTH] ;
+	PWLAN_PROFILE_INFO_LIST pProfileList;
+	PWLAN_PROFILE_INFO pProfileInfo;
+	CComboBox *pCb = &m_page_main.m_cb_profile; 
+	int index = m_page_main.m_cb_WlInf.GetCurSel();
+	if(index == -1) index = 0;
+	pGuid = pWlOp->GetInterfaceGuid(index);
+	dwResult = pWlOp->GetProfileList(pGuid, &pProfileList);
+	pCb->ResetContent();
+	for(i = 0; i < pProfileList->dwNumberOfItems; i++){
+		pProfileInfo = &pProfileList->ProfileInfo[i];
+		WideCharToMultiByte(CP_ACP, 0, pProfileInfo->strProfileName, WLAN_MAX_NAME_LENGTH, profileName, WLAN_MAX_NAME_LENGTH,NULL,NULL) ;
+		pCb->InsertString(i, profileName);
+	}
+	return dwResult;
+}
+
+int CIceLemonDlg::OnConnect()
+{
+	//pGuid =
+	CString str;
+	char tmp[WLAN_MAX_NAME_LENGTH];
+	WCHAR strProfileName[WLAN_MAX_NAME_LENGTH];
+	int index = m_page_main.m_cb_WlInf.GetCurSel();
+	if(index == -1) index = 0;
+	//str.Format("=== %d",index);
+	//AfxMessageBox(str);
+	m_page_main.m_cb_profile.GetWindowText((LPTSTR)tmp,WLAN_MAX_NAME_LENGTH);
+
+	pGuid = pWlOp->GetInterfaceGuid(index);
+	pWlOp->Connect(pGuid, tmp);
+	return 0;
+}
 BOOL CIceLemonDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -283,7 +360,7 @@ BOOL CIceLemonDlg::OnInitDialog()
 	// TODO: 在此添加额外的初始化代码
 	InitTabCtrl();
 	InitChariotPage();
-
+	AfxBeginThread(enum_wlaninf_func,this,0,0,0,0);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -723,7 +800,6 @@ int CIceLemonDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	PreRunDuration = 5;
 	// the default max throughput for plot
 	maxThroughput = 30;
-
 	// Set save state to false
 	IsSave = false;
 	return 0;
@@ -744,7 +820,7 @@ void CIceLemonDlg::SetTotalTestTime()
 }
 void CIceLemonDlg::CalculateTotalTestTime()
 {
-	int i, QDirCount;
+	int i;
 	
 	if (m_page_chariot.ckbEnablePreRun.GetCheck())
 	{
@@ -836,3 +912,14 @@ BOOL CIceLemonDlg::OnEraseBkgnd(CDC* pDC)
 
 
 
+
+
+void CIceLemonDlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	// TODO: 在此处添加消息处理程序代码
+	pWlOp->~CWlanOp();
+	if(pWlOp != NULL)
+		delete pWlOp;
+}

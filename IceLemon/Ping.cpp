@@ -7,7 +7,7 @@ CPing::CPing() :m_szICMPData(NULL),m_bIsInitSucc(FALSE)
 {
 	CString estr;
     WSADATA WSAData;
-	char name[125];
+	//char name[125];
 	char ip[16]={0};
 	PHOSTENT hostinfo = NULL;
     //WSAStartup(MAKEWORD(2, 2), &WSAData);

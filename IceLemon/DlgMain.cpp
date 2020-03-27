@@ -32,6 +32,8 @@ void CDlgMain::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LBL_RS, lblTimeRemainSecond);
 	DDX_Control(pDX, IDC_LBL_PROGRESSPERCENT, lblProgressPercent);
 	DDX_Control(pDX, IDC_BTN_ABORT, mBtnAbort);
+	DDX_Control(pDX, IDC_CB_ADAPTER, m_cb_WlInf);
+	DDX_Control(pDX, IDC_CB_PROFILE, m_cb_profile);
 }
 int CDlgMain::setContext(CIceLemonDlg *context)
 {
@@ -45,6 +47,10 @@ BEGIN_MESSAGE_MAP(CDlgMain, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_PING, &CDlgMain::OnBnClickedBtnPing)
 	ON_BN_CLICKED(IDC_BTN_IPCONF, &CDlgMain::OnBnClickedBtnIpconf)
 	ON_BN_CLICKED(IDC_BTN_CLEAR, &CDlgMain::OnBnClickedBtnClear)
+	ON_BN_CLICKED(IDC_BTN_CONN, &CDlgMain::OnBnClickedBtnConn)
+	ON_WM_KILLFOCUS()
+	ON_CBN_KILLFOCUS(IDC_CB_ADAPTER, &CDlgMain::OnKillfocusCbAdapter)
+	ON_CBN_SELCHANGE(IDC_CB_PROFILE, &CDlgMain::OnCbnSelchangeCbProfile)
 END_MESSAGE_MAP()
 
 
@@ -160,4 +166,29 @@ void CDlgMain::OnBnClickedBtnClear()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	m_redit.SetWindowText("");
+}
+
+
+void CDlgMain::OnBnClickedBtnConn()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	pIceLemonDlg->OnConnect();
+}
+
+
+
+
+
+void CDlgMain::OnKillfocusCbAdapter()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	pIceLemonDlg->GetAvailableNetList();
+	pIceLemonDlg->GetProfileList();
+
+}
+
+
+void CDlgMain::OnCbnSelchangeCbProfile()
+{
+	// TODO: 在此添加控件通知处理程序代码
 }
