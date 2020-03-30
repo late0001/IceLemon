@@ -822,7 +822,7 @@ void RunThread::GetThroughputMax(int x, int h)
 		if ((h != 1) || (ChariotParameter.Round_Count != 2))
 		{
 			pIceLemonDlg->PrintlnToMemo("");
-			DisplayWord.Format("Endpoint1 -> Endpoint2 throughput: %3.2f Mbps", avg1);
+			DisplayWord.Format("E1 -> E2 max throughput: %3.2f Mbps", avg1);
 			pIceLemonDlg->PrintlnToMemo(DisplayWord);
 		}
 
@@ -855,7 +855,7 @@ void RunThread::GetThroughputMax(int x, int h)
 
 
 		pIceLemonDlg->PrintlnToMemo("");
-		DisplayWord.Format("Endpoint2 -> Endpoint1 throughput: %3.2f Mbps", avg2);
+		DisplayWord.Format("E2 -> E1 max throughput: %3.2f Mbps", avg2);
 		pIceLemonDlg->PrintlnToMemo(DisplayWord);
 
 		// set flag for throughput > MaxThroughput
@@ -892,7 +892,7 @@ void RunThread::GetThroughputMax(int x, int h)
 
 
 		pIceLemonDlg->PrintlnToMemo("");
-		DisplayWord.Format("Endpoint1 -> Endpoint2 throughput: %3.2f Mbps", avg3);
+		DisplayWord.Format("E1 -> E2 max throughput: %3.2f Mbps", avg3);
 		pIceLemonDlg->PrintlnToMemo(DisplayWord);
 
 		avg4 = 0;
@@ -908,11 +908,11 @@ void RunThread::GetThroughputMax(int x, int h)
 		}
 
 		pIceLemonDlg->PrintlnToMemo("");
-		DisplayWord.Format("Endpoint2 -> Endpoint1 throughput: %3.2f Mbps", avg4);
+		DisplayWord.Format("E2 -> E1 max throughput: %3.2f Mbps", avg4);
 		pIceLemonDlg->PrintlnToMemo(DisplayWord);
 
 		pIceLemonDlg->PrintlnToMemo("");
-		DisplayWord.Format("Sum of Bi-direction throughput: %3.2f Mbps", avg3+avg4);
+		DisplayWord.Format("Sum of Bi-direction max throughput: %3.2f Mbps", avg3+avg4);
 		pIceLemonDlg->PrintlnToMemo(DisplayWord);
 
 		if ((avg3 + avg4) > pIceLemonDlg->maxThroughput)

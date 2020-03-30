@@ -197,9 +197,21 @@ void CIceLemonDlg::GetLocalIPInfo()
 			pIPAddr = &pAdapter->IpAddressList;
 			while (pIPAddr)
 			{
-				str.Format("%s\n IP: %s\tMask: %s\n",  pAdapter->Description, pIPAddr->IpAddress.String, pIPAddr->IpMask.String );
-				m_page_chariot.cbxEndpoint1.AddString(pIPAddr->IpAddress.String);
-				m_page_chariot.cbxEndpoint2.AddString(pIPAddr->IpAddress.String);
+				str.Format("%s\n type: %d\nIP: %s\tMask: %s\n", 
+					pAdapter->Description, 
+					pAdapter->Type,
+					pIPAddr->IpAddress.String, 
+					pIPAddr->IpMask.String );
+				if(strcmp(pIPAddr->IpAddress.String,"0.0.0.0")){
+
+					m_page_chariot.cbxEndpoint1.AddString(pIPAddr->IpAddress.String);
+					m_page_chariot.cbxEndpoint2.AddString(pIPAddr->IpAddress.String);
+					if(pAdapter->Type == 6 && strstr(pAdapter->Description, "PCI")){
+						m_page_chariot.cbxEndpoint1.SetWindowText(pIPAddr->IpAddress.String);
+					}
+					if(pAdapter->Type == 71 )
+						m_page_chariot.cbxEndpoint2.SetWindowText(pIPAddr->IpAddress.String);
+				}
 				PrintlnToMemo(str);
 				pIPAddr = pIPAddr->Next;
 			}
@@ -311,7 +323,21 @@ DWORD CIceLemonDlg::GetProfileList()
 	}
 	return dwResult;
 }
-
+UINT get_connect_state_func(LPVOID param)
+{
+	CIceLemonDlg *pIceLemonDlg = (CIceLemonDlg *)param;
+	CWlanOp *pWlop = pIceLemonDlg->pWlOp ;
+	PWLAN_CONNECTION_ATTRIBUTES pConnectAttr =(PWLAN_CONNECTION_ATTRIBUTES)GlobalAlloc(GMEM_ZEROINIT,sizeof(WLAN_CONNECTION_ATTRIBUTES)) ;
+	int i = 10;
+	while(i-->0){
+		pWlop->GetConnectionAttributes(*pIceLemonDlg->pGuid,&pConnectAttr);
+		Sleep(500);
+	}
+	//Sleep(500);
+	//delete pConnectAttr;
+	GlobalFree(pConnectAttr);
+	return 0;
+}
 int CIceLemonDlg::OnConnect()
 {
 	//pGuid =
@@ -326,6 +352,7 @@ int CIceLemonDlg::OnConnect()
 
 	pGuid = pWlOp->GetInterfaceGuid(index);
 	pWlOp->Connect(pGuid, tmp);
+	AfxBeginThread(get_connect_state_func,this,0,0,0);
 	return 0;
 }
 BOOL CIceLemonDlg::OnInitDialog()
@@ -376,10 +403,36 @@ void CIceLemonDlg::OnSysCommand(UINT nID, LPARAM lParam)
 		CDialogEx::OnSysCommand(nID, lParam);
 	}
 }
+typedef struct _TH_Y_AXIS{
+	int y_fac;
+	int y_ulimit;
+}TH_Y_AXIS;
 
-const int th_ulimit[5] = {
-	100, 200, 400, 800, 1000
+typedef struct _TH_X_AXIS{
+	int x_unit;
+	int x_ulimit;
+}TH_X_AXIS;
+
+const TH_Y_AXIS th_y_axis[8] = {
+	{5, 100},
+	{4, 200},
+	{4, 400},
+	{4, 800},
+	{5, 1000},
+	{6, 1200},
+	{5, 2000},
+	{6, 2400},
 };
+const TH_X_AXIS th_x_axis[] = {
+	{1, 15},
+	{2, 30},
+	{4, 60},
+	{8, 120},
+	{16,240},
+	{32,480},
+	{64,960},
+};
+
 
 // 如果向对话框添加最小化按钮，则需要下面的代码
 //  来绘制该图标。对于使用文档/视图模型的 MFC 应用程序，
@@ -441,7 +494,7 @@ void CIceLemonDlg::OnPaint()
 	CPen *pPenBlack=new CPen;
 	pPenBlack->CreatePen(PS_DOT,1,RGB(0,0,0));
 	pPenRed ->CreatePen(PS_SOLID, 1, RGB(255, 0, 0)); //红色画笔
-	pPenGreen ->CreatePen(PS_SOLID, 1, RGB(0, 255, 0)); //绿色画笔
+	pPenGreen ->CreatePen(PS_SOLID, 2, RGB(0, 255, 0)); //绿色画笔
 	//选中当前红色画笔,并保存以前的画笔
 	CGdiObject *pOldPen = pDC ->SelectObject(pPenRed);
 	
@@ -463,12 +516,13 @@ void CIceLemonDlg::OnPaint()
 	pDC->TextOut(650,-7,"时间轴");
 	
 
-	for(i = 1; i <= 15; i++){ //横标
-		s.Format("%d", i);
-		pDC->MoveTo(i*40,0);
-		pDC->LineTo(i*40,5);
-		pDC->TextOut(i*40,-10, s);
-	}
+	
+// 	for(i = 1; i <= 15; i++){ //横标
+// 		s.Format("%d", i);
+// 		pDC->MoveTo(i*40,0);
+// 		pDC->LineTo(i*40,5);
+// 		pDC->TextOut(i*40,-10, s);
+// 	}
 // 	    pDC->TextOut(7,50+0*40-5,"30");
 // 		pDC->TextOut(7,50+1*40-5,"25");
 // 		pDC->TextOut(7,50+2*40-5,"20");
@@ -476,18 +530,28 @@ void CIceLemonDlg::OnPaint()
 // 		pDC->TextOut(7,50+4*40-5,"10");
 // 		pDC->TextOut(7,50+5*40-5,"5");
 // 		pDC->TextOut(7,50+6*40-5,"0");
-	int upper_limit=th_ulimit[0];
+	int upper_ylimit_ord= 0,
+		upper_xlimit_ord = 0;
 	if(th_Cx != NULL){
-		for(i=0 ; i < 5; i++){
-			if(th_Cx->th_val_max<th_ulimit[i]){
-				upper_limit = th_ulimit[i];
+		int len = sizeof(th_y_axis)/sizeof(th_y_axis[0]);
+		for(i=0 ; i < len; i++){
+			if(th_Cx->th_val_max<th_y_axis[i].y_ulimit){
+				upper_ylimit_ord = i;
+				break;
+			}
+		}
+		len = sizeof(th_x_axis)/sizeof(th_x_axis[0]);
+		for(i = 0; i < len; i++){
+			if(th_Cx->cur_idx < th_x_axis[i].x_ulimit){
+				upper_xlimit_ord = i;
 				break;
 			}
 		}
 	}
 	pDC->SelectObject(pPenBlack);    //换笔触
-	int y_fac = 4,
-		y_unit;
+	int y_fac = th_y_axis[upper_ylimit_ord].y_fac,
+		y_unit = 0,
+	upper_limit = th_y_axis[upper_ylimit_ord].y_ulimit;
 	y_unit = 290*1.0/y_fac;
 	for(i = 0; i <= y_fac; i++){ //纵标
 		s.Format("%d", i*upper_limit/y_fac);
@@ -499,34 +563,54 @@ void CIceLemonDlg::OnPaint()
 		pDC->MoveTo(0,y_unit*i);
 		pDC->LineTo(700,y_unit*i);
 	}
+	int x_unit_x = th_x_axis[upper_xlimit_ord].x_unit;
+	float x_unit = 40*1.0/x_unit_x;
+	for(i = 1; i <= 15; i++){
+		s.Format("%d", i*x_unit_x);
+ 		pDC->MoveTo(i*40,0);
+		pDC->LineTo(i*40,5);
+		pDC->TextOut(i*40,-10, s);
+	}
 	for(i = 1; i <= 15; i++){ //竖线
 		pDC->MoveTo(i*40,0);
 		pDC->LineTo(i*40,290);
 	}
+	pPenRed->DeleteObject();
+	pPenRed->CreatePen(PS_SOLID, 2, RGB(255, 0, 0)); //红色画笔
 	pDC->SelectObject(pPenRed);    //换笔触
-	if(th_Cx != NULL){
-		// 			pDC->MoveTo(0,0);
-		 th_Cx->point[0].y =  th_Cx->th_val/upper_limit*290;
-		 th_Cx->point[0].x = th_Cx->cur_idx*40;
-		 th_Cx->point[1].y = th_Cx->th_val_max/upper_limit*290;
-		 th_Cx->point[1].x = th_Cx->cur_idx*40;
 
-		 xl.push_back(th_Cx->point[0]);
-		 xl_max.push_back(th_Cx->point[1]);
-		list<POINT>::iterator plist; 
+	if(th_Cx != NULL){
+			if(th_Cx->cur_idx == 0){ xl.clear();}
+		// 			pDC->MoveTo(0,0);
+		 CV_META cm;
+		 cm.idx = th_Cx->cur_idx;
+		 cm.th_val=th_Cx->th_val;
+		 cm.th_val_max = th_Cx->th_val_max;
+		 xl.push_back(cm);
+		// xl_max.push_back(th_Cx->th_val_max);
+		list<CV_META>::iterator plist; 
 		plist = xl.begin();
-		pDC->MoveTo(*plist);
+		POINT p1;
+		p1.y= (*plist).th_val/upper_limit*290;
+		p1.x = (*plist).idx*x_unit;
+		pDC->MoveTo(p1);
 		for(plist = xl.begin(); plist != xl.end(); plist++) {  
-			//POINT x = *plist; 
-			pDC->LineTo(*plist);
+			POINT p2;
+			p2.y= (*plist).th_val/upper_limit*290;
+			p2.x = (*plist).idx*x_unit;
+			pDC->LineTo(p2);
 		}
 		pDC->SelectObject(pPenGreen);    //换笔触
-		plist = xl_max.begin();
+		plist = xl.begin();
 		//pDC->MoveTo(0,0);
-		pDC->MoveTo(*plist);
-		for(plist = xl_max.begin(); plist != xl_max.end(); plist++) {  
-			//POINT x = *plist; 
-			pDC->LineTo(*plist);
+		p1.y= (*plist).th_val_max/upper_limit*290;
+		p1.x = (*plist).idx*x_unit;
+		pDC->MoveTo(p1);
+		for(plist = xl.begin(); plist != xl.end(); plist++) {  
+			POINT p2;
+			p2.y= (*plist).th_val_max/upper_limit*290;
+			p2.x = (*plist).idx*x_unit;
+			pDC->LineTo(p2);
 		}
 	}
 	//pDC->LineTo(x,y)

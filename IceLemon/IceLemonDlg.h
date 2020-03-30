@@ -11,6 +11,12 @@
 #include <list>
 #include "WlanOp.h"
 using namespace std;
+
+typedef struct _CV_META{
+	int idx;
+	float th_val;
+	float th_val_max;
+}CV_META;
 // CIceLemonDlg ¶Ô»°¿ò
 class CIceLemonDlg : public CDialogEx
 {
@@ -91,8 +97,8 @@ public:
 	int FinishChariotRoundCount;
 	double maxThroughput;
 	Through_Curve_X *th_Cx;
-	list<POINT> xl;
-	list<POINT> xl_max;
+	list<CV_META> xl;
+	//list<double> xl_max;
 	RunThread *MyRunThread;
 	CWlanOp *pWlOp;
 	GUID *pGuid;

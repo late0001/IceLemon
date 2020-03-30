@@ -168,6 +168,8 @@ DWORD CWlanOp::GetConnectionAttributes(
 {
 	DWORD dwDataSize = 0;
 	DWORD dwRet = ERROR_SUCCESS;
+	CString str;
+	BOOL isConnected = FALSE;
 	errorState = WlanQueryInterface(
 		hClientHandle,
 		&Guid,
@@ -177,6 +179,41 @@ DWORD CWlanOp::GetConnectionAttributes(
 		(PVOID*)ppConnAttr,
 		NULL
 		);
+	PWLAN_CONNECTION_ATTRIBUTES pConnAttr = NULL;
+	pConnAttr = *ppConnAttr;
+	switch (pConnAttr->isState) {
+	case wlan_interface_state_not_ready:
+		str = "Not ready";
+		break;
+	case wlan_interface_state_connected:
+		str = "Connected";
+		isConnected = TRUE;
+		break;
+	case wlan_interface_state_ad_hoc_network_formed:
+		str = "First node in a ad hoc network";
+		break;
+	case wlan_interface_state_disconnecting:
+		str = "Disconnecting";
+		break;
+	case wlan_interface_state_disconnected:
+		str = "Not connected";
+		break;
+	case wlan_interface_state_associating:
+		str = "Attempting to associate with a network";
+		break;
+	case wlan_interface_state_discovering:
+		str = "Auto configuration is discovering settings for the network";
+		break;
+	case wlan_interface_state_authenticating:
+		str = "In process of authenticating";
+		break;
+	default:
+		str = "Unknown state ";
+		break;
+	}
+	PrintlnToMemo(str);
+	//if(isConnected )
+	
 	dwRet = errorState;
 	return dwRet;
 }
@@ -231,6 +268,10 @@ void CWlanOp::listAllNetwork(GUID *pGuid)
 	/*Á¬½ÓÍøÂç*/
 	bool resultSearch = true;
 	GetAvailableNetworkList(pGuid, &pNetList);
+	if(pNetList == NULL){ 
+		PrintlnToMemo("Can not get available network list");
+		return ;
+	}
 	str.Format("ssid \t");
 	PrintToMemo(str);
 	str.Format("uNumberOfPhyTypes \t");
@@ -268,6 +309,7 @@ void CWlanOp::listAllNetwork(GUID *pGuid)
 		"\\pard\\nowidctlpar\\sa200\\sl276\\slmult1\\kerning0\\f2\\fs22\\lang2052\\par"
 		"}";
 	pDlg->PrintRtfToMemo(szBuf);
+
 }
 
 
@@ -289,15 +331,20 @@ int CWlanOp::setContext(CIceLemonDlg *pDialog)
 	pDlg = pDialog;
 	return 0;
 }
+#endif
 void CWlanOp::PrintToMemo(CString str, int autoScrollToCur)
 {
+#ifdef OUTPUT_DEBUG_INFO
 	pDlg->PrintToMemo(str, autoScrollToCur);
+#endif
 }
 void CWlanOp::PrintlnToMemo(CString str, int autoScrollToCur)
 {
+#ifdef OUTPUT_DEBUG_INFO
 	pDlg->PrintlnToMemo(str,autoScrollToCur);
-}
 #endif
+}
+
 
 #if 1
 int CWlanOp::Connect(GUID *pGuid, CHAR *ucSsid){

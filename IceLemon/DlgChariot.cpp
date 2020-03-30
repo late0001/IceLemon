@@ -197,5 +197,12 @@ void CDlgChariot::OnClickedBtnUpdateChariotParamData()
 	cbxEndpoint2.GetWindowText(ep2);
 	pIceLemonDlg->ChariotParameter.e1 = ep1;
 	pIceLemonDlg->ChariotParameter.e2 = ep2;
-	
+	ckbEndpoint12.SetCheck(1);
+	E12PairCount = 5;
+	cbxProtocol.SetCurSel(1);
+	CString fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\Scripts\\Throughput.scr";	//默认打开的文件名
+	strcpy_s(pIceLemonDlg->ChariotParameter.script, fileName);
+	pIceLemonDlg->m_page_chariot.lblScript.SetWindowText(fileName);
+	m_edit_sec = 16;
+	UpdateData(FALSE);
 }
