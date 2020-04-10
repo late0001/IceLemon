@@ -61,10 +61,12 @@ public:
 	void PrintRtfToMemo(CString rtfStr);
 	int  PingCmd();
 	void GetLocalIPInfo();
+	void GetLocalIPInfo(int index, CString &str_addr);
 	void InitChariotPage();
 	bool CheckCardSetting();
 	bool CheckEndpointIP();
 	bool CheckTestDuration();
+	bool CheckUseCase();
 	bool CheckTestDirection();
 	void CalculateLoopCount();
 	void ChariotCheck(CHR_HANDLE handle, CHR_API_RC code, CHR_STRING where);
@@ -73,9 +75,10 @@ public:
 	void CorrectTimeRemain(int h);
 	void SetTotalTestTime();
 	void UpdateProgress(int FinishRound);
-	int OnConnect();
+	int OnConnect( int index, char *profile, int wait);
+	int OnConnect(struct Chariot *chariot);
 	int GetAvailableNetList();
-	DWORD GetProfileList();
+	DWORD GetProfileList(int index);
 	void UpdateIPAddressListItem();
 	// Define Chariot struct varibles
 	struct Chariot ChariotParameter;
@@ -102,6 +105,7 @@ public:
 	RunThread *MyRunThread;
 	CWlanOp *pWlOp;
 	GUID *pGuid;
+	int cur_is_connected;
 	
 
 private:

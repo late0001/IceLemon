@@ -2,6 +2,7 @@
 #define __X_COMMON_H__248990009877__
 #include "afxwin.h"
 #define EPDirectionCnt  4
+#include "wlanapi.h"
 
 struct Chariot
 {
@@ -12,12 +13,20 @@ struct Chariot
 	CString testfile;    // The pointer which point to Chariot test file
 	char protocol;
 	bool TwoWay;   // Define if Tx/RX simultaneous test enable
+	int use_case;
 	unsigned long testduration,
+		duration_single,
 		Pair_Count,
 		Round_Count,
 		Test_Direction[EPDirectionCnt],   //index 0 not use
 		iteration;
 	unsigned long PairNum[3]; //how many Pair Numbers in each direction  //2008/3/20
+	int card1_index;
+	int card2_index;
+	char profile1[WLAN_MAX_NAME_LENGTH];
+	char profile2[WLAN_MAX_NAME_LENGTH];
+	CString str_ap1_addr;
+	CString str_ap2_addr;
 };
 
 // Define flag varibles

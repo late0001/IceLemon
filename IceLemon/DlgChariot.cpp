@@ -20,6 +20,9 @@ CDlgChariot::CDlgChariot(CWnd* pParent /*=NULL*/)
 	, E12PairCount(1)
 	, E21PairCount(1)
 	, E1221PairCount(1)
+	, m_edit_hour_s(0)
+	, m_edit_min_s(0)
+	, m_edit_sec_s(30)
 {
 
 }
@@ -54,6 +57,19 @@ void CDlgChariot::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CKB_PRERUN, ckbEnablePreRun);
 	DDX_Control(pDX, IDC_LBL_SCRIPT, lblScript);
 	DDX_Control(pDX, IDC_CBX_PROTOCOL, cbxProtocol);
+	DDX_Text(pDX, IDC_EDT_HOUR2, m_edit_hour_s);
+	DDV_MinMaxInt(pDX, m_edit_hour_s, 0, 60);
+	DDX_Text(pDX, IDC_EDT_MIN2, m_edit_min_s);
+	DDV_MinMaxInt(pDX, m_edit_min_s, 0, 60);
+	DDX_Text(pDX, IDC_EDT_SEC2, m_edit_sec_s);
+	DDV_MinMaxInt(pDX, m_edit_sec_s, 0, 60);
+	DDX_Control(pDX, IDC_CBX_TESTCASE, m_cbx_use_case);
+	DDX_Control(pDX, IDC_CBX_CARD1, m_cbx_card1);
+	DDX_Control(pDX, IDC_CBX_CARD2, m_cbx_card2);
+	DDX_Control(pDX, IDC_CBX_PROFILE1, m_cbx_profile1);
+	DDX_Control(pDX, IDC_CBX_PROFILE2, m_cbx_profile2);
+	DDX_Control(pDX, IDC_IPADDR_AP1, m_ip_ap1);
+	DDX_Control(pDX, IDC_IPADDR_AP2, m_ip_ap2);
 }
 
 
@@ -68,6 +84,12 @@ BEGIN_MESSAGE_MAP(CDlgChariot, CDialogEx)
 //	ON_BN_CLICKED(IDC_CKB_SAVETST, &CDlgChariot::OnBnClickedCkbSavetst)
 ON_BN_CLICKED(IDC_CKB_SAVETST, &CDlgChariot::OnClickedCkbSaveTst)
 ON_BN_CLICKED(IDC_BTN_UPD_CD, &CDlgChariot::OnClickedBtnUpdateChariotParamData)
+ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN5, &CDlgChariot::OnDeltaposSpin5)
+ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN6, &CDlgChariot::OnDeltaposSpin6)
+ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN7, &CDlgChariot::OnDeltaposSpin7)
+ON_CBN_KILLFOCUS(IDC_CBX_CARD1, &CDlgChariot::OnCbnKillfocusCbxCard1)
+ON_CBN_KILLFOCUS(IDC_CBX_CARD2, &CDlgChariot::OnCbnKillfocusCbxCard2)
+ON_BN_CLICKED(IDC_BUTTON2, &CDlgChariot::OnBnClickedButton2)
 END_MESSAGE_MAP()
 
 
@@ -204,5 +226,81 @@ void CDlgChariot::OnClickedBtnUpdateChariotParamData()
 	strcpy_s(pIceLemonDlg->ChariotParameter.script, fileName);
 	pIceLemonDlg->m_page_chariot.lblScript.SetWindowText(fileName);
 	m_edit_sec = 16;
+	m_cbx_card1.SetCurSel(0);
+	m_cbx_use_case.SetCurSel(1);
+	m_ip_ap2.SetWindowTextA("192.168.1.102");
+	pIceLemonDlg->ChariotParameter.e2 = "192.168.1.102";
 	UpdateData(FALSE);
+}
+
+
+void CDlgChariot::OnDeltaposSpin5(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	UpdateData(true);
+	if(pNMUpDown->iDelta == -1){
+		m_edit_hour_s +=1;
+
+	}else if(pNMUpDown->iDelta == 1){
+		m_edit_hour_s -=1;
+	}
+	UpdateData(false);
+	*pResult = 0;
+}
+
+
+void CDlgChariot::OnDeltaposSpin6(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	UpdateData(true);
+	if(pNMUpDown->iDelta == -1){
+		m_edit_min_s +=1;
+
+	}else if(pNMUpDown->iDelta == 1){
+		m_edit_min_s -=1;
+	}
+	UpdateData(false);
+	*pResult = 0;
+}
+
+
+void CDlgChariot::OnDeltaposSpin7(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	UpdateData(true);
+	if(pNMUpDown->iDelta == -1){
+		m_edit_sec_s +=1;
+
+	}else if(pNMUpDown->iDelta == 1){
+		m_edit_sec_s -=1;
+	}
+	UpdateData(false);
+	// TODO: 在此添加控件通知处理程序代码
+	*pResult = 0;
+}
+
+
+void CDlgChariot::OnCbnKillfocusCbxCard1()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	int index = m_cbx_card1.GetCurSel();
+	pIceLemonDlg->GetProfileList(index);
+}
+
+
+void CDlgChariot::OnCbnKillfocusCbxCard2()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	int index = m_cbx_card2.GetCurSel();
+	pIceLemonDlg->GetProfileList(index);
+}
+
+
+void CDlgChariot::OnBnClickedButton2()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString ap;
+	pIceLemonDlg->GetLocalIPInfo(m_cbx_card1.GetCurSel(),ap);
+	AfxMessageBox(ap);
+
 }

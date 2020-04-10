@@ -172,7 +172,11 @@ void CDlgMain::OnBnClickedBtnClear()
 void CDlgMain::OnBnClickedBtnConn()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	pIceLemonDlg->OnConnect();
+	char tmp[WLAN_MAX_NAME_LENGTH];
+	int index = m_cb_WlInf.GetCurSel();
+	if(index == -1) index = 0;
+	m_cb_profile.GetWindowText((LPTSTR)tmp,WLAN_MAX_NAME_LENGTH);
+	pIceLemonDlg->OnConnect(index, tmp, 0);
 }
 
 
@@ -183,7 +187,9 @@ void CDlgMain::OnKillfocusCbAdapter()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	pIceLemonDlg->GetAvailableNetList();
-	pIceLemonDlg->GetProfileList();
+
+	int index = m_cb_WlInf.GetCurSel();
+	pIceLemonDlg->GetProfileList(index);
 
 }
 

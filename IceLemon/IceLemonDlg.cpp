@@ -112,6 +112,10 @@ void CIceLemonDlg::InitChariotPage()
 	m_page_chariot.cbxProtocol.AddString("TCP");
 	m_page_chariot.cbxProtocol.AddString("UDP");
 	m_page_chariot.cbxProtocol.AddString("IPX");
+	m_page_chariot.m_cbx_use_case.AddString("单卡单AP");
+	m_page_chariot.m_cbx_use_case.AddString("单卡双AP");
+	m_page_chariot.m_cbx_use_case.AddString("双卡单AP");
+	m_page_chariot.m_cbx_use_case.SetCurSel(0);
 }
 
 void CIceLemonDlg::PrintToMemo(CString str, int autoScrollToCur)
@@ -208,6 +212,7 @@ void CIceLemonDlg::GetLocalIPInfo()
 					m_page_chariot.cbxEndpoint2.AddString(pIPAddr->IpAddress.String);
 					if(pAdapter->Type == 6 && strstr(pAdapter->Description, "PCI")){
 						m_page_chariot.cbxEndpoint1.SetWindowText(pIPAddr->IpAddress.String);
+						m_page_chariot.m_ip_ap1.SetWindowText(pIPAddr->IpAddress.String);
 					}
 					if(pAdapter->Type == 71 )
 						m_page_chariot.cbxEndpoint2.SetWindowText(pIPAddr->IpAddress.String);
@@ -220,6 +225,62 @@ void CIceLemonDlg::GetLocalIPInfo()
 	} 
 	free(pAdapterInfo);
 }
+
+void CIceLemonDlg::GetLocalIPInfo(int index, CString &str_addr)
+{
+	char adapter_name[256+4];
+	
+	CString szMark;
+	CString str;
+
+	PIP_ADAPTER_INFO pAdapterInfo;
+	PIP_ADAPTER_INFO pAdapter = NULL; 
+	DWORD dwRetVal = 0; 
+	PIP_ADDR_STRING pIPAddr;
+	pAdapterInfo = ( IP_ADAPTER_INFO * ) malloc( sizeof( IP_ADAPTER_INFO ) );
+	ULONG ulOutBufLen; 
+	ulOutBufLen = sizeof(IP_ADAPTER_INFO); 
+	if(index <0)index = 0;
+	m_page_chariot.m_cbx_card1.GetLBText(index, adapter_name);
+	// 第一次调用GetAdapterInfo获取ulOutBufLen大小 
+	if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW) 
+	{ 
+		free(pAdapterInfo);
+		pAdapterInfo = (IP_ADAPTER_INFO *) malloc (ulOutBufLen); 
+	} 
+
+	if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) == NO_ERROR) 
+	{ 
+		pAdapter = pAdapterInfo; 
+		PrintToMemo("",1);
+		while (pAdapter) 
+		{
+
+			if(strcmp(pAdapter->Description, adapter_name) == 0){
+				pIPAddr = &pAdapter->IpAddressList;
+				while (pIPAddr)
+				{
+
+					if(strcmp(pIPAddr->IpAddress.String,"0.0.0.0")){
+						str.Format("%s\n type: %d\nIP: %s\tMask: %s\n", 
+							pAdapter->Description, 
+							pAdapter->Type,
+							pIPAddr->IpAddress.String, 
+							pIPAddr->IpMask.String );
+						str_addr = pIPAddr->IpAddress.String;
+					}
+					PrintlnToMemo(str);
+					pIPAddr = pIPAddr->Next;
+				}
+			}
+
+			pAdapter = pAdapter->Next; 
+		} 
+	} 
+	free(pAdapterInfo);
+}
+
+
 void CIceLemonDlg::OnClickedBtnScript()
 {
 	CString defaultExt = "*.scr";	//默认打开的文件路径
@@ -284,6 +345,8 @@ UINT enum_wlaninf_func(LPVOID param)
 	CWlanOp *pWlop = new CWlanOp;
 	pIceLemonDlg->pWlOp = pWlop;
 	CComboBox *pCb = &pIceLemonDlg->m_page_main.m_cb_WlInf;
+	CComboBox *pCb1 = &pIceLemonDlg->m_page_chariot.m_cbx_card1;
+	CComboBox *pCb2 = &pIceLemonDlg->m_page_chariot.m_cbx_card2;
 	pWlop->setContext(pIceLemonDlg);
 	count = pWlop->GetNumberOfInterfaces();
 	//CString str;
@@ -291,6 +354,8 @@ UINT enum_wlaninf_func(LPVOID param)
 	for(i=0; i < count; i++){
 		nRet=WideCharToMultiByte(CP_OEMCP, 0, (LPCWCH)pWlop->GetDescription(i), -1, desc, 256, NULL, FALSE);
 		pCb->InsertString(i,desc);
+		pCb1->InsertString(i,desc);
+		pCb2->InsertString(i,desc);
 	}
 	return 0;
 }
@@ -303,7 +368,7 @@ int CIceLemonDlg::GetAvailableNetList()
 	return 0;
 }
 
-DWORD CIceLemonDlg::GetProfileList()
+DWORD CIceLemonDlg::GetProfileList(int index)
 {
 	DWORD dwResult;
 	int i;
@@ -311,15 +376,20 @@ DWORD CIceLemonDlg::GetProfileList()
 	PWLAN_PROFILE_INFO_LIST pProfileList;
 	PWLAN_PROFILE_INFO pProfileInfo;
 	CComboBox *pCb = &m_page_main.m_cb_profile; 
-	int index = m_page_main.m_cb_WlInf.GetCurSel();
+	CComboBox *pCb1 = &m_page_chariot.m_cbx_profile1;
+	CComboBox *pCb2 = &m_page_chariot.m_cbx_profile2;
 	if(index == -1) index = 0;
 	pGuid = pWlOp->GetInterfaceGuid(index);
 	dwResult = pWlOp->GetProfileList(pGuid, &pProfileList);
 	pCb->ResetContent();
+	pCb1->ResetContent();
+	pCb2->ResetContent();
 	for(i = 0; i < pProfileList->dwNumberOfItems; i++){
 		pProfileInfo = &pProfileList->ProfileInfo[i];
 		WideCharToMultiByte(CP_ACP, 0, pProfileInfo->strProfileName, WLAN_MAX_NAME_LENGTH, profileName, WLAN_MAX_NAME_LENGTH,NULL,NULL) ;
 		pCb->InsertString(i, profileName);
+		pCb1->InsertString(i, profileName);
+		pCb2->InsertString(i, profileName);
 	}
 	return dwResult;
 }
@@ -329,18 +399,40 @@ UINT get_connect_state_func(LPVOID param)
 	CWlanOp *pWlop = pIceLemonDlg->pWlOp ;
 	PWLAN_CONNECTION_ATTRIBUTES pConnectAttr =(PWLAN_CONNECTION_ATTRIBUTES)GlobalAlloc(GMEM_ZEROINIT,sizeof(WLAN_CONNECTION_ATTRIBUTES)) ;
 	int i = 10;
+	int con_state ;
 	while(i-->0){
-		pWlop->GetConnectionAttributes(*pIceLemonDlg->pGuid,&pConnectAttr);
+		con_state = pWlop->GetConnectionAttributes(*pIceLemonDlg->pGuid, &pConnectAttr);
+		if(con_state == 1) break;
 		Sleep(500);
 	}
+	pIceLemonDlg->cur_is_connected = con_state;
 	//Sleep(500);
 	//delete pConnectAttr;
 	GlobalFree(pConnectAttr);
 	return 0;
 }
-int CIceLemonDlg::OnConnect()
+
+int CIceLemonDlg::OnConnect( int index, char *profile, int wait)
+{
+	CString str;
+
+//	WCHAR strProfileName[WLAN_MAX_NAME_LENGTH];
+	//str.Format("=== %d",index);
+	//AfxMessageBox(str);
+	if(index == -1) index = 0;
+	pGuid = pWlOp->GetInterfaceGuid(index);
+	pWlOp->Connect(pGuid, profile);
+	CWinThread *pthread = AfxBeginThread(get_connect_state_func,this,0,0,0);
+	if(wait)
+		WaitForSingleObject(pthread->m_hThread,INFINITE);
+	return 0;
+}
+
+
+int CIceLemonDlg::OnConnect(struct Chariot *chariot)
 {
 	//pGuid =
+	DWORD ret;
 	CString str;
 	char tmp[WLAN_MAX_NAME_LENGTH];
 	WCHAR strProfileName[WLAN_MAX_NAME_LENGTH];
@@ -352,9 +444,11 @@ int CIceLemonDlg::OnConnect()
 
 	pGuid = pWlOp->GetInterfaceGuid(index);
 	pWlOp->Connect(pGuid, tmp);
-	AfxBeginThread(get_connect_state_func,this,0,0,0);
+	CWinThread *pWndTh = AfxBeginThread(get_connect_state_func,this,0,0,0);
+	ret = WaitForSingleObject(pWndTh->m_hThread,INFINITE);
 	return 0;
 }
+
 BOOL CIceLemonDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -760,6 +854,10 @@ void CIceLemonDlg::onBtnRun()
 				break;
 			case 4:
 				//CheckCardSetting();
+				if(CheckUseCase() == false){
+					state = 99;
+					break;
+				}
 				state = 5;
 				break;
 			case 5://******* Check test duration setting

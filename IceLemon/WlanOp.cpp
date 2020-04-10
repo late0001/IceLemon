@@ -167,7 +167,7 @@ DWORD CWlanOp::GetConnectionAttributes(
 	)
 {
 	DWORD dwDataSize = 0;
-	DWORD dwRet = ERROR_SUCCESS;
+	DWORD dwRet = 0;//ERROR_SUCCESS;
 	CString str;
 	BOOL isConnected = FALSE;
 	errorState = WlanQueryInterface(
@@ -188,6 +188,7 @@ DWORD CWlanOp::GetConnectionAttributes(
 	case wlan_interface_state_connected:
 		str = "Connected";
 		isConnected = TRUE;
+		dwRet = 1;
 		break;
 	case wlan_interface_state_ad_hoc_network_formed:
 		str = "First node in a ad hoc network";
@@ -211,10 +212,9 @@ DWORD CWlanOp::GetConnectionAttributes(
 		str = "Unknown state ";
 		break;
 	}
-	PrintlnToMemo(str);
+	PrintlnToMemo(str,1);
 	//if(isConnected )
-	
-	dwRet = errorState;
+	//dwRet = errorState;
 	return dwRet;
 }
 
@@ -391,7 +391,7 @@ int CWlanOp::Connect(GUID *pGuid, CHAR *ucSsid){
 	}
 #ifdef OUTPUT_DEBUG_INFO	
 	else {
-		PrintlnToMemo("Connect successful!");
+		PrintlnToMemo("Call WlanConnect!");
 	}
 #endif
 	delete parameters;

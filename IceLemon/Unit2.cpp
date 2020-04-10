@@ -801,7 +801,7 @@ void RunThread::GetThroughputMax(int x, int h)
 	case 1:   //E1->E2
 		PairNum = pIceLemonDlg->m_page_chariot.E12PairCount;
 		avg1 = 0;
-
+		pIceLemonDlg->maxThroughput = avg1;
 		for (k=1; k<=PairNum; k++)
 		{
 			avg = 0;
@@ -811,7 +811,11 @@ void RunThread::GetThroughputMax(int x, int h)
 				avg = 0;
 				pIceLemonDlg->PrintlnToMemo("Error occur");
 			}
-			avg1 = avg1 + avg;
+			//avg1 = avg1 + avg;
+			if (avg > pIceLemonDlg->maxThroughput)
+			{
+				pIceLemonDlg->maxThroughput = avg;
+			}
 		}
 
 		// 		if ( (avg1 < 0.0001) || (avg1 > 1000) )
@@ -822,27 +826,23 @@ void RunThread::GetThroughputMax(int x, int h)
 		if ((h != 1) || (ChariotParameter.Round_Count != 2))
 		{
 			pIceLemonDlg->PrintlnToMemo("");
-			DisplayWord.Format("E1 -> E2 max throughput: %3.2f Mbps", avg1);
+			DisplayWord.Format("E1 -> E2 max throughput: %3.2f Mbps", pIceLemonDlg->maxThroughput);
 			pIceLemonDlg->PrintlnToMemo(DisplayWord);
 		}
 
-		// set flag for throughput > MaxThroughput
-		if (avg1 > pIceLemonDlg->maxThroughput)
-		{
-			pIceLemonDlg->maxThroughput = avg1;
-		}
+
 
 		// 		for (k=1; k<=PairNum; k++)
 		// 			CHR_pair_delete(pair[k]);
 		// 
 		// 		CHR_test_delete(test);
-		th_curve.th_val_max = avg1;
+		th_curve.th_val_max = pIceLemonDlg->maxThroughput;
 		break;
 	case 2:    //E2->E1
 		PairNum = pIceLemonDlg->m_page_chariot.E21PairCount;
 
 		avg2 = 0;
-
+		pIceLemonDlg->maxThroughput = avg2;
 		for (k=1; k<=PairNum; k++)
 		{
 			avg = 0;
@@ -850,7 +850,11 @@ void RunThread::GetThroughputMax(int x, int h)
 			if (rc != CHR_OK)
 				avg = 0;
 
-			avg2 = avg2 + avg;
+			//avg2 = avg2 + avg;
+			if (avg > pIceLemonDlg->maxThroughput)
+			{
+				pIceLemonDlg->maxThroughput = avg;
+			}
 		}
 
 
@@ -859,16 +863,13 @@ void RunThread::GetThroughputMax(int x, int h)
 		pIceLemonDlg->PrintlnToMemo(DisplayWord);
 
 		// set flag for throughput > MaxThroughput
-		if (avg2 > pIceLemonDlg->maxThroughput)
-		{
-			pIceLemonDlg->maxThroughput = avg2;
-		}
+
 
 		// 		for (k=1; k<=PairNum; k++)
 		// 			CHR_pair_delete(pair[k]);
 		// 
 		// 		CHR_test_delete(test);
-		th_curve.th_val_max = avg2;
+		th_curve.th_val_max = pIceLemonDlg->maxThroughput;
 		break;
 	case 3:  //E1<->E2
 		PairNum = pIceLemonDlg->m_page_chariot.E1221PairCount;
@@ -877,7 +878,6 @@ void RunThread::GetThroughputMax(int x, int h)
 		pIceLemonDlg->PrintlnToMemo("--- Down&Up Link test ---");
 
 		avg3 = 0;
-
 		for (k=1; k<=PairNum; k++)
 		{
 			avg = 0;
@@ -886,7 +886,10 @@ void RunThread::GetThroughputMax(int x, int h)
 			if (rc != CHR_OK)
 				avg = 0;
 
-			avg3 = avg3 + avg;
+			if (avg > avg3)
+			{
+				avg3 = avg;
+			}
 		}
 
 
@@ -904,27 +907,25 @@ void RunThread::GetThroughputMax(int x, int h)
 			if (rc != CHR_OK)
 				avg = 0;
 
-			avg4 = avg4 + avg;
+			if (avg > avg4)
+			{
+				avg4 = avg;
+			}
 		}
 
 		pIceLemonDlg->PrintlnToMemo("");
 		DisplayWord.Format("E2 -> E1 max throughput: %3.2f Mbps", avg4);
 		pIceLemonDlg->PrintlnToMemo(DisplayWord);
 
-		pIceLemonDlg->PrintlnToMemo("");
-		DisplayWord.Format("Sum of Bi-direction max throughput: %3.2f Mbps", avg3+avg4);
-		pIceLemonDlg->PrintlnToMemo(DisplayWord);
-
-		if ((avg3 + avg4) > pIceLemonDlg->maxThroughput)
-		{
-			pIceLemonDlg->maxThroughput = avg3 + avg4;
-		}
+	//	pIceLemonDlg->PrintlnToMemo("");
+	//	DisplayWord.Format("Sum of Bi-direction max throughput: %3.2f Mbps", avg3+avg4);
+	//	pIceLemonDlg->PrintlnToMemo(DisplayWord);
 
 		// 		for (k=1; k<=PairNum*2; k++)
 		// 			CHR_pair_delete(pair[k]);
 		// 
 		// 		CHR_test_delete(test);
-		th_curve.th_val_max = avg3+avg4;
+		th_curve.th_val_max =pIceLemonDlg->maxThroughput;
 		break;
 
 	}  // end for "switch(ChariotParameter.Test_Direction[i])"
@@ -974,6 +975,75 @@ int RunThread::Run()
 					break;
 				}
 				pIceLemonDlg->CurrentLoopCount = k; //to set what loop the program run now.
+				if(ChariotParameter.use_case == 1){
+					if(k % 2 == 1){
+					//Á¬Ïß
+						int retry = 5;
+						while(retry--){
+							pIceLemonDlg->OnConnect(ChariotParameter.card1_index, ChariotParameter.profile1 , 1);
+							if(pIceLemonDlg->cur_is_connected == 1)break;
+							Sleep(200);
+						}
+						if(!pIceLemonDlg->cur_is_connected) {
+							AfxMessageBox("can not connect to network!");
+							return -1;
+						}
+						//Sleep(1000);
+						ChariotParameter.e1 = ChariotParameter.str_ap1_addr;
+						ChariotParameter.e2 = "";//
+						retry = 5;
+						do{
+							pIceLemonDlg->GetLocalIPInfo(ChariotParameter.card1_index,ChariotParameter.e2);
+							if(ChariotParameter.e2 == ""){
+								DisplayWord.Format("[%d/5] Try to get ip address",6-retry);
+								pIceLemonDlg->PrintlnToMemo(DisplayWord);
+								Sleep(1000);
+								continue;
+							}else{
+								break;
+							}
+						}while(retry--);
+						if(ChariotParameter.e2 ==""){
+							AfxMessageBox("can not fetch ip address of endpoint2!");
+							return -1;
+						}
+						//else{
+						//	AfxMessageBox(ChariotParameter.e2);
+						//}
+					}else{
+					//pIceLemonDlg->OnConnect();
+						int retry = 5;
+						while(retry--){
+							pIceLemonDlg->OnConnect(ChariotParameter.card1_index, ChariotParameter.profile2 , 1);
+							if(pIceLemonDlg->cur_is_connected == 1)break;
+							Sleep(200);
+						}
+						if(!pIceLemonDlg->cur_is_connected) {
+							AfxMessageBox("can not connect to network!");
+							return -1;
+						}
+						
+						ChariotParameter.e1 = ChariotParameter.str_ap2_addr;
+						ChariotParameter.e2 = "";//
+						retry = 5;
+						do{
+							pIceLemonDlg->GetLocalIPInfo(ChariotParameter.card1_index,ChariotParameter.e2);
+							if(ChariotParameter.e2 == ""){
+								DisplayWord.Format("[%d/5] Try to get ip address",6-retry);
+								pIceLemonDlg->PrintlnToMemo(DisplayWord);
+								Sleep(1000);
+								continue;
+							}else{
+								break;
+							}
+						}while(retry--);
+						if(ChariotParameter.e2 ==""){
+							AfxMessageBox("can not fetch ip address of endpoint2!");
+							return -1;
+						}
+					}//End if(k % 2 == 1){
+				}//End if(ChariotParameter.use_case == 1){
+				//return 0;
 				pIceLemonDlg->m_page_main.SetTimer(1, 200, NULL);
 				i = 0;
 				state = 3;
@@ -1006,15 +1076,17 @@ int RunThread::Run()
 				if ((h == 1) && (ChariotParameter.Round_Count == 2))   //Pre-Run
 				{
 					TestDuration = pIceLemonDlg->PreRunDuration;
-					pIceLemonDlg->m_page_main.m_redit.SetSel(-1,-1);
-					pIceLemonDlg->m_page_main.m_redit.ReplaceSel("\r\n");
-					pIceLemonDlg->m_page_main.m_redit.ReplaceSel("*************************\r\n");
-					pIceLemonDlg->m_page_main.m_redit.ReplaceSel("Start Pre-Running...\r\n");
+					pIceLemonDlg->PrintlnToMemo("");
+					pIceLemonDlg->PrintlnToMemo("*************************");
+					pIceLemonDlg->PrintlnToMemo("Start Pre-Running...");
 					IsPreRun = true;
 				}
 				else
 				{
 					TestDuration = ChariotParameter.testduration;
+					if(ChariotParameter.use_case == 1){
+						TestDuration = ChariotParameter.duration_single;
+					}
 					IsPreRun = false;
 				}
 
