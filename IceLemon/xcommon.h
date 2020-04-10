@@ -45,6 +45,13 @@ typedef struct _Through_Curve_X{
 	POINT point[15];
 }Through_Curve_X, *PThrough_Curve_X;
 
+typedef struct _Test1_item{
+	CString e1_ip;
+	CString e2_ip;
+	double throughput;
+	long time;
+}Test1_item;
+
 #define	WM_UPDATEUSERDATA	(WM_USER + 1)
 #define	WM_UPDATE_STEXT	(WM_USER + 2)
 #define	WM_UPDATE_CHART	(WM_USER + 3)
@@ -70,6 +77,7 @@ public:
 	 void GetThroughput(int x, int h);
 	 void GetThroughputMax(int x, int h);
 	 void GetThroughput(int AttIndex, int x, int h);
+	 void SaveOneToDb();
 	 bool EndChariotTest();
 	 void Creat_Test();
 	 void Creat_Pair(unsigned int n);

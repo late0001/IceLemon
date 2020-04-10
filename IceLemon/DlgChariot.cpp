@@ -300,7 +300,10 @@ void CDlgChariot::OnBnClickedButton2()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	CString ap;
-	pIceLemonDlg->GetLocalIPInfo(m_cbx_card1.GetCurSel(),ap);
-	AfxMessageBox(ap);
+	//pIceLemonDlg->GetLocalIPInfo(m_cbx_card1.GetCurSel(),ap);
+	
+	//AfxMessageBox(ap);
+	Test1_item item;
+	pIceLemonDlg->InsertRecord(&item);
 
 }

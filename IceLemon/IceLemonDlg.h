@@ -52,6 +52,7 @@ public:
 	void DisplayPage(int i);
 public:
 	void InitTabCtrl();
+	void InitDBConn();
 	void onBtnRun();
 	void OnKillfocusCbxProtocol();
 	void OnClickedBtnScript();
@@ -80,6 +81,7 @@ public:
 	int GetAvailableNetList();
 	DWORD GetProfileList(int index);
 	void UpdateIPAddressListItem();
+	void InsertRecord(Test1_item *item);
 	// Define Chariot struct varibles
 	struct Chariot ChariotParameter;
 	// Define flag varibles
@@ -106,6 +108,8 @@ public:
 	CWlanOp *pWlOp;
 	GUID *pGuid;
 	int cur_is_connected;
+	
+	_ConnectionPtr m_pConnection;
 	
 
 private:

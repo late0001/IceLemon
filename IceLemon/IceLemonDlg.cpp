@@ -449,6 +449,28 @@ int CIceLemonDlg::OnConnect(struct Chariot *chariot)
 	return 0;
 }
 
+void CIceLemonDlg::InitDBConn()
+{
+	HRESULT hr;
+	try
+	{
+		hr = m_pConnection.CreateInstance("ADODB.Connection");///创建Connection对象
+		if(SUCCEEDED(hr))
+		{
+			m_pConnection->ConnectionTimeout = 5;
+			//"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=D:\xv\Projects\IceLemon\IceLemon\DAT.accdb"
+			hr = m_pConnection->Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=D:\\xv\\Projects\\IceLemon\\IceLemon\\DAT.accdb","","",adModeUnknown);///连接数据库
+			///上面一句中连接字串中的Provider是针对ACCESS2000环境的，对于ACCESS97,需要改为:Provider=Microsoft.Jet.OLEDB.3.51;
+		}
+	}
+	catch(_com_error e)///捕捉异常
+	{
+		CString errormessage;
+		errormessage.Format("连接数据库失败!\r错误信息:%s",e.ErrorMessage());
+		AfxMessageBox(errormessage);///显示错误信息
+	} 
+}
+
 BOOL CIceLemonDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -482,7 +504,35 @@ BOOL CIceLemonDlg::OnInitDialog()
 	InitTabCtrl();
 	InitChariotPage();
 	AfxBeginThread(enum_wlaninf_func,this,0,0,0,0);
+	InitDBConn();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
+}
+
+void CIceLemonDlg::InsertRecord(Test1_item *item)
+{
+	///往表格里面添加记录
+	 _variant_t RecordsAffected;
+	CString sql;
+#if 1
+	sql.Format("INSERT INTO test1(endpoint1_ip,endpoint2_ip,throughput_avg,time1) VALUES ( '%s','%s',%f,Format(Now(),'hh:mm:ss'))",
+		item->e1_ip.GetBuffer(item->e1_ip.GetLength()), 
+		item->e2_ip.GetBuffer(item->e2_ip.GetLength()),
+		item->throughput
+		);
+#else 
+	sql = "INSERT INTO test1(endpoint1_ip,endpoint2_ip,throughput_avg,time1) VALUES ( 'ss','bb',1,Format(Now(),'hh:mm:ss'))";
+#endif
+
+	try{
+		if(m_pConnection == NULL)
+			InitDBConn();
+		//m_pConnection->Execute(_bstr_t(sql),&RecordsAffected,adCmdText);
+		m_pConnection->Execute(_bstr_t(sql),NULL,adCmdText);
+	}catch(_com_error e){
+		CString errormessage;
+		errormessage.Format("失败!\r\n错误信息:%s",e.ErrorMessage());
+	}
+
 }
 
 void CIceLemonDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -694,6 +744,7 @@ void CIceLemonDlg::OnPaint()
 			p2.x = (*plist).idx*x_unit;
 			pDC->LineTo(p2);
 		}
+#if 0
 		pDC->SelectObject(pPenGreen);    //换笔触
 		plist = xl.begin();
 		//pDC->MoveTo(0,0);
@@ -706,6 +757,7 @@ void CIceLemonDlg::OnPaint()
 			p2.x = (*plist).idx*x_unit;
 			pDC->LineTo(p2);
 		}
+#endif
 	}
 	//pDC->LineTo(x,y)
 	pDC->SelectObject(pOldFont);
@@ -1104,4 +1156,6 @@ void CIceLemonDlg::OnDestroy()
 	pWlOp->~CWlanOp();
 	if(pWlOp != NULL)
 		delete pWlOp;
+	if(m_pConnection->State)
+		 m_pConnection->Close(); ///如果已经打开了连接则关闭它
 }

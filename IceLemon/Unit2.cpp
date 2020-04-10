@@ -644,6 +644,16 @@ void RunThread::GetThroughput(int AttIndex, int x, int h)
 	//pIceLemonDlg->SendMessage(WM_UPDATEUSERDATA, false, 0);
 }
 
+void RunThread::SaveOneToDb()
+{
+	Test1_item item;
+	item.e1_ip = ChariotParameter.e1;
+	item.e2_ip = ChariotParameter.e2;
+	item.throughput = th_curve.th_val;
+	item.time = time(NULL);
+	pIceLemonDlg->InsertRecord(&item);
+}
+
 void RunThread::GetThroughput(int x, int h)
 {
 	CString DisplayWord;
@@ -663,9 +673,9 @@ void RunThread::GetThroughput(int x, int h)
 			avg = 0;
 			rc = CHR_pair_results_get_average(pair[k], CHR_RESULTS_THROUGHPUT, &avg);
 
-			if (rc != CHR_OK)
+			if (rc != CHR_OK){
 				avg = 0;
-
+			}
 			avg1 = avg1 + avg;
 		}
 
@@ -1097,7 +1107,7 @@ int RunThread::Run()
 
 				if (status == false)
 				{
-					pIceLemonDlg->m_page_main.m_redit.ReplaceSel("Setup Chariot Fail!!\r\n");			
+					pIceLemonDlg->PrintlnToMemo("Setup Chariot Fail!!");			
 					CHR_test_force_delete(test);
 					state = 99;   //error
 					break;
@@ -1122,6 +1132,7 @@ int RunThread::Run()
 					if(difftime(tNow,tStart) > tCntSec) {
 						GetThroughput(ChariotParameter.Test_Direction[i],h);
 						GetThroughputMax(ChariotParameter.Test_Direction[i],h);
+						SaveOneToDb();
 						th_curve.cur_idx = tCntSec;
 						pIceLemonDlg->SendMessage(WM_UPDATE_CHART,(WPARAM)&th_curve, NULL);
 						tCntSec++;
@@ -1155,10 +1166,10 @@ int RunThread::Run()
 						//error occurs at start, if error occurs within 1 second
 						if ( ((int) ChariotStatus == 8) && (difftime(tNow,tStart) <= 1) )
 						{
-							pIceLemonDlg->m_page_main.m_redit.ReplaceSel("\n");
-							pIceLemonDlg->m_page_main.m_redit.ReplaceSel("*******Charior error: IP address unreachable !!*******\n");
-							pIceLemonDlg->m_page_main.m_redit.ReplaceSel("\n");
-							pIceLemonDlg->m_page_main.m_redit.ReplaceSel("--> Please check IP address setting & AP/cable connection!!\n");
+							pIceLemonDlg->PrintlnToMemo("");
+							pIceLemonDlg->PrintlnToMemo("*******Charior error: IP address unreachable !!*******");
+							pIceLemonDlg->PrintlnToMemo("");
+							pIceLemonDlg->PrintlnToMemo("--> Please check IP address setting & AP/cable connection!!");
 							IsError = true;
 							//IsStopped = true;
 							state = 99;
