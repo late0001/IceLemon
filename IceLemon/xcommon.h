@@ -3,7 +3,8 @@
 #include "afxwin.h"
 #define EPDirectionCnt  4
 #include "wlanapi.h"
-
+#include <list>
+using namespace std;
 struct Chariot
 {
 	CString e1,e2;         // Define Endpoint1&2 IP address
@@ -53,6 +54,12 @@ typedef struct _Test1_item{
 	long time;
 }Test1_item;
 
+typedef struct _CV_META{
+	int idx;
+	float th_val;
+	float th_val_max;
+}CV_META;
+
 #define	WM_UPDATEUSERDATA	(WM_USER + 1)
 #define	WM_UPDATE_STEXT	(WM_USER + 2)
 #define	WM_UPDATE_CHART	(WM_USER + 3)
@@ -69,6 +76,8 @@ private:
 	 bool IsError;
 	 double avg1, avg2, avg3, avg4,avg5, avg6;
 	 Through_Curve_X th_curve;
+	 list<CV_META> xl;
+	 CString datFileName;
 public:
 	 RunThread();
 	 RunThread(CIceLemonDlg *pDlg, bool CreateSuspended);
@@ -84,6 +93,10 @@ public:
 	 void Creat_Pair(unsigned int n);
 	 void Save_ChariotTestFile(unsigned long direction, unsigned loopcount,
 		 unsigned long j, unsigned long k);
+	 int GetSaveDataFileName(unsigned long direction, unsigned loop_count,
+		 unsigned long j, unsigned long k, CString &fileName);
+	 void TouchFile(int k);
+	 int SaveTPToFile();
 	 void Set_Flag(struct SFlag flag);
 	 void Set_Chariot(struct Chariot chariotP);
 	 int Run();

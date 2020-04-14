@@ -137,7 +137,13 @@ bool CIceLemonDlg::CheckTestDuration()
 		}
 		cnt = ChariotParameter.testduration / ChariotParameter.duration_single;
 		cnt = cnt%2 == 0 ? cnt: cnt-1;
-
+		if(cnt == 0) {
+			sprintf_s(msg,"Error! total time equal to single time!!\nPlease recheck!!");
+			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);
+			DisplayPage(1);
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>", 1);
+			return 0;
+		}
 		ChariotParameter.loop_count = cnt;
 		sprintf_s(msg, "ChariotParameter.testduration %d\n"
 						"ChariotParameter.duration_single %d\n"

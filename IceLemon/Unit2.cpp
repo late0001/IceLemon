@@ -942,6 +942,116 @@ void RunThread::GetThroughputMax(int x, int h)
 	//pIceLemonDlg->SendMessage(WM_UPDATEUSERDATA, false, 0);
 }
 
+int RunThread::GetSaveDataFileName(unsigned long direction, unsigned loop_count,
+				  unsigned long j, unsigned long k, CString &fileName)
+{
+	CString  HeadName = ChariotParameter.testfile,
+		TypeName = "",
+		FullName = "",
+		DirectionName = "";
+	char *ExtendName;
+	int length, rc;
+	char pBuf[MAX_PATH];
+	if(HeadName = ""){
+		 //存放路径
+		GetCurrentDirectory(MAX_PATH,pBuf); 
+		HeadName.Format("%s\\test1",pBuf);
+	}
+	//remove sub-filename .xxx to avoid error
+	if (HeadName.Mid(HeadName.GetLength()-3, 1) == ".")
+	{
+		HeadName = HeadName.Mid(1, HeadName.GetLength()-4);
+	}
+
+	length = HeadName.GetLength();
+
+	switch (direction)
+	{
+	case 1:
+		DirectionName = "_Pair12";
+		break;
+	case 2:
+		DirectionName = "_Pair21";
+		break;
+	case 3:
+		DirectionName = "_Pair#";
+		break;
+	case 4:
+		DirectionName = "_ExtPair";
+		break;
+	}
+
+
+
+	if (loop_count >1)
+	{
+		DirectionName = DirectionName + "_Att%d_Round%d";
+		ExtendName = DirectionName.GetBuffer(100);
+		DirectionName.ReleaseBuffer();
+		if(k %2 == 1) 
+			k=1;
+		else
+			k=2;
+		TypeName.Format(ExtendName, 0, k);
+	}
+	else
+	{
+		DirectionName = DirectionName + "_Att%d";
+		ExtendName = DirectionName.GetBuffer(100);
+		DirectionName.ReleaseBuffer();
+		TypeName.Format(ExtendName, 0);
+	}
+
+
+	FullName = HeadName + TypeName;
+
+	FullName = FullName + ".txt";
+
+	//pIceLemonDlg->m_page_chariot.lbl_saveName.SetWindowText(FullName);
+	fileName = FullName;
+	return 0;
+}
+
+int RunThread::SaveTPToFile()
+{
+	FILE *file = NULL;
+	char file_name[255];
+	char buf[255];
+	int ret = 0;
+	float throughput;
+	time_t t;
+	struct tm p ;
+	char *wday[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+	strncpy_s(file_name,datFileName.GetBuffer(datFileName.GetLength()),datFileName.GetLength());
+	ret = fopen_s(&file, file_name, "a");
+	t = time(NULL);
+	ret=gmtime_s(&p , &t);
+	sprintf_s(buf, "%d年%02d月%02d日 %s %02d:%02d:%02d\n",
+			(1900+p.tm_year), (1+p.tm_mon),p.tm_mday,
+			wday[p.tm_wday],p.tm_hour+8>=24?p.tm_hour+8-24:p.tm_hour+8, p.tm_min, p.tm_sec
+			);
+	fwrite(buf, strlen(buf), 1, file);
+	list<CV_META>::iterator plist; 
+	for(plist = xl.begin(); plist != xl.end(); plist++) {  
+		throughput = plist->th_val;
+		sprintf_s(buf, "%.02f \0", throughput);
+		fwrite(buf, strlen(buf)+1, 1, file);
+	}
+	fwrite("\n", 1, 1, file);
+	fclose(file);
+	return 0;
+}
+
+void RunThread::TouchFile(int k)
+{
+	char fileName[255]={0};
+	FILE *pFile;
+	int ret;
+	if(k>2) return; // have no need create new file
+	strncpy_s(fileName, datFileName.GetBuffer(datFileName.GetLength()),datFileName.GetLength());
+	ret = fopen_s( &pFile, fileName, "w");
+	fclose(pFile);
+}
 int RunThread::Run()
 {
 	char ChariotStatus;
@@ -1183,6 +1293,9 @@ int RunThread::Run()
 				}
 				if (ChariotParameter.testfile != "")
 					Save_ChariotTestFile(ChariotParameter.Test_Direction[i], LoopCount, j, k);
+				GetSaveDataFileName(ChariotParameter.Test_Direction[i], LoopCount, j, k, datFileName);
+				TouchFile(k); // clear the file content
+
 				CHR_test_start(test);  //  Start Test!!
 				time(&tStart);
 				time(&tNow);
@@ -1206,6 +1319,13 @@ int RunThread::Run()
 						th_curve.cur_idx = tCntSec;
 						pIceLemonDlg->SendMessage(WM_UPDATE_CHART,(WPARAM)&th_curve, NULL);
 						tCntSec++;
+
+						if(th_curve.cur_idx == 0){ xl.clear();}
+						CV_META cm;
+						cm.idx = th_curve.cur_idx;
+						cm.th_val=th_curve.th_val;
+						//cm.th_val_max = th_curve.th_val_max;
+						xl.push_back(cm);
 					}
 					pIceLemonDlg->m_page_main.m_redit.SetSel(-1,-1);
 					if ( (Flag.Halt == true) || (Flag.Abort == true) ) // if press halt, stop the current pair test!!
@@ -1263,6 +1383,7 @@ int RunThread::Run()
 				if ( ((int) ChariotStatus != 11) && ((int) ChariotStatus != 8) )
 					EndChariotTest();
 
+				SaveTPToFile();
 				if (IsPreRun == false)
 				{
 					if (ChariotParameter.testfile != "")

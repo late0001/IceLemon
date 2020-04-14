@@ -12,11 +12,7 @@
 #include "WlanOp.h"
 using namespace std;
 
-typedef struct _CV_META{
-	int idx;
-	float th_val;
-	float th_val_max;
-}CV_META;
+
 // CIceLemonDlg ¶Ô»°¿ò
 class CIceLemonDlg : public CDialogEx
 {
