@@ -80,6 +80,7 @@ public:
 	int OnConnect(struct Chariot *chariot);
 	int GetAvailableNetList();
 	DWORD GetProfileList(int index);
+	DWORD Card2GetProfileList(int index);
 	void UpdateIPAddressListItem();
 	void InsertRecord(Test1_item *item);
 	// Define Chariot struct varibles

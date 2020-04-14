@@ -686,7 +686,7 @@ void RunThread::GetThroughput(int x, int h)
 
 		if ((h != 1) || (ChariotParameter.Round_Count != 2))
 		{
-			pIceLemonDlg->PrintlnToMemo("");
+			//pIceLemonDlg->PrintlnToMemo("");
 			DisplayWord.Format("Endpoint1 -> Endpoint2 throughput: %3.2f Mbps", avg1);
 			pIceLemonDlg->PrintlnToMemo(DisplayWord);
 		}
@@ -969,7 +969,7 @@ int RunThread::Run()
 				break;
 			case 0:
 				FinishItem = 0; // record total finish item in test rounds
-				LoopCount = pIceLemonDlg->LoopCount; // set the test round
+				LoopCount = ChariotParameter.loop_count;//pIceLemonDlg->LoopCount; // set the test round
 				j = 0;
 				state = 1;
 				break;
@@ -1052,7 +1052,76 @@ int RunThread::Run()
 							return -1;
 						}
 					}//End if(k % 2 == 1){
-				}//End if(ChariotParameter.use_case == 1){
+				}//End if(ChariotParameter.use_case == 1)
+				else if (ChariotParameter.use_case == 2){
+					if(k % 2 == 1){
+						//Á¬Ïß
+						int retry = 5;
+						while(retry--){
+							pIceLemonDlg->OnConnect(ChariotParameter.card1_index, ChariotParameter.profile1 , 1);
+							if(pIceLemonDlg->cur_is_connected == 1)break;
+							Sleep(200);
+						}
+						if(!pIceLemonDlg->cur_is_connected) {
+							AfxMessageBox("can not connect to network!");
+							return -1;
+						}
+						//Sleep(1000);
+						//ChariotParameter.e1 = ChariotParameter.str_ap1_addr;
+						ChariotParameter.e2 = "";//
+						retry = 5;
+						do{
+							pIceLemonDlg->GetLocalIPInfo(ChariotParameter.card1_index,ChariotParameter.e2);
+							if(ChariotParameter.e2 == ""){
+								DisplayWord.Format("[%d/5] Try to get ip address",6-retry);
+								pIceLemonDlg->PrintlnToMemo(DisplayWord);
+								Sleep(1000);
+								continue;
+							}else{
+								break;
+							}
+						}while(retry--);
+						if(ChariotParameter.e2 ==""){
+							AfxMessageBox("can not fetch ip address of endpoint2!");
+							return -1;
+						}
+						//else{
+						//	AfxMessageBox(ChariotParameter.e2);
+						//}
+					}else{
+						//pIceLemonDlg->OnConnect();
+						int retry = 5;
+						while(retry--){
+							pIceLemonDlg->OnConnect(ChariotParameter.card2_index, ChariotParameter.profile2 , 1);
+							if(pIceLemonDlg->cur_is_connected == 1)break;
+							Sleep(200);
+						}
+						if(!pIceLemonDlg->cur_is_connected) {
+							AfxMessageBox("can not connect to network!");
+							return -1;
+						}
+
+						//ChariotParameter.e1 = ChariotParameter.str_ap2_addr;
+						ChariotParameter.e2 = "";//
+						retry = 5;
+						do{
+							pIceLemonDlg->GetLocalIPInfo(ChariotParameter.card2_index,ChariotParameter.e2);
+							if(ChariotParameter.e2 == ""){
+								DisplayWord.Format("[%d/5] Try to get ip address",6-retry);
+								pIceLemonDlg->PrintlnToMemo(DisplayWord);
+								Sleep(1000);
+								continue;
+							}else{
+								break;
+							}
+						}while(retry--);
+						if(ChariotParameter.e2 ==""){
+							AfxMessageBox("can not fetch ip address of endpoint2!");
+							return -1;
+						}
+					}//End if(k % 2 == 1){
+				}
+
 				//return 0;
 				pIceLemonDlg->m_page_main.SetTimer(1, 200, NULL);
 				i = 0;
@@ -1094,7 +1163,7 @@ int RunThread::Run()
 				else
 				{
 					TestDuration = ChariotParameter.testduration;
-					if(ChariotParameter.use_case == 1){
+					if(ChariotParameter.use_case == 1 || ChariotParameter.use_case == 2){
 						TestDuration = ChariotParameter.duration_single;
 					}
 					IsPreRun = false;
@@ -1124,14 +1193,15 @@ int RunThread::Run()
 				state = 5;
 				break;
 			case 5://wait for pair test complete
-				if(difftime(tNow, tStart) > TestDuration +1)//test finish
+				//if(difftime(tNow, tStart) > TestDuration +1)//test finish
+				if(difftime(tNow, tStart) > TestDuration)//test finish
 				{
 					state = 6;
 					break;
 				}else {
 					if(difftime(tNow,tStart) > tCntSec) {
 						GetThroughput(ChariotParameter.Test_Direction[i],h);
-						GetThroughputMax(ChariotParameter.Test_Direction[i],h);
+						//GetThroughputMax(ChariotParameter.Test_Direction[i],h);
 						SaveOneToDb();
 						th_curve.cur_idx = tCntSec;
 						pIceLemonDlg->SendMessage(WM_UPDATE_CHART,(WPARAM)&th_curve, NULL);
@@ -1197,7 +1267,7 @@ int RunThread::Run()
 				{
 					if (ChariotParameter.testfile != "")
 						CHR_test_save(test); //save Chariot test file *.tst
-					GetThroughput(j, ChariotParameter.Test_Direction[i], h); //Get Throughput ane delete test object
+					//GetThroughput(j, ChariotParameter.Test_Direction[i], h); //Get Throughput ane delete test object
 					
 				}
 				else

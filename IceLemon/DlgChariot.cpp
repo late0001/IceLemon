@@ -88,8 +88,8 @@ ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN5, &CDlgChariot::OnDeltaposSpin5)
 ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN6, &CDlgChariot::OnDeltaposSpin6)
 ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN7, &CDlgChariot::OnDeltaposSpin7)
 ON_CBN_KILLFOCUS(IDC_CBX_CARD1, &CDlgChariot::OnCbnKillfocusCbxCard1)
-ON_CBN_KILLFOCUS(IDC_CBX_CARD2, &CDlgChariot::OnCbnKillfocusCbxCard2)
 ON_BN_CLICKED(IDC_BUTTON2, &CDlgChariot::OnBnClickedButton2)
+ON_CBN_KILLFOCUS(IDC_CBX_CARD2, &CDlgChariot::OnCbnKillfocusCbxCard2)
 END_MESSAGE_MAP()
 
 
@@ -225,11 +225,13 @@ void CDlgChariot::OnClickedBtnUpdateChariotParamData()
 	CString fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\Scripts\\Throughput.scr";	//默认打开的文件名
 	strcpy_s(pIceLemonDlg->ChariotParameter.script, fileName);
 	pIceLemonDlg->m_page_chariot.lblScript.SetWindowText(fileName);
-	m_edit_sec = 16;
+	m_edit_sec = 30;
+#if 1
 	m_cbx_card1.SetCurSel(0);
 	m_cbx_use_case.SetCurSel(1);
-	m_ip_ap2.SetWindowTextA("192.168.1.102");
-	pIceLemonDlg->ChariotParameter.e2 = "192.168.1.102";
+	m_ip_ap2.SetWindowTextA("192.168.1.100");
+	pIceLemonDlg->ChariotParameter.e2 = "192.168.1.100";
+#endif
 	UpdateData(FALSE);
 }
 
@@ -292,9 +294,8 @@ void CDlgChariot::OnCbnKillfocusCbxCard2()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	int index = m_cbx_card2.GetCurSel();
-	pIceLemonDlg->GetProfileList(index);
+	pIceLemonDlg->Card2GetProfileList(index);
 }
-
 
 void CDlgChariot::OnBnClickedButton2()
 {
@@ -307,3 +308,6 @@ void CDlgChariot::OnBnClickedButton2()
 	pIceLemonDlg->InsertRecord(&item);
 
 }
+
+
+

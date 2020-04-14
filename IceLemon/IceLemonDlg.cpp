@@ -393,6 +393,28 @@ DWORD CIceLemonDlg::GetProfileList(int index)
 	}
 	return dwResult;
 }
+
+DWORD CIceLemonDlg::Card2GetProfileList(int index)
+{
+	DWORD dwResult;
+	int i;
+	char profileName[WLAN_MAX_NAME_LENGTH] ;
+	PWLAN_PROFILE_INFO_LIST pProfileList;
+	PWLAN_PROFILE_INFO pProfileInfo;
+	CComboBox *pCb2 = &m_page_chariot.m_cbx_profile2;
+	if(index == -1) index = 0;
+	pGuid = pWlOp->GetInterfaceGuid(index);
+	dwResult = pWlOp->GetProfileList(pGuid, &pProfileList);
+	pCb2->ResetContent();
+	for(i = 0; i < pProfileList->dwNumberOfItems; i++){
+		pProfileInfo = &pProfileList->ProfileInfo[i];
+		WideCharToMultiByte(CP_ACP, 0, pProfileInfo->strProfileName, WLAN_MAX_NAME_LENGTH, 
+			profileName, WLAN_MAX_NAME_LENGTH,NULL,NULL) ;
+		pCb2->InsertString(i, profileName);
+	}
+	return dwResult;
+}
+
 UINT get_connect_state_func(LPVOID param)
 {
 	CIceLemonDlg *pIceLemonDlg = (CIceLemonDlg *)param;
@@ -679,7 +701,7 @@ void CIceLemonDlg::OnPaint()
 	if(th_Cx != NULL){
 		int len = sizeof(th_y_axis)/sizeof(th_y_axis[0]);
 		for(i=0 ; i < len; i++){
-			if(th_Cx->th_val_max<th_y_axis[i].y_ulimit){
+			if(th_Cx->th_val<th_y_axis[i].y_ulimit){
 				upper_ylimit_ord = i;
 				break;
 			}
@@ -918,6 +940,7 @@ void CIceLemonDlg::onBtnRun()
 					state = 99;
 					break;
 				}
+				
 				if(CheckEndpointIP() == false)
 				{
 					state = 99;
@@ -1055,7 +1078,7 @@ void CIceLemonDlg::SetTotalTestTime()
 void CIceLemonDlg::CalculateTotalTestTime()
 {
 	int i;
-	
+	LoopCount =ChariotParameter.loop_count;
 	if (m_page_chariot.ckbEnablePreRun.GetCheck())
 	{
 		UpdateData(TRUE);
@@ -1080,20 +1103,21 @@ void CIceLemonDlg::CalculateTotalTestTime()
 void CIceLemonDlg::CorrectTimeRemain(int h)
 {
 	unsigned long remainTime;
-
+	unsigned long  test_duration; 
 	m_page_main.KillTimer(1);
-
+	test_duration = ChariotParameter.testduration;
+	if(ChariotParameter.use_case == 1 || ChariotParameter.use_case == 2) test_duration = ChariotParameter.duration_single;
 	if (!m_page_chariot.ckbEnablePreRun.GetCheck())
-		remainTime = ChariotParameter.testduration * remainItem;
+		remainTime = test_duration * remainItem;
 	else
 	{
 		if (h == 1) //before Pre-Run
 		{
-			remainTime = ((m_page_chariot.m_edit_preRun ) + (ChariotParameter.testduration))* remainItem/2;
+			remainTime = ((m_page_chariot.m_edit_preRun ) + test_duration)* remainItem/2;
 		}
 		else //before No-Pre-Run
 		{
-			remainTime = (m_page_chariot.m_edit_preRun) *  remainItem/2 + (ChariotParameter.testduration) * (remainItem/2+1) - 3;
+			remainTime = (m_page_chariot.m_edit_preRun) *  remainItem/2 + test_duration * (remainItem/2+1) - 3;
 		}
 	}
 	m_page_main.SetTestTime(remainTime);

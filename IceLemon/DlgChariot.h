@@ -77,4 +77,5 @@ public:
 	CIPAddressCtrl m_ip_ap1;
 	CIPAddressCtrl m_ip_ap2;
 	afx_msg void OnBnClickedButton2();
+	
 };

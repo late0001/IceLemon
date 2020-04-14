@@ -6,14 +6,15 @@
 
 struct Chariot
 {
-	CString e1,e2;      // Define Endpoint1&2 IP address
+	CString e1,e2;         // Define Endpoint1&2 IP address
 	char script[256];      // The pointer which point to Chariot script file
-	char script2[256];      // The pointer which point to Chariot script file if att> x dB
+	char script2[256];     // The pointer which point to Chariot script file if att> x dB
 	char Qos[256];         //The service of quality
-	CString testfile;    // The pointer which point to Chariot test file
+	CString testfile;	   // The pointer which point to Chariot test file
 	char protocol;
-	bool TwoWay;   // Define if Tx/RX simultaneous test enable
+	bool TwoWay;		   // Define if Tx/RX simultaneous test enable
 	int use_case;
+	int loop_count;
 	unsigned long testduration,
 		duration_single,
 		Pair_Count,

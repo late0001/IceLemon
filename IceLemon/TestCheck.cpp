@@ -103,6 +103,7 @@ bool CIceLemonDlg::CheckEndpointIP()
 
 bool CIceLemonDlg::CheckTestDuration()
 {
+	int cnt = 0;
 	ChariotParameter.testduration = (m_page_chariot.m_edit_hour*3600 + m_page_chariot.m_edit_min*60 + m_page_chariot.m_edit_sec);
 	PreRunDuration = m_page_chariot.m_edit_preRun;
 	if (ChariotParameter.testduration == 0)
@@ -116,7 +117,8 @@ bool CIceLemonDlg::CheckTestDuration()
 		PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>", 1);
 		return 0;
 	}
-	if(ChariotParameter.use_case == 1){
+	ChariotParameter.loop_count = 1;
+	if(ChariotParameter.use_case == 1 || ChariotParameter.use_case == 2){
 		ChariotParameter.duration_single = (m_page_chariot.m_edit_hour_s*3600 + m_page_chariot.m_edit_min_s*60 + m_page_chariot.m_edit_sec_s);
 		if(ChariotParameter.duration_single == 0){
 			sprintf_s(msg,"Single execution time cannot be set to zero!!\nPlease recheck!!");
@@ -126,6 +128,25 @@ bool CIceLemonDlg::CheckTestDuration()
 			PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>", 1);
 			return 0;
 		}
+		if(ChariotParameter.testduration < ChariotParameter.duration_single){
+			sprintf_s(msg,"Error! total time less than single time!!\nPlease recheck!!");
+			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);
+			DisplayPage(1);
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>", 1);
+			return 0;
+		}
+		cnt = ChariotParameter.testduration / ChariotParameter.duration_single;
+		cnt = cnt%2 == 0 ? cnt: cnt-1;
+
+		ChariotParameter.loop_count = cnt;
+		sprintf_s(msg, "ChariotParameter.testduration %d\n"
+						"ChariotParameter.duration_single %d\n"
+						"ChariotParameter.loop_count %d\n",
+						ChariotParameter.testduration,
+						ChariotParameter.duration_single,
+						ChariotParameter.loop_count
+						);
+		MessageBox(msg,"Info", MB_OK | MB_ICONINFORMATION);
 	}
 	
 	return 1;
@@ -134,7 +155,7 @@ bool CIceLemonDlg::CheckTestDuration()
 bool CIceLemonDlg::CheckUseCase()
 {
 	ChariotParameter.use_case = m_page_chariot.m_cbx_use_case.GetCurSel();
-	
+	CString str;
 	if (ChariotParameter.use_case == -1)
 	{
 		sprintf_s(msg,"The test case must be set!!\nPlease recheck!!");
@@ -157,7 +178,7 @@ bool CIceLemonDlg::CheckUseCase()
 			return 0;
 		}
 	    m_page_chariot.m_cbx_profile1.GetWindowTextA(ChariotParameter.profile1,WLAN_MAX_NAME_LENGTH);
-		CString str = ChariotParameter.profile1;
+		str = ChariotParameter.profile1;
 		if(str.Compare("")== 0){
 			sprintf_s(msg,"The profile1 must be set!!\nPlease recheck!!");
 			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);	
@@ -173,6 +194,53 @@ bool CIceLemonDlg::CheckUseCase()
 			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);	
 			DisplayPage(1);
 			m_page_chariot.m_cbx_profile2.SetFocus();
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>",1);
+			return 0;
+		}
+	}else if (ChariotParameter.use_case == 2){
+		ChariotParameter.card1_index = m_page_chariot.m_cbx_card1.GetCurSel();
+		if(ChariotParameter.card1_index == -1) {
+			sprintf_s(msg,"The card 1 must be set!!\nPlease recheck!!");
+			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);	
+			DisplayPage(1);
+			m_page_chariot.m_cbx_card1.SetFocus();
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>",1);
+			return 0;
+		}
+		ChariotParameter.card2_index = m_page_chariot.m_cbx_card2.GetCurSel();
+		if(ChariotParameter.card2_index == -1) {
+			sprintf_s(msg,"The card 2 must be set!!\nPlease recheck!!");
+			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);	
+			DisplayPage(1);
+			m_page_chariot.m_cbx_card2.SetFocus();
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>",1);
+			return 0;
+		}
+		if(ChariotParameter.card1_index == ChariotParameter.card2_index){
+			sprintf_s(msg,"Two cards cannot be the same!!\nPlease recheck!!");
+			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);	
+			DisplayPage(1);
+			m_page_chariot.m_cbx_card2.SetFocus();
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>",1);
+			return 0;
+		}
+		m_page_chariot.m_cbx_profile1.GetWindowTextA(ChariotParameter.profile1,WLAN_MAX_NAME_LENGTH);
+		CString str = ChariotParameter.profile1;
+		if(str.Compare("")== 0){
+			sprintf_s(msg,"The profile1 must be set!!\nPlease recheck!!");
+			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);	
+			DisplayPage(1);
+			m_page_chariot.m_cbx_profile1.SetFocus();
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>",1);
+			return 0;
+		}
+		m_page_chariot.m_cbx_profile2.GetWindowTextA(ChariotParameter.profile2,WLAN_MAX_NAME_LENGTH);
+		str = ChariotParameter.profile2;
+		if(str.Compare("")== 0){
+			sprintf_s(msg,"The profile1 must be set!!\nPlease recheck!!");
+			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);	
+			DisplayPage(1);
+			m_page_chariot.m_cbx_profile1.SetFocus();
 			PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>",1);
 			return 0;
 		}
