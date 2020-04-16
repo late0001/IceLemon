@@ -952,7 +952,7 @@ int RunThread::GetSaveDataFileName(unsigned long direction, unsigned loop_count,
 	char *ExtendName;
 	int length, rc;
 	char pBuf[MAX_PATH];
-	if(HeadName = ""){
+	if(HeadName == ""){
 		 //´æ·ÅÂ·¾¶
 		GetCurrentDirectory(MAX_PATH,pBuf); 
 		HeadName.Format("%s\\test1",pBuf);
