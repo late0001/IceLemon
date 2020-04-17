@@ -1,9 +1,13 @@
 #ifndef __X_COMMON_H__248990009877__
 #define __X_COMMON_H__248990009877__
 #include "afxwin.h"
+
+
 #define EPDirectionCnt  4
+#define AttValueCnt     60
 #include "wlanapi.h"
 #include <list>
+
 using namespace std;
 struct Chariot
 {
@@ -29,6 +33,19 @@ struct Chariot
 	char profile2[WLAN_MAX_NAME_LENGTH];
 	CString str_ap1_addr;
 	CString str_ap2_addr;
+};
+
+struct Attenuator
+{
+	unsigned long Attenuator_Value[AttValueCnt+1]; // Attenuator value matrix, index 0 not use
+	unsigned long Value_Count;          // The number of attenuator value
+	unsigned long MaxAttValue,
+		MinAttValue;          // The Max and Min Attenuation value
+	unsigned long Ext_Attenuation;      // External attenuation
+	int Dev;
+	int Dev2;
+	int Dev3;
+	int Dev4;
 };
 
 // Define flag varibles
@@ -70,6 +87,7 @@ class RunThread :public CWinThread
 	 DECLARE_DYNCREATE(RunThread);
 private:
 	 CIceLemonDlg *pIceLemonDlg;
+	 struct Attenuator AttenuatorParameter;
 	 struct Chariot ChariotParameter;
 	 struct SFlag Flag;
 	 unsigned long test, run, pair[15];
@@ -78,6 +96,9 @@ private:
 	 Through_Curve_X th_curve;
 	 list<CV_META> xl;
 	 CString datFileName;
+	 char  DataTmpFileList[512];
+public:
+	 CString dataFullName;
 public:
 	 RunThread();
 	 RunThread(CIceLemonDlg *pDlg, bool CreateSuspended);
@@ -99,6 +120,8 @@ public:
 	 int SaveTPToFile();
 	 void Set_Flag(struct SFlag flag);
 	 void Set_Chariot(struct Chariot chariotP);
+	 void SetDataTmpFile(unsigned long jj, unsigned long k);
+	 void SaveTmpData(unsigned long saveFormat, unsigned long j);
 	 int Run();
 	 bool IsPreRun; 
 	 virtual BOOL InitInstance();

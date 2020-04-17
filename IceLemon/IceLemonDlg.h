@@ -83,9 +83,11 @@ public:
 	struct Chariot ChariotParameter;
 	// Define flag varibles
 	struct SFlag Flag;
-	int SaveFormat;
+	int saveFormat;
 	bool IsSave;
+	CString workDirectory;
 	int FinishItem;
+	int finishAttItem;
 	char msg[CHR_MAX_RETURN_MSG];
 	char errorInfo[CHR_MAX_ERROR_INFO];
 	unsigned long PreRunDuration;

@@ -265,7 +265,7 @@ bool CIceLemonDlg::CheckTestDirection()
 	{
 		ChariotParameter.Pair_Count = 1;
 		ChariotParameter.Test_Direction[1] = 4;
-		SaveFormat = 1;
+		saveFormat = 1;
 		return 1;
 	}
 
@@ -290,7 +290,7 @@ bool CIceLemonDlg::CheckTestDirection()
 	
 
 	// decide the format of test result of tmpfile
-	SaveFormat = 0;    //save format: 0: E1->E2 + E2->E1, 1: E1->E2, 2: E2->E1
+	saveFormat = 0;    //save format: 0: E1->E2 + E2->E1, 1: E1->E2, 2: E2->E1
 	//3: #E1->E2 + #E2->E1 + #sum
 	//4: E1->E2 + #E1->E2 + #E2->E1 + #sum
 	//5: E2->E1 + #E1->E2 + #E2->E1 + #sum
@@ -298,12 +298,12 @@ bool CIceLemonDlg::CheckTestDirection()
 
 	for (p = 1 ; p <= ChariotParameter.Pair_Count; p++)
 	{
-		SaveFormat = SaveFormat + ChariotParameter.Test_Direction[p];
+		saveFormat = saveFormat + ChariotParameter.Test_Direction[p];
 	}
 
-	if  ( (ChariotParameter.Pair_Count == 2) && (SaveFormat == 3) )
+	if  ( (ChariotParameter.Pair_Count == 2) && (saveFormat == 3) )
 	{
-		SaveFormat = 0; // to distinct 1+2 & 3 only
+		saveFormat = 0; // to distinct 1+2 & 3 only
 	}
 
 	return 1;

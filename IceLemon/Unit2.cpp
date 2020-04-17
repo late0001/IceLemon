@@ -1052,18 +1052,212 @@ void RunThread::TouchFile(int k)
 	ret = fopen_s( &pFile, fileName, "w");
 	fclose(pFile);
 }
+
+//---------------------------------------------------------------------------
+void RunThread::SetDataTmpFile(unsigned long jj, unsigned long k)
+{
+   /* Define tmp file pointer for save data
+    * Name Rule: FullName = HeadName + TypeName (if required) + TailName
+    * General Filename: C:/DataTmp_Typexx.txt
+    * HeadName-> "DataTmp" ;
+    * TypeName->  "_Typexx", Type means Round or Rate or Angle, xx means type value;
+    * TailName->  ".txt",
+    * Example1: C:\DataTmp_Round2.txt   --> Round2 test data
+    * Example2: C:\DataTmp_RateOFDM 12M.txt  --> 54Mbps test data
+    * Example3: C:\DataTmp_Angle180.txt --> 180 degree test data
+    * Example4: C:\DataTmp_Parameter1.txt --> Parameter1 test data
+    * Example4: C:\DataTmp_Temperature30.txt --> tempaerature test data
+    */
+
+   /* Also Define Chariot test file pointer
+    * Name Rule: FullName = HeadName + TypeName (if required)
+    * HeadName-> ChariotParameter.testfile (String format-> path/****.tst)
+    * TypeName-> "_Type1xx_Type2yy_Type3zz"
+    * Type1-> Pair  xx: 12 or 21 or #(2way)
+    * Type2-> Att   yy: 0~119
+    * Type3-> Round or Rate or Angle  zz: 1~3 or 54~1 or 15~360 or -10~+80
+    * Example1: C:\Program Files\NetIQ\Chariot\Tests\****_Pair12_Att25_Rate36.tst
+    */
+
+   CString HeadName = "DataTmp",
+          TypeName,
+          TailName = ".txt",
+          DisplayWord;
+   int LoopCount, LoopType, i, j;
+   char *DataTmpFilename;
+   FILE *tmpFile;
+   errno_t err;
+   LoopCount = pIceLemonDlg->LoopCount;
+
+ 
+       LoopType = 3;
+
+       // build the tmp data filename for iteration test
+       if (LoopCount == 1)  // if only one iteration, no type-name required!!
+        {
+           TypeName = "";
+        }
+       else
+        {
+
+           pIceLemonDlg->PrintlnToMemo(DisplayWord);
+           DisplayWord.Format("<<< Iteraion: %d >>>", k);
+           pIceLemonDlg->PrintlnToMemo(DisplayWord);
+           TypeName.Format( "_Round%d" + k);
+        }
+
+
+   //SetCurrentDir(Form1->WorkDictionary);
+   dataFullName = pIceLemonDlg->workDirectory + "\\" + HeadName + TypeName + TailName;
+   DataTmpFilename = dataFullName.GetBuffer(dataFullName.GetLength());
+
+   // Delete the existing data in tmp file & new a data tmp file
+   if (jj == 1)       //create new file if the first att value
+    {
+      err = fopen_s(&tmpFile, DataTmpFilename,"w+t");
+
+      fclose(tmpFile);
+
+      //Add DataTmpFile to DataTmpFileList
+
+      sprintf_s(DataTmpFileList, "%s\\DataTmpFileList.txt", pIceLemonDlg->workDirectory);
+       err = fopen_s(&tmpFile, DataTmpFileList,"a+t");
+      fprintf(tmpFile,"%s\n",dataFullName);
+      fclose(tmpFile);
+    }
+
+}
+//---------------------------------------------------------------------------
+void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j)
+{
+	FILE *TmpFile;
+	char *DataTmpFilename;
+	CString xValName;
+	errno_t err;
+	DataTmpFilename = dataFullName.GetBuffer(dataFullName.GetLength());
+	//Form1->Label1->Caption = DataFullName;
+	// Save test result to tmp file (the current attenuator value)
+
+	//if ( (Form1->ckbRotatorEnable->Checked == true) && (Form1->ckbEnableFieldTryMode->Checked == true) )
+	//	xValName = "Ang    Ofs    Ang    ";
+	//else
+		xValName = "Att     ";
+
+	err = fopen_s(&TmpFile, DataTmpFilename,"a+t"); // open temp file for append data
+
+	switch (saveFormat)
+	{
+	case 0:
+		if (j==1)   // print header file at the first attenuator value
+		{
+			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
+			fprintf(TmpFile,"%sE1->E2    E2->E1\n", xValName);
+
+			fprintf(TmpFile,"===    ===    ===   =======   =======\n");
+		}
+
+		fprintf(TmpFile,"%3d %9.2f %9.2f\n", 0,
+			avg1, avg2);
+		break;
+	case 1:
+		if (j==1)
+		{
+			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
+
+//			if (Form1->ckbLoadTestFile->Checked == true)
+//			{               
+//				fprintf(TmpFile,"%sExt_ALL    Ext_DLP    Ext_ULP\n", xValName);
+//				fprintf(TmpFile, "===    ===    ===   ========   ========   ========\n");
+//			}
+//			else
+			{
+				fprintf(TmpFile,"Att E1->E2\n");
+				fprintf(TmpFile,"=== ========\n");
+			}
+		}
+
+//		if (Form1->ckbLoadTestFile->Checked == true)
+//			fprintf(TmpFile,"%3d %6d %6d %9.2f %9.2f %9.2f\n", AttenuatorParameter.Attenuator_Value[j],
+//			AttenuatorParameter.Ext_Attenuation,
+//			AttenuatorParameter.Attenuator_Value[j]+AttenuatorParameter.Ext_Attenuation,
+//			avg4, avg5, avg6);
+//		else
+			fprintf(TmpFile,"%d %9.2f\n", 0,
+			avg1);
+
+		break;
+	case 2:
+		if (j==1)
+		{
+			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
+			fprintf(TmpFile,"Att      E2->E1\n");
+			fprintf(TmpFile,"===      =======\n");
+		}
+
+		fprintf(TmpFile,"%3d  %9.2f\n", 0,
+			avg2);
+		break;
+	case 3:
+		if (j==1)
+		{
+			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
+			fprintf(TmpFile,"Att    #E1->E2   #E2->E1   #E2<->E1 \n");
+			fprintf(TmpFile,"===    =======   =======   =======\n");
+		}
+
+		fprintf(TmpFile,"%3d %9.2f %9.2f %9.2f\n",0,
+			avg3, avg4, avg3+avg4);
+		break;
+	case 4:
+		if (j==1)
+		{
+			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
+			fprintf(TmpFile,"Att   E1->E2   #E1->E2   #E2->E1   #E1<->E2 \n");
+			fprintf(TmpFile,"===   =======   =======   =======   =======\n");
+		}
+
+		fprintf(TmpFile,"%3d %9.2f %9.2f %9.2f %9.2f\n",0,
+			avg1, avg3, avg4, avg3+avg4);
+		break;
+	case 5:
+		if (j==1)
+		{
+			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
+			fprintf(TmpFile,"Att    E2->E1   #E1->E2   #E2->E1   #E1<->E2 \n");
+			fprintf(TmpFile,"===    =======   =======   =======   =======\n");
+		}
+
+		fprintf(TmpFile,"%3d %9.2f %9.2f %9.2f %9.2f\n", 0,
+			avg2, avg3, avg4, avg3+avg4);
+		break;
+	case 6:
+		if (j==1)
+		{
+			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
+			fprintf(TmpFile,"Att    E1->E2    E2->E1   #E1->E2   #E2->E1   #E1<->E2 \n");
+			fprintf(TmpFile,"===    =======   =======   =======   =======   =======\n");
+		}
+
+		fprintf(TmpFile,"%3d  %9.2f %9.2f %9.2f %9.2f %9.2f\n", 0,
+			avg1, avg2, avg3, avg4, avg3+avg4);
+		break;
+	} //end for switch (saveformat)
+	fclose(TmpFile);
+}
+
 int RunThread::Run()
 {
 	char ChariotStatus;
-	int FinishItem;
-	unsigned long  TestDuration;    // used for tmp file format
+	int FinishItem, finishAttItem;
+	unsigned long saveFormat, TestDuration;    // used for tmp file format
 	time_t tStart,tNow;
 	int tCntSec = 0;
 	int state = -1;
+	FILE *tmpFile;
 	bool OutLoop = false;
 	bool status;
 	unsigned long h, i, j;
-	int k,LoopCount;
+	int k=0,LoopCount;
 	int FinishTmpRound;
 	CString DisplayWord;
 	//while(!Terminate){
@@ -1078,12 +1272,21 @@ int RunThread::Run()
 				state = 0;
 				break;
 			case 0:
+				saveFormat = pIceLemonDlg->saveFormat;
 				FinishItem = 0; // record total finish item in test rounds
+				finishAttItem = 0; // record total finish attenuator count in test rounds
 				LoopCount = ChariotParameter.loop_count;//pIceLemonDlg->LoopCount; // set the test round
+				AttenuatorParameter.Value_Count = 4;
 				j = 0;
 				state = 1;
 				break;
 			case 1:
+				//if finish j-loop?
+				if (++j > AttenuatorParameter.Value_Count)
+				{
+					state = 100;
+					break;
+				}
 				k = 0;
 				state = 2;
 				break;
@@ -1233,7 +1436,9 @@ int RunThread::Run()
 				}
 
 				//return 0;
-				pIceLemonDlg->m_page_main.SetTimer(1, 200, NULL);
+				pIceLemonDlg->m_page_main.SetTimer(1, 200, NULL); //Enable Timer
+				SetDataTmpFile(j,k);  // Set Data Tmp Filename, (The filename varies with "k")
+
 				i = 0;
 				state = 3;
 				break;	
@@ -1335,15 +1540,15 @@ int RunThread::Run()
 						
 						if (Flag.Halt == true)
 						{
-							pIceLemonDlg->m_page_main.m_redit.ReplaceSel("Wait for halt....");
+							pIceLemonDlg->PrintlnToMemo("Wait for halt....", 1);
 							state = 18;
 							break;
 						}
 
 						if (Flag.Abort == true)
 						{
-							pIceLemonDlg->m_page_main.m_redit.ReplaceSel("\r\n");
-							pIceLemonDlg->m_page_main.m_redit.ReplaceSel("Wait for stop....");
+							pIceLemonDlg->PrintlnToMemo("");
+							pIceLemonDlg->PrintlnToMemo("Wait for stop....", 1);
 							CHR_test_force_delete(test);
 							state = 95;
 							break;
@@ -1389,13 +1594,14 @@ int RunThread::Run()
 					if (ChariotParameter.testfile != "")
 						CHR_test_save(test); //save Chariot test file *.tst
 					//GetThroughput(j, ChariotParameter.Test_Direction[i], h); //Get Throughput ane delete test object
+					 GetThroughput(j, ChariotParameter.Test_Direction[i], h); //Get Throughput ane delete test object
 					
 				}
 				else
 				{
 					CHR_test_force_delete(test);  //delete test if pre-run
-					pIceLemonDlg->m_page_main.m_redit.ReplaceSel("Stop Pre-Running...\n");
-					pIceLemonDlg->m_page_main.m_redit.ReplaceSel("*************************\n");
+					pIceLemonDlg->PrintlnToMemo("Stop Pre-Running...\n");
+					pIceLemonDlg->PrintlnToMemo("*************************\n");
 				}
 
 				FinishTmpRound++;
@@ -1404,8 +1610,8 @@ int RunThread::Run()
 				break;
 			case 18:
 				pIceLemonDlg->m_page_main.KillTimer(1);
-				pIceLemonDlg->m_page_main.m_redit.ReplaceSel("\n");
-				pIceLemonDlg->m_page_main.m_redit.ReplaceSel("Test Halt!!\n");
+				pIceLemonDlg->PrintlnToMemo("");
+				pIceLemonDlg->PrintlnToMemo("Test Halt!!",1);
 				i--;   // go back to the halt pair-test if continue to run
 
 				while (1)  //wait for continue or abort
@@ -1415,8 +1621,8 @@ int RunThread::Run()
 					{
 						//ShowRunApperance();
 						pIceLemonDlg->m_page_main.SetTimer(1, 200, NULL);
-						pIceLemonDlg->m_page_main.m_redit.ReplaceSel("\n");
-						pIceLemonDlg->m_page_main.m_redit.ReplaceSel("Test Continue....\n");
+						pIceLemonDlg->PrintlnToMemo("");
+						pIceLemonDlg->PrintlnToMemo("Test Continue....",1);
 
 						pIceLemonDlg->FinishChariotRoundCount = pIceLemonDlg->FinishChariotRoundCount - FinishTmpRound; //correct progress
 
@@ -1437,17 +1643,30 @@ int RunThread::Run()
 				break;
 			case 80: //i-loop (chariot pair) finish process
 				//SaveTmpData(saveformat, j);  //save tmp data
-
+				 SaveTmpData(saveFormat, j);  //save tmp data
 			
 
 				FinishItem++;  // total finish item in all loopcount
-
+				pIceLemonDlg->FinishItem = FinishItem;
+				if (j == AttenuatorParameter.Value_Count)  //the last attenuator value
+				{
+					 errno_t err= fopen_s(&tmpFile, dataFullName.GetBuffer(dataFullName.GetLength()),"a+t");
+					fprintf(tmpFile,"### %6d", finishAttItem + 1);  //how many att item in this loop
+					fclose(tmpFile);
+				}
 
 				state = 2;  // to the next-k (loop)
 				break;
 			case 90:
+				if (k-1 == LoopCount)
+				{
+					// Update finish item
+					finishAttItem++;  // record at each k-loop (it means finish att count)
+					pIceLemonDlg->finishAttItem = finishAttItem;
+				}
 
-				state = 101;  //to the next-j (attenuator Value)
+				state = 1;  //to the next-j (attenuator Value)
+				//state = 101;  //to finish attenuator test
 				break;
 			case 95://Abort process
 				pIceLemonDlg->PrintlnToMemo("");
@@ -1460,6 +1679,7 @@ int RunThread::Run()
 				pIceLemonDlg->PrintlnToMemo("<<<<<<<<<<<<<<<< Finish (Error Occur!!) >>>>>>>>>>>>>>>>>");
 				state = 101;
 				break;
+			case 100:
 			case 101:
 				Flag.Run = false; // to break "if (Flag_run)"
 

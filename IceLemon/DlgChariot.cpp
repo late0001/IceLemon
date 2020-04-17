@@ -219,6 +219,7 @@ void CDlgChariot::OnClickedBtnUpdateChariotParamData()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	CString ep1,ep2;
+	UpdateData(TRUE);
 	cbxEndpoint1.GetWindowText(ep1);
 	cbxEndpoint2.GetWindowText(ep2);
 	pIceLemonDlg->ChariotParameter.e1 = ep1;

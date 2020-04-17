@@ -494,6 +494,20 @@ void CIceLemonDlg::InitDBConn()
 	} 
 }
 
+int GetWorkDirectory(CString & strFilePath)
+{
+	CString strFilename;
+	int iniValue = 0,nPos;
+	iniValue = GetModuleFileName(0,strFilename.GetBuffer(MAX_PATH),MAX_PATH);
+	if(iniValue<=0)
+		return -1;
+	strFilename.ReleaseBuffer();
+
+	nPos=strFilename.ReverseFind('\\');   
+	strFilePath = strFilename.Left(nPos);   
+	return 0;
+}
+
 BOOL CIceLemonDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -528,6 +542,7 @@ BOOL CIceLemonDlg::OnInitDialog()
 	SetMenu(&m_menu);
 	InitTabCtrl();
 	InitChariotPage();
+	GetWorkDirectory(workDirectory);
 	AfxBeginThread(enum_wlaninf_func,this,0,0,0,0);
 	InitDBConn();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
