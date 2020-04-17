@@ -78,4 +78,8 @@ public:
 	CIPAddressCtrl m_ip_ap2;
 	afx_msg void OnBnClickedButton2();
 	
+	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLoadconf1();
+	afx_msg void OnLoadconf2();
+	afx_msg void OnLoadconf3();
 };

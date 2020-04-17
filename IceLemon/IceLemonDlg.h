@@ -26,7 +26,7 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 
-
+	CMenu m_menu;
 // 实现
 protected:
 	HICON m_hIcon;
@@ -120,4 +120,5 @@ public:
 	CStatic m_chartPic;
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnDestroy();
+	afx_msg void OnImportConf();
 };

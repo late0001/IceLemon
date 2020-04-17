@@ -688,7 +688,7 @@ void RunThread::GetThroughput(int x, int h)
 		{
 			//pIceLemonDlg->PrintlnToMemo("");
 			DisplayWord.Format("Endpoint1 -> Endpoint2 throughput: %3.2f Mbps", avg1);
-			pIceLemonDlg->PrintlnToMemo(DisplayWord);
+			pIceLemonDlg->PrintlnToMemo(DisplayWord,1);
 		}
 
 		// set flag for throughput > MaxThroughput

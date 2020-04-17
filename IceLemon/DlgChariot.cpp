@@ -90,6 +90,10 @@ ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN7, &CDlgChariot::OnDeltaposSpin7)
 ON_CBN_KILLFOCUS(IDC_CBX_CARD1, &CDlgChariot::OnCbnKillfocusCbxCard1)
 ON_BN_CLICKED(IDC_BUTTON2, &CDlgChariot::OnBnClickedButton2)
 ON_CBN_KILLFOCUS(IDC_CBX_CARD2, &CDlgChariot::OnCbnKillfocusCbxCard2)
+ON_WM_RBUTTONDOWN()
+ON_COMMAND(ID_LOADCONF1, &CDlgChariot::OnLoadconf1)
+ON_COMMAND(ID_LOADCONF2, &CDlgChariot::OnLoadconf2)
+ON_COMMAND(ID_LOADCONF3, &CDlgChariot::OnLoadconf3)
 END_MESSAGE_MAP()
 
 
@@ -221,13 +225,15 @@ void CDlgChariot::OnClickedBtnUpdateChariotParamData()
 	pIceLemonDlg->ChariotParameter.e2 = ep2;
 	//ckbEndpoint12.SetCheck(1);
 	//E12PairCount = 5;
-	ckbEndpoint21.SetCheck(1);
-	E21PairCount = 5;
-	cbxProtocol.SetCurSel(1);
-	CString fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\Scripts\\Throughput.scr";	//默认打开的文件名
+	//ckbEndpoint21.SetCheck(1);
+	//E21PairCount = 5;
+
+	CString fileName="" ;
+	pIceLemonDlg->m_page_chariot.lblScript.GetWindowText(fileName);
+	if(fileName == "")
+		fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\Scripts\\Throughput.scr";	//默认打开的文件名
 	strcpy_s(pIceLemonDlg->ChariotParameter.script, fileName);
-	pIceLemonDlg->m_page_chariot.lblScript.SetWindowText(fileName);
-	m_edit_sec = 30;
+
 #if 0
 	m_cbx_card1.SetCurSel(0);
 	m_cbx_use_case.SetCurSel(1);
@@ -313,3 +319,84 @@ void CDlgChariot::OnBnClickedButton2()
 
 
 
+
+
+void CDlgChariot::OnRButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	CMenu menu;//菜单
+	CMenu* pPopupMenu;//菜单指针
+	CBitmap m_bitmap1;//位图
+
+	menu.LoadMenu(IDR_MENU2);
+
+	pPopupMenu = menu.GetSubMenu(0);   
+
+	ClientToScreen(&point);
+
+	pPopupMenu->TrackPopupMenu(TPM_TOPALIGN,point.x,point.y,this,NULL);
+	CDialogEx::OnRButtonDown(nFlags, point);
+}
+
+
+void CDlgChariot::OnLoadconf1()
+{
+	// TODO: 在此添加命令处理程序代码
+	ckbEndpoint12.SetCheck(1);
+	E12PairCount = 5;
+	cbxProtocol.SetCurSel(1);//TCP
+	CString fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\Scripts\\Throughput.scr";	//默认打开的文件名
+	pIceLemonDlg->m_page_chariot.lblScript.SetWindowText(fileName);
+	m_edit_min = 1;
+	m_edit_sec = 0;
+	m_cbx_use_case.SetCurSel(0);
+
+	UpdateData(FALSE);
+}
+
+
+void CDlgChariot::OnLoadconf2()
+{
+	// TODO: 在此添加命令处理程序代码
+	// TODO: 在此添加命令处理程序代码
+	ckbEndpoint12.SetCheck(1);
+	E12PairCount = 5;
+	cbxProtocol.SetCurSel(1);//TCP
+	CString fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\Scripts\\Throughput.scr";	//默认打开的文件名
+	pIceLemonDlg->m_page_chariot.lblScript.SetWindowText(fileName);
+	m_edit_hour = 0;
+	m_edit_min = 1;
+	m_edit_sec = 0;
+	m_edit_hour_s = 0;
+	m_edit_min_s = 0;
+	m_edit_sec_s = 30;
+	m_cbx_card1.SetCurSel(0);
+	m_cbx_use_case.SetCurSel(1);
+	m_ip_ap2.SetWindowTextA("192.168.1.100");
+	pIceLemonDlg->ChariotParameter.e2 = "192.168.1.100";
+
+	UpdateData(FALSE);
+}
+
+
+void CDlgChariot::OnLoadconf3()
+{
+	// TODO: 在此添加命令处理程序代码
+	ckbEndpoint12.SetCheck(1);
+	E12PairCount = 5;
+	cbxProtocol.SetCurSel(1);//TCP
+	CString fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\Scripts\\Throughput.scr";	//默认打开的文件名
+	pIceLemonDlg->m_page_chariot.lblScript.SetWindowText(fileName);
+	m_edit_hour = 0;
+	m_edit_min = 1;
+	m_edit_sec = 0;
+	m_edit_hour_s = 0;
+	m_edit_min_s = 0;
+	m_edit_sec_s = 30;
+	m_cbx_card1.SetCurSel(0);
+	m_cbx_use_case.SetCurSel(2);
+	m_ip_ap2.SetWindowTextA("192.168.1.100");
+	pIceLemonDlg->ChariotParameter.e2 = "192.168.1.100";
+	UpdateData(FALSE);
+}

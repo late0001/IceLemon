@@ -76,6 +76,7 @@ BEGIN_MESSAGE_MAP(CIceLemonDlg, CDialogEx)
 	ON_MESSAGE(WM_UPDATE_CHART, &CIceLemonDlg::OnUpdateChart)
 	ON_WM_ERASEBKGND()
 	ON_WM_DESTROY()
+	ON_COMMAND(ID_IMPORT_CONF, &CIceLemonDlg::OnImportConf)
 END_MESSAGE_MAP()
 
 
@@ -523,6 +524,8 @@ BOOL CIceLemonDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
+	m_menu.LoadMenu(IDR_MENU1);
+	SetMenu(&m_menu);
 	InitTabCtrl();
 	InitChariotPage();
 	AfxBeginThread(enum_wlaninf_func,this,0,0,0,0);
@@ -1182,4 +1185,11 @@ void CIceLemonDlg::OnDestroy()
 		delete pWlOp;
 	if(m_pConnection->State)
 		 m_pConnection->Close(); ///如果已经打开了连接则关闭它
+}
+
+
+void CIceLemonDlg::OnImportConf()
+{
+	// TODO: 在此添加命令处理程序代码
+	MessageBox("你大爷的! 又想偷懒！！！");
 }
