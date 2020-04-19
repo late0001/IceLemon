@@ -6,6 +6,7 @@
 #include "afxcmn.h"
 #include "DlgMain.h"
 #include "DlgChariot.h"
+#include "DlgTestOnly.h"
 #include "xcommon.h"
 #include "afxwin.h"
 #include <list>
@@ -41,8 +42,9 @@ public:
 	CTabCtrl m_tab;
 	CDlgMain m_page_main;
 	CDlgChariot m_page_chariot;
+	CDlgTestOnly m_page_testonly;
 	int m_curSelTab;
-	CDialogEx *pDlg[2];
+	CDialogEx *pDlg[3];
 	afx_msg void OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	void DisplayPage(int i);

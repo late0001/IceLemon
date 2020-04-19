@@ -347,7 +347,10 @@ void CDlgChariot::OnLoadconf1()
 	ckbEndpoint12.SetCheck(1);
 	E12PairCount = 5;
 	cbxProtocol.SetCurSel(1);//TCP
-	CString fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\Scripts\\Throughput.scr";	//默认打开的文件名
+	char tmpBuf[255] = { 0 };
+	GetCurrentDirectory(255, tmpBuf);
+	CString fileName;
+	fileName.Format("%s\\Scripts\\Throughput.scr", tmpBuf);	//默认打开的文件名
 	pIceLemonDlg->m_page_chariot.lblScript.SetWindowText(fileName);
 	m_edit_min = 1;
 	m_edit_sec = 0;
@@ -364,7 +367,10 @@ void CDlgChariot::OnLoadconf2()
 	ckbEndpoint12.SetCheck(1);
 	E12PairCount = 5;
 	cbxProtocol.SetCurSel(1);//TCP
-	CString fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\Scripts\\Throughput.scr";	//默认打开的文件名
+	char tmpBuf[255] = { 0 };
+	GetCurrentDirectory(255, tmpBuf);
+	CString fileName;
+	fileName.Format("%s\\Scripts\\Throughput.scr", tmpBuf);	//默认打开的文件名
 	pIceLemonDlg->m_page_chariot.lblScript.SetWindowText(fileName);
 	m_edit_hour = 0;
 	m_edit_min = 1;
@@ -387,7 +393,10 @@ void CDlgChariot::OnLoadconf3()
 	ckbEndpoint12.SetCheck(1);
 	E12PairCount = 5;
 	cbxProtocol.SetCurSel(1);//TCP
-	CString fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\Scripts\\Throughput.scr";	//默认打开的文件名
+	char tmpBuf[255] = { 0 };
+	GetCurrentDirectory(255, tmpBuf);
+	CString fileName;
+	fileName.Format("%s\\Scripts\\Throughput.scr", tmpBuf);	//默认打开的文件名
 	pIceLemonDlg->m_page_chariot.lblScript.SetWindowText(fileName);
 	m_edit_hour = 0;
 	m_edit_min = 1;

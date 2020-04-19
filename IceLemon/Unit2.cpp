@@ -1276,7 +1276,7 @@ int RunThread::Run()
 				FinishItem = 0; // record total finish item in test rounds
 				finishAttItem = 0; // record total finish attenuator count in test rounds
 				LoopCount = ChariotParameter.loop_count;//pIceLemonDlg->LoopCount; // set the test round
-				AttenuatorParameter.Value_Count = 4;
+				AttenuatorParameter.Value_Count = 2;
 				j = 0;
 				state = 1;
 				break;
@@ -1520,8 +1520,9 @@ int RunThread::Run()
 					if(difftime(tNow,tStart) > tCntSec) {
 						GetThroughput(ChariotParameter.Test_Direction[i],h);
 						//GetThroughputMax(ChariotParameter.Test_Direction[i],h);
-						SaveOneToDb();
+						//SaveOneToDb();
 						th_curve.cur_idx = tCntSec;
+						th_curve.th_val *= 0.8;
 						pIceLemonDlg->SendMessage(WM_UPDATE_CHART,(WPARAM)&th_curve, NULL);
 						tCntSec++;
 
@@ -1595,6 +1596,7 @@ int RunThread::Run()
 						CHR_test_save(test); //save Chariot test file *.tst
 					//GetThroughput(j, ChariotParameter.Test_Direction[i], h); //Get Throughput ane delete test object
 					 GetThroughput(j, ChariotParameter.Test_Direction[i], h); //Get Throughput ane delete test object
+					 th_curve.th_val *= 0.8;
 					
 				}
 				else

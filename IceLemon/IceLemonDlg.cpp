@@ -85,10 +85,13 @@ void CIceLemonDlg::InitTabCtrl()
 {
 	m_tab.InsertItem(0,_T("Main"));
 	m_tab.InsertItem(1,_T("Chariot"));
+	m_tab.InsertItem(2,_T("TestOnly"));
 	m_page_main.Create(IDD_DLG_MAIN, &m_tab);
 	m_page_chariot.Create(IDD_DLG_CHARIOT, &m_tab);
+	m_page_testonly.Create(IDD_DLG_TESTONLY, &m_tab);
 	m_page_main.setContext(this);
 	m_page_chariot.setContext(this);
+	m_page_testonly.setContext(this);
 	CRect rc;
 	m_tab.GetClientRect(rc);
 	rc.top += 32;
@@ -97,12 +100,15 @@ void CIceLemonDlg::InitTabCtrl()
 	//rc.right -= 0;
 	m_page_main.MoveWindow(&rc);
 	m_page_chariot.MoveWindow(&rc);
+	m_page_testonly.MoveWindow(&rc);
 	//把对话框对象指针保存起来
 	pDlg[0] = &m_page_main;
 	pDlg[1] = &m_page_chariot;
+	pDlg[2] = &m_page_testonly;
 	//显示初始页面
 	pDlg[0]->ShowWindow(SW_SHOW);
 	pDlg[1]->ShowWindow(SW_HIDE);
+	pDlg[2]->ShowWindow(SW_HIDE);
 	//保存当前选择
 	m_curSelTab = 0;
 
@@ -285,7 +291,12 @@ void CIceLemonDlg::GetLocalIPInfo(int index, CString &str_addr)
 void CIceLemonDlg::OnClickedBtnScript()
 {
 	CString defaultExt = "*.scr";	//默认打开的文件路径
-	CString fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\Scripts\\Throughput.scr";	//默认打开的文件名
+	char tmpBuf[255] = {0};
+	 GetCurrentDirectory(255, tmpBuf);
+	CString fileName;
+	fileName.Format("%s\\Scripts\\Throughput.scr",tmpBuf);	//默认打开的文件名
+	//AfxMessageBox(fileName);
+	//return ;
 	CString filter = "文件 (*.scr; *.*)|*.scr;*.*||";	//文件过虑的类型
 	CFileDialog openFileDlg(TRUE, defaultExt, fileName, OFN_HIDEREADONLY|OFN_READONLY, filter, NULL);
 	//openFileDlg.GetOFN().lpstrInitialDir = "E:\\FileTest\\test.doc";
