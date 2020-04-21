@@ -37,8 +37,7 @@ END_MESSAGE_MAP()
 volatile double throughput_instant;
 int gAvgThAddr;
 int gOldAddr;
-int gOldAddr_ixchariot6AD6F0;// hook address ixchariot.dll+6AD6F0
-int g_ixchariot_1063C;
+int gJmpBackAddr;
 extern CIceLemonDlg *pIceLemonDlg;
 
 // CDlgTestOnly 消息处理程序
@@ -67,9 +66,8 @@ _declspec(naked) void hook_report_get_extended_stats()
 			push    ebp
 			mov     ebp,esp
 			sub     esp,0A8h
-			mov eax, gOldAddr
-			add eax, 9
-			jmp eax
+			push   gJmpBackAddr
+			ret
 	}
 }
 
@@ -92,6 +90,7 @@ void CDlgTestOnly::OnBnClickedInfo()
 	GetDlgItem(IDC_LB_MODBASE)->SetWindowText(str);
 	int report_get_extended_stats_addr = (int)GetProcAddress(hMoudle, "report_get_extended_stats");
 	gOldAddr = report_get_extended_stats_addr;
+	gJmpBackAddr = gOldAddr +9;
 	str.Format("0x%x", report_get_extended_stats_addr);
 	GetDlgItem(IDC_LB_FUNC1_ADDR)->SetWindowText(str);
 	SIZE_T NumOfBytesWritten;
@@ -100,6 +99,7 @@ void CDlgTestOnly::OnBnClickedInfo()
 	unsigned char JmpCode[5] = { 0xe9, 0x00, 0x00, 0x00, 0x00 };
 	RtlCopyMemory ( JmpCode+1, &JmpOffSet, 4 );
 	WriteProcessMemory(GetCurrentProcess(),(BYTE*)gOldAddr,JmpCode,5,&NumOfBytesWritten);
+	
 	/*
 	ixchariot.dll+6AD6EA - 8B 55 0C              - mov edx,[ebp+0C]
 ixchariot.dll+6AD6ED - 8B 45 08              - mov eax,[ebp+08]

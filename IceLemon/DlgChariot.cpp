@@ -234,13 +234,13 @@ void CDlgChariot::OnClickedBtnUpdateChariotParamData()
 	if(fileName == "")
 		fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\Scripts\\Throughput.scr";	//默认打开的文件名
 	strcpy_s(pIceLemonDlg->ChariotParameter.script, fileName);
-
-#if 0
-	m_cbx_card1.SetCurSel(0);
-	m_cbx_use_case.SetCurSel(1);
-	m_ip_ap2.SetWindowTextA("192.168.1.100");
-	pIceLemonDlg->ChariotParameter.e2 = "192.168.1.100";
-#endif
+	int use_case = m_cbx_use_case.GetCurSel();
+	if(use_case <0){AfxMessageBox("please recheck test mode that must be set");}
+	pIceLemonDlg->ChariotParameter.use_case = use_case;
+	if(use_case == 1){
+		m_ip_ap2.GetWindowText(ep2);
+		pIceLemonDlg->ChariotParameter.e2 = ep2;
+	}
 	UpdateData(FALSE);
 }
 
@@ -364,6 +364,11 @@ void CDlgChariot::OnLoadconf2()
 {
 	// TODO: 在此添加命令处理程序代码
 	// TODO: 在此添加命令处理程序代码
+	if(m_cbx_card2.IsWindowVisible()){
+		GetDlgItem(IDC_LB_CARD2)->ShowWindow(SW_HIDE);
+		m_cbx_card2.ShowWindow(SW_HIDE);
+	}
+	
 	ckbEndpoint12.SetCheck(1);
 	E12PairCount = 5;
 	cbxProtocol.SetCurSel(1);//TCP

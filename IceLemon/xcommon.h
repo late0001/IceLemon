@@ -118,10 +118,11 @@ public:
 		 unsigned long j, unsigned long k, CString &fileName);
 	 void TouchFile(int k);
 	 int SaveTPToFile();
+	 int GetDateTime(char (&buf)[255], int fmt);
 	 void Set_Flag(struct SFlag flag);
 	 void Set_Chariot(struct Chariot chariotP);
 	 void SetDataTmpFile(unsigned long jj, unsigned long k);
-	 void SaveTmpData(unsigned long saveFormat, unsigned long j);
+	 void SaveTmpData(unsigned long saveFormat, unsigned long j, int k);
 	 int Run();
 	 bool IsPreRun; 
 	 virtual BOOL InitInstance();

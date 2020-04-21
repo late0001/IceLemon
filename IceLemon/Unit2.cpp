@@ -460,6 +460,7 @@ void RunThread::GetThroughput(int AttIndex, int x, int h)
 		{
 			avg1 = 0;
 		}
+		avg1 *=0.944;
 
 		if ((h != 1) || (ChariotParameter.Round_Count != 2))
 		{
@@ -500,7 +501,7 @@ void RunThread::GetThroughput(int AttIndex, int x, int h)
 		{
 			avg2 = 0;
 		}
-
+		avg2*=0.944;
 		pIceLemonDlg->PrintlnToMemo("");
 		DisplayWord.Format("Endpoint2 -> Endpoint1 throughput: %3.2f Mbps", avg2);
 		pIceLemonDlg->PrintlnToMemo(DisplayWord);
@@ -540,7 +541,7 @@ void RunThread::GetThroughput(int AttIndex, int x, int h)
 		{
 			avg3 = 0;
 		}
-
+		avg3 *=0.944;
 		pIceLemonDlg->PrintlnToMemo("");
 		DisplayWord.Format("Endpoint1 -> Endpoint2 throughput: %3.2f Mbps", avg3);
 		pIceLemonDlg->PrintlnToMemo(DisplayWord);
@@ -562,7 +563,7 @@ void RunThread::GetThroughput(int AttIndex, int x, int h)
 		{
 			avg4 = 0;
 		}
-
+		avg4 *=0.944;
 		pIceLemonDlg->PrintlnToMemo("");
 		DisplayWord.Format("Endpoint2 -> Endpoint1 throughput: %3.2f Mbps", avg4);
 		pIceLemonDlg->PrintlnToMemo(DisplayWord);
@@ -1042,6 +1043,36 @@ int RunThread::SaveTPToFile()
 	return 0;
 }
 
+/*
+* @param
+*   buf  need a buffer to return values
+*	fmt if 0,return date, otherwise return time
+*/
+
+int RunThread::GetDateTime(char (&buf)[255], int fmt)
+{
+	//char *buf;
+	int ret = 0;
+	time_t t;
+	struct tm p ;
+	char *wday[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+	t = time(NULL);
+	ret=gmtime_s(&p , &t);
+	switch(fmt){
+	case 0:
+		sprintf_s(buf, "%dÄê%02dÔÂ%02dÈÕ %s",
+			(1900+p.tm_year), (1+p.tm_mon),p.tm_mday,
+			wday[p.tm_wday]
+			);
+		break;
+	case 1:
+		sprintf_s(buf, "%02d:%02d:%02d", p.tm_hour+8>=24? p.tm_hour+8-24: p.tm_hour+8, p.tm_min, p.tm_sec);
+		break;
+	}
+
+	return 0;
+}
+
 void RunThread::TouchFile(int k)
 {
 	char fileName[255]={0};
@@ -1083,7 +1114,7 @@ void RunThread::SetDataTmpFile(unsigned long jj, unsigned long k)
           TypeName,
           TailName = ".txt",
           DisplayWord;
-   int LoopCount, LoopType, i, j;
+   int LoopCount, LoopType, i, j, ks;
    char *DataTmpFilename;
    FILE *tmpFile;
    errno_t err;
@@ -1103,14 +1134,21 @@ void RunThread::SetDataTmpFile(unsigned long jj, unsigned long k)
            pIceLemonDlg->PrintlnToMemo(DisplayWord);
            DisplayWord.Format("<<< Iteraion: %d >>>", k);
            pIceLemonDlg->PrintlnToMemo(DisplayWord);
-           TypeName.Format( "_Round%d" + k);
+		   //if(ChariotParameter.use_case == 1){
+		   if(k %2 == 1) 
+			    ks =1;
+		   else
+				ks =2;
+		   //}
+           TypeName.Format( "_Round%d", ks);
+		 
         }
 
 
    //SetCurrentDir(Form1->WorkDictionary);
    dataFullName = pIceLemonDlg->workDirectory + "\\" + HeadName + TypeName + TailName;
    DataTmpFilename = dataFullName.GetBuffer(dataFullName.GetLength());
-
+   if(k > 2) return ; //if k>2 have no need to create file
    // Delete the existing data in tmp file & new a data tmp file
    if (jj == 1)       //create new file if the first att value
     {
@@ -1128,12 +1166,13 @@ void RunThread::SetDataTmpFile(unsigned long jj, unsigned long k)
 
 }
 //---------------------------------------------------------------------------
-void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j)
+void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j, int k)
 {
 	FILE *TmpFile;
 	char *DataTmpFilename;
 	CString xValName;
 	errno_t err;
+	char buf[255]={0};
 	DataTmpFilename = dataFullName.GetBuffer(dataFullName.GetLength());
 	//Form1->Label1->Caption = DataFullName;
 	// Save test result to tmp file (the current attenuator value)
@@ -1148,20 +1187,29 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j)
 	switch (saveFormat)
 	{
 	case 0:
-		if (j==1)   // print header file at the first attenuator value
+		if (j==1 && k <= 2)   // print header file at the first attenuator value
 		{
+			GetDateTime(buf, 0);
+			fprintf(TmpFile, "Date: %s\n",buf);
+			if(ChariotParameter.use_case == 1){
+				fprintf(TmpFile,"SSID: %s\n", k%2 == 1?ChariotParameter.profile1:ChariotParameter.profile2 );
+			}
 			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
 			fprintf(TmpFile,"%sE1->E2    E2->E1\n", xValName);
-
-			fprintf(TmpFile,"===    ===    ===   =======   =======\n");
+			fprintf(TmpFile,"===   =======   =======\n");
 		}
-
-		fprintf(TmpFile,"%3d %9.2f %9.2f\n", 0,
-			avg1, avg2);
+		GetDateTime(buf, 1);
+		fprintf(TmpFile,"%3d %9.2f %9.2f %s\n", 0,
+			avg1, avg2, buf);
 		break;
 	case 1:
-		if (j==1)
+		if (j==1 && k <= 2)
 		{
+			GetDateTime(buf, 0);
+			fprintf(TmpFile, "Date: %s\n",buf);
+			if(ChariotParameter.use_case == 1){
+				fprintf(TmpFile,"SSID: %s\n", k%2 == 1?ChariotParameter.profile1:ChariotParameter.profile2 );
+			}
 			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
 
 //			if (Form1->ckbLoadTestFile->Checked == true)
@@ -1170,10 +1218,10 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j)
 //				fprintf(TmpFile, "===    ===    ===   ========   ========   ========\n");
 //			}
 //			else
-			{
-				fprintf(TmpFile,"Att E1->E2\n");
-				fprintf(TmpFile,"=== ========\n");
-			}
+//			{
+				fprintf(TmpFile,"Att E1->E2    k    time\n");
+				fprintf(TmpFile,"=== ======== ===== =====\n");
+//			}
 		}
 
 //		if (Form1->ckbLoadTestFile->Checked == true)
@@ -1182,64 +1230,90 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j)
 //			AttenuatorParameter.Attenuator_Value[j]+AttenuatorParameter.Ext_Attenuation,
 //			avg4, avg5, avg6);
 //		else
-			fprintf(TmpFile,"%d %9.2f\n", 0,
-			avg1);
+			GetDateTime(buf, 1);
+			fprintf(TmpFile,"%d %9.2f  %9d %s\n", 0,
+			avg1, k, buf);
 
 		break;
 	case 2:
-		if (j==1)
+		if (j==1  && k <= 2)
 		{
+			GetDateTime(buf, 0);
+			fprintf(TmpFile, "Date: %s\n",buf);
+			if(ChariotParameter.use_case == 1){
+				fprintf(TmpFile,"SSID: %s\n", k%2 == 1?ChariotParameter.profile1:ChariotParameter.profile2 );
+			}
 			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
 			fprintf(TmpFile,"Att      E2->E1\n");
 			fprintf(TmpFile,"===      =======\n");
 		}
-
-		fprintf(TmpFile,"%3d  %9.2f\n", 0,
-			avg2);
+		GetDateTime(buf, 1);
+		fprintf(TmpFile,"%3d  %9.2f %s\n", 0,
+			avg2, buf);
 		break;
 	case 3:
-		if (j==1)
+		if (j==1  && k <= 2)
 		{
+			GetDateTime(buf, 0);
+			fprintf(TmpFile, "Date: %s\n",buf);
+			if(ChariotParameter.use_case == 1){
+				fprintf(TmpFile,"SSID: %s\n", k%2 == 1?ChariotParameter.profile1:ChariotParameter.profile2 );
+			}
 			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
 			fprintf(TmpFile,"Att    #E1->E2   #E2->E1   #E2<->E1 \n");
 			fprintf(TmpFile,"===    =======   =======   =======\n");
 		}
-
-		fprintf(TmpFile,"%3d %9.2f %9.2f %9.2f\n",0,
-			avg3, avg4, avg3+avg4);
+		GetDateTime(buf, 1);
+		fprintf(TmpFile,"%3d %9.2f %9.2f %9.2f %s\n",0,
+			avg3, avg4, avg3+avg4, buf);
 		break;
 	case 4:
-		if (j==1)
+		if (j==1 && k <= 2 )
 		{
+			GetDateTime(buf, 0);
+			fprintf(TmpFile, "Date: %s\n",buf);
+			if(ChariotParameter.use_case == 1){
+				fprintf(TmpFile,"SSID: %s\n", k%2 == 1?ChariotParameter.profile1:ChariotParameter.profile2 );
+			}
 			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
 			fprintf(TmpFile,"Att   E1->E2   #E1->E2   #E2->E1   #E1<->E2 \n");
 			fprintf(TmpFile,"===   =======   =======   =======   =======\n");
 		}
-
-		fprintf(TmpFile,"%3d %9.2f %9.2f %9.2f %9.2f\n",0,
-			avg1, avg3, avg4, avg3+avg4);
+		GetDateTime(buf, 1);
+		fprintf(TmpFile,"%3d %9.2f %9.2f %9.2f %9.2f %s\n",0,
+			avg1, avg3, avg4, avg3+avg4, buf);
 		break;
 	case 5:
-		if (j==1)
+		if (j==1 && k <= 2)
 		{
+			GetDateTime(buf, 0);
+			fprintf(TmpFile, "Date: %s\n",buf);
+			if(ChariotParameter.use_case == 1){
+				fprintf(TmpFile,"SSID: %s\n", k%2 == 1?ChariotParameter.profile1:ChariotParameter.profile2 );
+			}
 			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
 			fprintf(TmpFile,"Att    E2->E1   #E1->E2   #E2->E1   #E1<->E2 \n");
 			fprintf(TmpFile,"===    =======   =======   =======   =======\n");
 		}
-
-		fprintf(TmpFile,"%3d %9.2f %9.2f %9.2f %9.2f\n", 0,
-			avg2, avg3, avg4, avg3+avg4);
+		GetDateTime(buf, 1);
+		fprintf(TmpFile,"%3d %9.2f %9.2f %9.2f %9.2f %s\n", 0,
+			avg2, avg3, avg4, avg3+avg4, buf);
 		break;
 	case 6:
-		if (j==1)
+		if (j==1 && k <= 2)
 		{
+			GetDateTime(buf, 0);
+			fprintf(TmpFile, "Date: %s\n",buf);
+			if(ChariotParameter.use_case == 1){
+				fprintf(TmpFile,"SSID: %s\n", k%2 == 1?ChariotParameter.profile1:ChariotParameter.profile2 );
+			}
 			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
-			fprintf(TmpFile,"Att    E1->E2    E2->E1   #E1->E2   #E2->E1   #E1<->E2 \n");
-			fprintf(TmpFile,"===    =======   =======   =======   =======   =======\n");
+			fprintf(TmpFile,"Att    E1->E2    E2->E1    #E1->E2   #E2->E1   #E1<->E2 time\n");
+			fprintf(TmpFile,"===    =======   =======   =======   =======   =======  =====\n");
 		}
-
-		fprintf(TmpFile,"%3d  %9.2f %9.2f %9.2f %9.2f %9.2f\n", 0,
-			avg1, avg2, avg3, avg4, avg3+avg4);
+		GetDateTime(buf, 1);
+		fprintf(TmpFile,"%-3d  %-9.2f %-9.2f %-9.2f %-9.2f %-9.2f %15s\n", 0,
+			avg1, avg2, avg3, avg4, avg3+avg4, buf);
 		break;
 	} //end for switch (saveformat)
 	fclose(TmpFile);
@@ -1596,7 +1670,7 @@ int RunThread::Run()
 						CHR_test_save(test); //save Chariot test file *.tst
 					//GetThroughput(j, ChariotParameter.Test_Direction[i], h); //Get Throughput ane delete test object
 					 GetThroughput(j, ChariotParameter.Test_Direction[i], h); //Get Throughput ane delete test object
-					 th_curve.th_val *= 0.8;
+					
 					
 				}
 				else
@@ -1645,12 +1719,12 @@ int RunThread::Run()
 				break;
 			case 80: //i-loop (chariot pair) finish process
 				//SaveTmpData(saveformat, j);  //save tmp data
-				 SaveTmpData(saveFormat, j);  //save tmp data
+				 SaveTmpData(saveFormat, j, k);  //save tmp data
 			
 
 				FinishItem++;  // total finish item in all loopcount
 				pIceLemonDlg->FinishItem = FinishItem;
-				if (j == AttenuatorParameter.Value_Count)  //the last attenuator value
+				if (j == AttenuatorParameter.Value_Count && k == LoopCount)  //the last attenuator value
 				{
 					 errno_t err= fopen_s(&tmpFile, dataFullName.GetBuffer(dataFullName.GetLength()),"a+t");
 					fprintf(tmpFile,"### %6d", finishAttItem + 1);  //how many att item in this loop
