@@ -94,6 +94,7 @@ ON_WM_RBUTTONDOWN()
 ON_COMMAND(ID_LOADCONF1, &CDlgChariot::OnLoadconf1)
 ON_COMMAND(ID_LOADCONF2, &CDlgChariot::OnLoadconf2)
 ON_COMMAND(ID_LOADCONF3, &CDlgChariot::OnLoadconf3)
+ON_COMMAND(ID_SAVE_CONF, &CDlgChariot::OnSaveConf)
 END_MESSAGE_MAP()
 
 
@@ -186,11 +187,73 @@ void CDlgChariot::OnClickedBtnScript()
 
 }
 
+int CDlgChariot::InitConf(){
+	// TODO: 在此添加命令处理程序代码
+	CString str, protocol;
+	char buf[50];
+	int tmp;
+	CString strPath=_T("./CurInfo.ini");
+	if(!m_cbx_card2.IsWindowVisible()){
+		GetDlgItem(IDC_LB_CARD2)->ShowWindow(SW_SHOW);
+		m_cbx_card2.ShowWindow(SW_SHOW);
+	}
 
+
+	
+	tmp =::GetPrivateProfileInt(_T("ChariotInfo"), _T("test_mode"), 0, strPath);
+	m_cbx_use_case.SetCurSel(tmp);
+	::GetPrivateProfileString(_T("ChariotInfo"), _T("ep1"), "127.0.0.1", str.GetBuffer(20),20,strPath);
+	cbxEndpoint1.SetWindowText(str);
+	::GetPrivateProfileString(_T("ChariotInfo"), _T("ep2"), "127.0.0.1", str.GetBuffer(20),20,strPath);
+	cbxEndpoint2.SetWindowText(str);
+
+	::GetPrivateProfileString(_T("ChariotInfo"), _T("protocol"), "TCP", str.GetBuffer(20),20, strPath);
+	cbxProtocol.SetWindowText(str);
+	::GetPrivateProfileString(_T("ChariotInfo"), _T("script"), "", str.GetBuffer(255),255, strPath);
+	lblScript.SetWindowText(str);
+	
+	::GetPrivateProfileString(_T("ChariotInfo"), _T("E12"), "0 1", buf, 50, strPath);
+	sscanf_s(buf, "%d %d", &tmp, &E12PairCount);
+	if(tmp >0) ckbEndpoint12.SetCheck(1);
+	::GetPrivateProfileString(_T("ChariotInfo"), _T("E21"), "0 1", buf, 50, strPath);
+	sscanf_s(buf, "%d %d", &tmp, &E21PairCount);
+	if(tmp >0) ckbEndpoint21.SetCheck(1);
+	::GetPrivateProfileString(_T("ChariotInfo"), _T("E21"), "0 1", buf, 50, strPath);
+	sscanf_s(buf, "%d %d", &tmp, &E1221PairCount);
+	if(tmp >0) ckb2way.SetCheck(1);
+
+
+	m_edit_hour = ::GetPrivateProfileInt(_T("Total Time"), _T("hour"), 0, strPath);
+
+	m_edit_min = ::GetPrivateProfileInt(_T("Total Time"), _T("min"), 0, strPath);
+
+	m_edit_sec = ::GetPrivateProfileInt(_T("Total Time"), _T("sec"), 0, strPath);
+
+	m_edit_hour_s = ::GetPrivateProfileInt(_T("Single Time"), _T("hour"), 0, strPath);
+	m_edit_min_s = ::GetPrivateProfileInt(_T("Single Time"), _T("min"), 0, strPath);
+	m_edit_sec_s = ::GetPrivateProfileInt(_T("Single Time"), _T("sec"), 0, strPath);
+
+
+	::GetPrivateProfileString(_T("ChariotInfo"), _T("card1"), "", str.GetBuffer(255),255, strPath);
+	m_cbx_card1.SetWindowText(str);
+	::GetPrivateProfileString(_T("ChariotInfo"), _T("card2"), "", str.GetBuffer(255),255, strPath);
+	m_cbx_card2.GetWindowText(str);
+	::GetPrivateProfileString(_T("ChariotInfo"), _T("profile1"), "", str.GetBuffer(255),255, strPath);
+	m_cbx_profile1.SetWindowText(str);
+	::GetPrivateProfileString(_T("ChariotInfo"), _T("profile2"), "", str.GetBuffer(255),255, strPath);
+	m_cbx_profile2.SetWindowText(str);
+	::GetPrivateProfileString(_T("ChariotInfo"), _T("AP1"), "", str.GetBuffer(255), 255, strPath);
+	m_ip_ap1.SetWindowText(str);
+	::GetPrivateProfileString(_T("ChariotInfo"), _T("AP2"), "", str.GetBuffer(255), 255, strPath);
+	m_ip_ap2.SetWindowText(str);
+
+	UpdateData(FALSE);
+	return 0;
+}
 BOOL CDlgChariot::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+	InitConf();
 	return TRUE;
 }
 
@@ -235,7 +298,9 @@ void CDlgChariot::OnClickedBtnUpdateChariotParamData()
 		fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\Scripts\\Throughput.scr";	//默认打开的文件名
 	strcpy_s(pIceLemonDlg->ChariotParameter.script, fileName);
 	int use_case = m_cbx_use_case.GetCurSel();
-	if(use_case <0){AfxMessageBox("please recheck test mode that must be set");}
+	if(use_case <0){
+		AfxMessageBox("please recheck test mode that must be set");
+	}
 	pIceLemonDlg->ChariotParameter.use_case = use_case;
 	if(use_case == 1){
 		m_ip_ap2.GetWindowText(ep2);
@@ -395,6 +460,10 @@ void CDlgChariot::OnLoadconf2()
 void CDlgChariot::OnLoadconf3()
 {
 	// TODO: 在此添加命令处理程序代码
+	if(!m_cbx_card2.IsWindowVisible()){
+		GetDlgItem(IDC_LB_CARD2)->ShowWindow(SW_SHOW);
+		m_cbx_card2.ShowWindow(SW_SHOW);
+	}
 	ckbEndpoint12.SetCheck(1);
 	E12PairCount = 5;
 	cbxProtocol.SetCurSel(1);//TCP
@@ -414,4 +483,56 @@ void CDlgChariot::OnLoadconf3()
 	m_ip_ap2.SetWindowTextA("192.168.1.100");
 	pIceLemonDlg->ChariotParameter.e2 = "192.168.1.100";
 	UpdateData(FALSE);
+}
+
+
+void CDlgChariot::OnSaveConf()
+{
+	// TODO: 在此添加命令处理程序代码
+	CString str, protocol;
+	CString strPath=_T("./CurInfo.ini");
+	UpdateData(TRUE);
+	str.Format("%d",m_cbx_use_case.GetCurSel());
+	::WritePrivateProfileString(_T("ChariotInfo"), _T("test_mode"), str, strPath);
+	cbxEndpoint1.GetWindowText(str);
+	::WritePrivateProfileString(_T("ChariotInfo"), _T("ep1"), str, strPath);
+	cbxEndpoint2.GetWindowText(str);
+	::WritePrivateProfileString(_T("ChariotInfo"), _T("ep2"), str, strPath);
+	cbxProtocol.GetWindowText(protocol);
+	::WritePrivateProfileString(_T("ChariotInfo"), _T("protocol"), protocol, strPath);
+	lblScript.GetWindowText(str);
+	::WritePrivateProfileString(_T("ChariotInfo"), _T("script"), str, strPath);
+	
+	str.Format("%d %d", ckbEndpoint12.GetCheck(),E12PairCount);
+	::WritePrivateProfileString(_T("ChariotInfo"), _T("E12"), str, strPath);
+	str.Format("%d %d", ckbEndpoint21.GetCheck(), E21PairCount);
+	::WritePrivateProfileString(_T("ChariotInfo"), _T("E21"), str, strPath);
+	str.Format("%d %d", ckb2way.GetCheck(), E1221PairCount);
+	::WritePrivateProfileString(_T("ChariotInfo"), _T("E1221"), str, strPath);
+	
+	str.Format("%d", m_edit_hour);
+	::WritePrivateProfileString(_T("Total Time"), _T("hour"), str, strPath);
+	str.Format("%d", m_edit_min);
+	::WritePrivateProfileString(_T("Total Time"), _T("min"), str, strPath);
+	str.Format("%d", m_edit_sec);
+	::WritePrivateProfileString(_T("Total Time"), _T("sec"), str, strPath);
+	str.Format("%d", m_edit_hour_s);
+	::WritePrivateProfileString(_T("Single Time"), _T("hour"), str, strPath);
+	str.Format("%d", m_edit_min_s);
+	::WritePrivateProfileString(_T("Single Time"), _T("min"), str, strPath);
+	str.Format("%d", m_edit_sec_s);
+	::WritePrivateProfileString(_T("Single Time"), _T("sec"), str, strPath);
+	m_cbx_card1.GetWindowText(str);
+	::WritePrivateProfileString(_T("ChariotInfo"), _T("card1"), str, strPath);
+	m_cbx_card2.GetWindowText(str);
+	::WritePrivateProfileString(_T("ChariotInfo"), _T("card2"), str, strPath);
+	m_cbx_profile1.GetWindowText(str);
+	::WritePrivateProfileString(_T("ChariotInfo"), _T("profile1"), str, strPath);
+	m_cbx_profile2.GetWindowText(str);
+	::WritePrivateProfileString(_T("ChariotInfo"), _T("profile2"), str, strPath);
+	m_ip_ap1.GetWindowText(str);
+	::WritePrivateProfileString(_T("ChariotInfo"), _T("AP1"), str, strPath);
+	m_ip_ap2.GetWindowText(str);
+	::WritePrivateProfileString(_T("ChariotInfo"), _T("AP2"), str, strPath);	
+	MessageBox("完成!");
 }

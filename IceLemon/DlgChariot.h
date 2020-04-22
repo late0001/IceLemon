@@ -24,6 +24,7 @@ protected:
 
 public:
 	int setContext(CIceLemonDlg *pDlg);
+	int InitConf();
 	CIceLemonDlg *pIceLemonDlg;
 	CSpinButtonCtrl m_spin_hour;
 //	int m_edit_hour;
@@ -82,4 +83,5 @@ public:
 	afx_msg void OnLoadconf1();
 	afx_msg void OnLoadconf2();
 	afx_msg void OnLoadconf3();
+	afx_msg void OnSaveConf();
 };

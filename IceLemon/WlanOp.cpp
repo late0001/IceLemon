@@ -283,10 +283,10 @@ void CWlanOp::listAllNetwork(GUID *pGuid)
 		"{\\colortbl ;\\red255\\green0\\blue0;}"
 		"{\\*\\generator Riched20 10.0.14393}{\\*\\mmathPr\\mdispDef1\\mwrapIndent1440 }\\viewkind4\\uc1\\trowd\\trgaph108\\trleft5\\trbrdrl\\brdrs\\brdrw10 \\trbrdrt\\brdrs\\brdrw10 \\trbrdrr\\brdrs\\brdrw10 \\trbrdrb\\brdrs\\brdrw10 \\trpaddl108\\trpaddr108\\trpaddfl3\\trpaddfr3";
 		
-		str.Format("\\clbrdrl\\brdrw10\\brdrs\\clbrdrt\\brdrw10\\brdrs\\clbrdrr\\brdrw10\\brdrs\\clbrdrb\\brdrw10\\brdrs \\cellx2771\\clbrdrl\\brdrw10\\brdrs\\clbrdrt\\brdrw10\\brdrs\\clbrdrr\\brdrw10\\brdrs\\clbrdrb\\brdrw10\\brdrs \\cellx5536\\clbrdrl\\brdrw10\\brdrs\\clbrdrt\\brdrw10\\brdrs\\clbrdrr\\brdrw10\\brdrs\\clbrdrb\\brdrw10\\brdrs \\cellx8301" 
+	str.Format("\\clbrdrl\\brdrw10\\brdrs\\clbrdrt\\brdrw10\\brdrs\\clbrdrr\\brdrw10\\brdrs\\clbrdrb\\brdrw10\\brdrs \\cellx2771\\clbrdrl\\brdrw10\\brdrs\\clbrdrt\\brdrw10\\brdrs\\clbrdrr\\brdrw10\\brdrs\\clbrdrb\\brdrw10\\brdrs \\cellx5536\\clbrdrl\\brdrw10\\brdrs\\clbrdrt\\brdrw10\\brdrs\\clbrdrr\\brdrw10\\brdrs\\clbrdrb\\brdrw10\\brdrs \\cellx8301" 
 		"\\pard\\intbl\\nowidctlpar\\qj\\cf1\\kerning2\\f1\\fs21\\lang2052 %s\\lang1033\\cell %s\\cell %s\\cell\\row\\trowd\\trgaph108\\trleft5\\trbrdrl\\brdrs\\brdrw10 \\trbrdrt\\brdrs\\brdrw10 \\trbrdrr\\brdrs\\brdrw10 \\trbrdrb\\brdrs\\brdrw10 \\trpaddl108\\trpaddr108\\trpaddfl3\\trpaddfr3",
 		"SSID", "uNumberOfPhyTypes", "wlanSignalQuality");
-		szBuf+=str;
+	szBuf+=str;
 		
 	for(nNetNumber = 0; nNetNumber < pNetList->dwNumberOfItems; nNetNumber++)
 	{
@@ -391,7 +391,8 @@ int CWlanOp::Connect(GUID *pGuid, CHAR *ucSsid){
 	}
 #ifdef OUTPUT_DEBUG_INFO	
 	else {
-		PrintlnToMemo("Call WlanConnect!");
+		wsprintf(buf, "Call WlanConnect\nWlan Connect ssid:%s\n", ucSsid);
+		PrintlnToMemo(buf);
 	}
 #endif
 	delete parameters;

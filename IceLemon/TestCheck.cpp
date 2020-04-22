@@ -37,9 +37,7 @@ bool CIceLemonDlg::CheckEndpointIP()
 			m_page_chariot.m_ip_ap1.SetFocus();
 			//ClearCardInitialState(); //Stop Rtllib, Socket, unload 8187DLL
 
-			m_page_main.m_redit.SetSel(-1,-1);
-			m_page_main.m_redit.ReplaceSel("<<<<<<<<<<<<<<<<< please input endpoint ip (Test Abort!!) >>>>>>>>>>>>>>>>>\r\n");
-
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< please input endpoint ip (Test Abort!!) >>>>>>>>>>>>>>>>>");
 			return 0;
 		}
 		ChariotParameter.card1_index = m_page_chariot.m_cbx_card1.GetCurSel();
@@ -49,9 +47,8 @@ bool CIceLemonDlg::CheckEndpointIP()
 			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);
 			DisplayPage(1);
 			m_page_chariot.m_cbx_card1.SetFocus();
-
-			m_page_main.m_redit.SetSel(-1,-1);
-			m_page_main.m_redit.ReplaceSel("<<<<<<<<<<<<<<<<< please select card1  (Test Abort!!) >>>>>>>>>>>>>>>>>\r\n");
+		
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< please select card1  (Test Abort!!) >>>>>>>>>>>>>>>>>");
 
 			return 0;
 		}
@@ -63,8 +60,7 @@ bool CIceLemonDlg::CheckEndpointIP()
 			DisplayPage(1);
 			m_page_chariot.m_cbx_profile1.SetFocus();
 
-			m_page_main.m_redit.SetSel(-1,-1);
-			m_page_main.m_redit.ReplaceSel("<<<<<<<<<<<<<<<<< please set profile1  (Test Abort!!) >>>>>>>>>>>>>>>>>\r\n");
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< please set profile1  (Test Abort!!) >>>>>>>>>>>>>>>>>");
 			return 0;
 		}
 		strcpy_s(ChariotParameter.profile1 ,str_p1.GetBuffer(str_p1.GetLength()));
@@ -76,8 +72,7 @@ bool CIceLemonDlg::CheckEndpointIP()
 			DisplayPage(1);
 			m_page_chariot.m_cbx_profile2.SetFocus();
 
-			m_page_main.m_redit.SetSel(-1,-1);
-			m_page_main.m_redit.ReplaceSel("<<<<<<<<<<<<<<<<< please set profile2  (Test Abort!!) >>>>>>>>>>>>>>>>>\r\n");
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< please set profile2  (Test Abort!!) >>>>>>>>>>>>>>>>>");
 			return 0;
 		}
 		strcpy_s(ChariotParameter.profile2 ,str_p2.GetBuffer(str_p2.GetLength()));
@@ -92,8 +87,7 @@ bool CIceLemonDlg::CheckEndpointIP()
 		m_page_chariot.GetDlgItem(IDC_CBO_ENTPOINT1)->SetFocus();
 		//ClearCardInitialState(); //Stop Rtllib, Socket, unload 8187DLL
 
-		m_page_main.m_redit.SetSel(-1,-1);
-		m_page_main.m_redit.ReplaceSel("<<<<<<<<<<<<<<<<< please input endpoint ip (Test Abort!!) >>>>>>>>>>>>>>>>>\r\n");
+		PrintlnToMemo("<<<<<<<<<<<<<<<<< please input endpoint ip (Test Abort!!) >>>>>>>>>>>>>>>>>");
 
 		return 0;
 	}

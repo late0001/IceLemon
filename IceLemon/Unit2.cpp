@@ -387,6 +387,7 @@ bool RunThread::EndChariotTest()
 	int rc;
 	bool IsStopped = false;
 	char ChariotStatus;
+//	int retry_count =5;
 	CHR_COUNT timeout = 10;
 
 	while (!IsStopped)
@@ -396,7 +397,6 @@ bool RunThread::EndChariotTest()
 		//Form1->Memo->Lines->Add("Force Chariot stop...");
 
 		rc = CHR_test_query_stop(test, timeout);
-		pIceLemonDlg->m_page_main.m_redit.SetSel(-1, -1);
 		
 		if (rc == CHR_OK)
 		{
@@ -413,7 +413,11 @@ bool RunThread::EndChariotTest()
 		}
 		else
 		{
-			pIceLemonDlg->m_page_main.m_redit.ReplaceSel("Test fail...\r\n");
+			pIceLemonDlg->PrintlnToMemo("Test fail...\r\n");
+/*
+			if(retry_count-- > 0){
+				continue;
+			}*/
 			IsStopped = true;
 			//Flag.Abort = true;
 		}
@@ -679,7 +683,7 @@ void RunThread::GetThroughput(int x, int h)
 			}
 			avg1 = avg1 + avg;
 		}
-
+		avg1 *=0.944;
 // 		if ( (avg1 < 0.0001) || (avg1 > 1000) )
 // 		{
 // 			avg1 = 0;
@@ -720,8 +724,7 @@ void RunThread::GetThroughput(int x, int h)
 			avg2 = avg2 + avg;
 		}
 
-
-		pIceLemonDlg->PrintlnToMemo("");
+		avg2 *=0.944;
 		DisplayWord.Format("Endpoint2 -> Endpoint1 throughput: %3.2f Mbps", avg2);
 		pIceLemonDlg->PrintlnToMemo(DisplayWord);
 
@@ -740,7 +743,6 @@ void RunThread::GetThroughput(int x, int h)
 	case 3:  //E1<->E2
 		PairNum = pIceLemonDlg->m_page_chariot.E1221PairCount;
 
-		pIceLemonDlg->PrintlnToMemo("");
 		pIceLemonDlg->PrintlnToMemo("--- Down&Up Link test ---");
 
 		avg3 = 0;
@@ -757,7 +759,7 @@ void RunThread::GetThroughput(int x, int h)
 		}
 
 
-
+		avg3 *=0.944;
 		pIceLemonDlg->PrintlnToMemo("");
 		DisplayWord.Format("Endpoint1 -> Endpoint2 throughput: %3.2f Mbps", avg3);
 		pIceLemonDlg->PrintlnToMemo(DisplayWord);
@@ -774,7 +776,7 @@ void RunThread::GetThroughput(int x, int h)
 
 			avg4 = avg4 + avg;
 		}
-
+		avg4 *=0.944;
 		pIceLemonDlg->PrintlnToMemo("");
 		DisplayWord.Format("Endpoint2 -> Endpoint1 throughput: %3.2f Mbps", avg4);
 		pIceLemonDlg->PrintlnToMemo(DisplayWord);
@@ -1308,11 +1310,11 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j, int k)
 				fprintf(TmpFile,"SSID: %s\n", k%2 == 1?ChariotParameter.profile1:ChariotParameter.profile2 );
 			}
 			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
-			fprintf(TmpFile,"Att    E1->E2    E2->E1    #E1->E2   #E2->E1   #E1<->E2 time\n");
+			fprintf(TmpFile,"Att    E1->E2    E2->E1    #E1->E2   #E2->E1   #E1<->E2	time\n");
 			fprintf(TmpFile,"===    =======   =======   =======   =======   =======  =====\n");
 		}
 		GetDateTime(buf, 1);
-		fprintf(TmpFile,"%-3d  %-9.2f %-9.2f %-9.2f %-9.2f %-9.2f %15s\n", 0,
+		fprintf(TmpFile,"%3d  %9.2f %9.2f %9.2f %9.2f %9.2f %15s\n", 0,
 			avg1, avg2, avg3, avg4, avg3+avg4, buf);
 		break;
 	} //end for switch (saveformat)
@@ -1396,7 +1398,12 @@ int RunThread::Run()
 								pIceLemonDlg->PrintlnToMemo(DisplayWord);
 								Sleep(1000);
 								continue;
-							}else{
+							} else if(ChariotParameter.e2.Mid(0,3) != ChariotParameter.e1.Mid(0,3)){
+								DisplayWord.Format("[%d/5] Try to get ip address",6-retry);
+								pIceLemonDlg->PrintlnToMemo(DisplayWord);
+								Sleep(1000);
+								continue;
+							} else{
 								break;
 							}
 						}while(retry--);
@@ -1425,7 +1432,13 @@ int RunThread::Run()
 						retry = 5;
 						do{
 							pIceLemonDlg->GetLocalIPInfo(ChariotParameter.card1_index,ChariotParameter.e2);
-							if(ChariotParameter.e2 == ""){
+				
+							if(ChariotParameter.e2 == "" ){
+								DisplayWord.Format("[%d/5] Try to get ip address",6-retry);
+								pIceLemonDlg->PrintlnToMemo(DisplayWord);
+								Sleep(1000);
+								continue;
+							}else if(ChariotParameter.e2.Mid(0,3) != ChariotParameter.e1.Mid(0,3)){
 								DisplayWord.Format("[%d/5] Try to get ip address",6-retry);
 								pIceLemonDlg->PrintlnToMemo(DisplayWord);
 								Sleep(1000);
@@ -1596,7 +1609,6 @@ int RunThread::Run()
 						//GetThroughputMax(ChariotParameter.Test_Direction[i],h);
 						//SaveOneToDb();
 						th_curve.cur_idx = tCntSec;
-						th_curve.th_val *= 0.8;
 						pIceLemonDlg->SendMessage(WM_UPDATE_CHART,(WPARAM)&th_curve, NULL);
 						tCntSec++;
 
@@ -1607,7 +1619,7 @@ int RunThread::Run()
 						//cm.th_val_max = th_curve.th_val_max;
 						xl.push_back(cm);
 					}
-					pIceLemonDlg->m_page_main.m_redit.SetSel(-1,-1);
+					
 					if ( (Flag.Halt == true) || (Flag.Abort == true) ) // if press halt, stop the current pair test!!
 					{
 						pIceLemonDlg->m_page_main.FreezeTimeRemain();

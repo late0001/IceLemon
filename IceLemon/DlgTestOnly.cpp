@@ -133,7 +133,9 @@ void CDlgTestOnly::OnBnClickedButton1()
 	//CString str;
 	//str.Format("%g", throughput_instant);
 	//pIceLemonDlg->m_page_testonly.GetDlgItem(IDC_LB_TP_INSTANT)->SetWindowText(str);
+
 	AfxBeginThread(read_th_func, pIceLemonDlg, 0, 0, 0, 0);
+
 }
 
 
