@@ -65,7 +65,7 @@ typedef struct _Through_Curve_X{
 }Through_Curve_X, *PThrough_Curve_X;
 
 typedef struct _Test1_item{
-	CString SSID;
+	char SSID[255];
 	CString e1_ip;
 	CString e2_ip;
 	double e1_e2;

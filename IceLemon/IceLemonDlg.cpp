@@ -573,10 +573,11 @@ void CIceLemonDlg::InsertRecord(CString sql)
 		if(m_pConnection == NULL)
 			InitDBConn();
 		//m_pConnection->Execute(_bstr_t(sql),&RecordsAffected,adCmdText);
-		m_pConnection->Execute(_bstr_t(sql),&RecordsAffected,adCmdText);
+		m_pConnection->Execute((_bstr_t)sql,NULL,adCmdText);
 	}catch(_com_error e){
 		CString errormessage;
 		errormessage.Format(" ß∞‹!\r\n¥ÌŒÛ–≈œ¢:%s",e.ErrorMessage());
+		
 	}
 
 }

@@ -662,7 +662,7 @@ void RunThread::SaveOneToDb(unsigned long saveFormat)
 	case 1:   //E1->E2
 		sql.Format("INSERT INTO test1(SSID, endpoint1_ip,endpoint2_ip,[E1->E2], time1)"
 			"VALUES ('%s', '%s','%s', %f, Format(Now(),'hh:mm:ss'))",
-			item->SSID.GetBuffer(item->SSID.GetLength()),
+			item->SSID,
 			item->e1_ip.GetBuffer(item->e1_ip.GetLength()), 
 			item->e2_ip.GetBuffer(item->e2_ip.GetLength()),
 			item->e1_e2
@@ -672,7 +672,7 @@ void RunThread::SaveOneToDb(unsigned long saveFormat)
 	case 2:    //E2->E1
 		sql.Format("INSERT INTO test1(SSID, endpoint1_ip,endpoint2_ip, [E2->E1], time1)"
 			"VALUES ('%s', '%s','%s', %f, Format(Now(),'hh:mm:ss'))",
-			item->SSID.GetBuffer(item->SSID.GetLength()),
+			item->SSID,
 			item->e1_ip.GetBuffer(item->e1_ip.GetLength()), 
 			item->e2_ip.GetBuffer(item->e2_ip.GetLength()),
 			item->e2_e1
@@ -682,7 +682,7 @@ void RunThread::SaveOneToDb(unsigned long saveFormat)
 	case 3:  //E1<->E2
 		sql.Format("INSERT INTO test1(SSID, endpoint1_ip,endpoint2_ip, [#E1->E2], [#E2->E1], [#E1<->E2], time1)"
 			"VALUES ('%s', '%s','%s', %f, %f, %f, Format(Now(),'hh:mm:ss'))",
-			item->SSID.GetBuffer(item->SSID.GetLength()),
+			item->SSID,
 			item->e1_ip.GetBuffer(item->e1_ip.GetLength()), 
 			item->e2_ip.GetBuffer(item->e2_ip.GetLength()),
 			item->e1s_e2, item->e2s_e1, item->two_way
@@ -693,7 +693,7 @@ void RunThread::SaveOneToDb(unsigned long saveFormat)
 	case 4:   //Est Load Test File
 		sql.Format("INSERT INTO test1(SSID, endpoint1_ip,endpoint2_ip,[E1->E2], [#E1->E2], [#E2->E1], [#E1<->E2], time1)"
 			"VALUES ('%s', '%s','%s', %f, %f, %f, %f, Format(Now(),'hh:mm:ss'))",
-			item->SSID.GetBuffer(item->SSID.GetLength()),
+			item->SSID,
 			item->e1_ip.GetBuffer(item->e1_ip.GetLength()), 
 			item->e2_ip.GetBuffer(item->e2_ip.GetLength()),
 			item->e1_e2, item->e1s_e2, item->e2s_e1, item->two_way
@@ -703,7 +703,7 @@ void RunThread::SaveOneToDb(unsigned long saveFormat)
 	case 5:   //Est Load Test File
 		sql.Format("INSERT INTO test1(SSID, endpoint1_ip,endpoint2_ip,[E2->E1], [#E1->E2], [#E2->E1], [#E1<->E2], time1)"
 			"VALUES ('%s', '%s','%s', %f, %f, %f, %f, Format(Now(),'hh:mm:ss'))",
-			item->SSID.GetBuffer(item->SSID.GetLength()),
+			item->SSID,
 			item->e1_ip.GetBuffer(item->e1_ip.GetLength()), 
 			item->e2_ip.GetBuffer(item->e2_ip.GetLength()),
 			item->e2_e1, item->e1s_e2, item->e2s_e1, item->two_way
@@ -713,7 +713,7 @@ void RunThread::SaveOneToDb(unsigned long saveFormat)
 	case 6:
 		sql.Format("INSERT INTO test1(SSID, endpoint1_ip,endpoint2_ip,[E1->E2], [E2->E1], [#E1->E2], [#E2->E1], [#E1<->E2], time1)"
 			"VALUES ('%s', '%s','%s', %f, %f, %f, %f, %f, Format(Now(),'hh:mm:ss'))",
-			item->SSID.GetBuffer(item->SSID.GetLength()),
+			item->SSID,
 			item->e1_ip.GetBuffer(item->e1_ip.GetLength()), 
 			item->e2_ip.GetBuffer(item->e2_ip.GetLength()),
 			item->e1_e2, item->e2_e1, item->e1s_e2, item->e2s_e1, item->two_way
@@ -1202,10 +1202,14 @@ void RunThread::SetDataTmpFile(unsigned long jj, unsigned long k)
            DisplayWord.Format("<<< Iteraion: %d >>>", k);
            pIceLemonDlg->PrintlnToMemo(DisplayWord);
 		   //if(ChariotParameter.use_case == 1){
+#if 0
 		   if(k %2 == 1) 
 			    ks =1;
 		   else
 				ks =2;
+#else
+		   ks = 1;
+#endif
 		   //}
            TypeName.Format( "_Round%d", ks);
 		 
@@ -1215,7 +1219,7 @@ void RunThread::SetDataTmpFile(unsigned long jj, unsigned long k)
    //SetCurrentDir(Form1->WorkDictionary);
    dataFullName = pIceLemonDlg->workDirectory + "\\test_result\\" + HeadName + TypeName + TailName;
    DataTmpFilename = dataFullName.GetBuffer(dataFullName.GetLength());
-   if(k > 2) return ; //if k>2 have no need to create file
+   if(k > 1) return ; //if k>2 have no need to create file
    // Delete the existing data in tmp file & new a data tmp file
    if (jj == 1)       //create new file if the first att value
     {
@@ -1254,29 +1258,25 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j, int k)
 	switch (saveFormat)
 	{
 	case 0:
-		if (j==1 && k <= 2)   // print header file at the first attenuator value
+		if (j==1 && k==1)   // print header file at the first attenuator value
 		{
 			GetDateTime(buf, 0);
 			fprintf(TmpFile, "Date: %s\n",buf);
-			if(ChariotParameter.use_case == 1){
-				fprintf(TmpFile,"SSID: %s\n", k%2 == 1?ChariotParameter.profile1:ChariotParameter.profile2 );
-			}
+
 			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
-			fprintf(TmpFile,"%sE1->E2    E2->E1\n", xValName);
-			fprintf(TmpFile,"===   =======   =======\n");
+			fprintf(TmpFile,"%s    %-20s    E1->E2    E2->E1\n", xValName, "SSID");
+			fprintf(TmpFile,"===   %-20s   =======   =======\n", "=======");
 		}
 		GetDateTime(buf, 1);
-		fprintf(TmpFile,"%3d %9.2f %9.2f %s\n", 0,
+		fprintf(TmpFile,"%3d  %-20s  %9.2f %9.2f %s\n", 0, t_item.SSID,
 			avg1, avg2, buf);
 		break;
 	case 1:
-		if (j==1 && k <= 2)
+		if (j==1 && k==1)
 		{
 			GetDateTime(buf, 0);
 			fprintf(TmpFile, "Date: %s\n",buf);
-			if(ChariotParameter.use_case == 1){
-				fprintf(TmpFile,"SSID: %s\n", k%2 == 1?ChariotParameter.profile1:ChariotParameter.profile2 );
-			}
+		
 			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
 
 //			if (Form1->ckbLoadTestFile->Checked == true)
@@ -1286,8 +1286,8 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j, int k)
 //			}
 //			else
 //			{
-				fprintf(TmpFile,"Att E1->E2    k    time\n");
-				fprintf(TmpFile,"=== ======== ===== =====\n");
+				fprintf(TmpFile,"Att  %-20s     E1->E2     k      time\n", "SSID");
+				fprintf(TmpFile,"===  %-20s    ========	  =====	  =====\n", "=======");
 //			}
 		}
 
@@ -1298,88 +1298,78 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j, int k)
 //			avg4, avg5, avg6);
 //		else
 			GetDateTime(buf, 1);
-			fprintf(TmpFile,"%d %9.2f  %9d %s\n", 0,
+			fprintf(TmpFile,"%d %-20s %9.2f  %9d       %-15s\n", 0, t_item.SSID,
 			avg1, k, buf);
 
 		break;
 	case 2:
-		if (j==1  && k <= 2)
+		if (j==1 && k==1)
 		{
 			GetDateTime(buf, 0);
 			fprintf(TmpFile, "Date: %s\n",buf);
-			if(ChariotParameter.use_case == 1){
-				fprintf(TmpFile,"SSID: %s\n", k%2 == 1? ChariotParameter.profile1:ChariotParameter.profile2 );
-			}
+	
 			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
-			fprintf(TmpFile,"Att      E2->E1\n");
-			fprintf(TmpFile,"===      =======\n");
+			fprintf(TmpFile,"Att   %-20s   E2->E1   time\n", "SSID");
+			fprintf(TmpFile,"===   %-20s   ======   ======\n","======");
 		}
 		GetDateTime(buf, 1);
-		fprintf(TmpFile,"%3d  %9.2f %s\n", 0,
+		fprintf(TmpFile,"%3d  %-20s %9.2f %-15s\n", 0, t_item.SSID,
 			avg2, buf);
 		break;
 	case 3:
-		if (j==1  && k <= 2)
+		if (j==1 && k==1)
 		{
 			GetDateTime(buf, 0);
 			fprintf(TmpFile, "Date: %s\n",buf);
-			if(ChariotParameter.use_case == 1){
-				fprintf(TmpFile,"SSID: %s\n", k%2 == 1?ChariotParameter.profile1:ChariotParameter.profile2 );
-			}
+		
 			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
-			fprintf(TmpFile,"Att    #E1->E2   #E2->E1   #E2<->E1 \n");
-			fprintf(TmpFile,"===    =======   =======   =======\n");
+			fprintf(TmpFile,"Att  %-20s    #E1->E2   #E2->E1   #E2<->E1  time\n", "SSID");
+			fprintf(TmpFile,"===  %-20s    =======   =======   =======   ======\n", "=======");
 		}
 		GetDateTime(buf, 1);
-		fprintf(TmpFile,"%3d %9.2f %9.2f %9.2f %s\n",0,
+		fprintf(TmpFile,"%3d %-20s %9.2f %9.2f %9.2f    %-15s\n",0, t_item.SSID,
 			avg3, avg4, avg3+avg4, buf);
 		break;
 	case 4:
-		if (j==1 && k <= 2 )
+		if (j==1 && k==1)
 		{
 			GetDateTime(buf, 0);
 			fprintf(TmpFile, "Date: %s\n",buf);
-			if(ChariotParameter.use_case == 1){
-				fprintf(TmpFile,"SSID: %s\n", k%2 == 1?ChariotParameter.profile1:ChariotParameter.profile2 );
-			}
+			
 			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
-			fprintf(TmpFile,"Att   E1->E2   #E1->E2   #E2->E1   #E1<->E2 \n");
-			fprintf(TmpFile,"===   =======   =======   =======   =======\n");
+			fprintf(TmpFile,"Att   %-20s    E1->E2   #E1->E2   #E2->E1   #E1<->E2  time\n", "SSID");
+			fprintf(TmpFile,"===   %-20s    ======   =======   =======   =======   ======\n", "=======");
 		}
 		GetDateTime(buf, 1);
-		fprintf(TmpFile,"%3d %9.2f %9.2f %9.2f %9.2f %s\n",0,
+		fprintf(TmpFile,"%3d  %-20s %9.2f %9.2f %9.2f %9.2f %15s\n",0, t_item.SSID,
 			avg1, avg3, avg4, avg3+avg4, buf);
 		break;
 	case 5:
-		if (j==1 && k <= 2)
+		if (j==1 && k==1)
 		{
 			GetDateTime(buf, 0);
 			fprintf(TmpFile, "Date: %s\n",buf);
-			if(ChariotParameter.use_case == 1){
-				fprintf(TmpFile,"SSID: %s\n", k%2 == 1?ChariotParameter.profile1:ChariotParameter.profile2 );
-			}
+		
 			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
-			fprintf(TmpFile,"Att    E2->E1   #E1->E2   #E2->E1   #E1<->E2 \n");
-			fprintf(TmpFile,"===    =======   =======   =======   =======\n");
+			fprintf(TmpFile,"Att  %-20s    E2->E1   #E1->E2   #E2->E1   #E1<->E2  time\n", "SSID");
+			fprintf(TmpFile,"===  %-20s   =======   =======   =======   =======   =======\n", "======");
 		}
 		GetDateTime(buf, 1);
-		fprintf(TmpFile,"%3d %9.2f %9.2f %9.2f %9.2f %s\n", 0,
+		fprintf(TmpFile,"%3d  %-20s %9.2f %9.2f %9.2f %9.2f %-15s\n", 0, t_item.SSID,
 			avg2, avg3, avg4, avg3+avg4, buf);
 		break;
 	case 6:
-		if (j==1 && k <= 2)
+		if (j==1 && k==1)
 		{
 			GetDateTime(buf, 0);
 			fprintf(TmpFile, "Date: %s\n",buf);
-			if(ChariotParameter.use_case == 1){
-				fprintf(TmpFile,"SSID: %s\n", k%2 == 1?ChariotParameter.profile1:ChariotParameter.profile2 );
-			}
+		
 			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
-			fprintf(TmpFile,"Att    E1->E2    E2->E1    #E1->E2   #E2->E1   #E1<->E2	time\n");
-			fprintf(TmpFile,"===    =======   =======   =======   =======   =======  =====\n");
+			fprintf(TmpFile,"Att   %-20s   E1->E2    E2->E1    #E1->E2   #E2->E1   #E1<->E2	  time\n", "SSID");
+			fprintf(TmpFile,"===   %-20s   =======   =======   =======   =======   ========	  =====\n", "======");
 		}
 		GetDateTime(buf, 1);
-		fprintf(TmpFile,"%3d  %9.2f %9.2f %9.2f %9.2f %9.2f %15s\n", 0,
+		fprintf(TmpFile,"%3d  %-20s %9.2f %9.2f %9.2f %9.2f %9.2f       %-15s\n", 0, t_item.SSID,
 			avg1, avg2, avg3, avg4, avg3+avg4, buf);
 		break;
 	} //end for switch (saveformat)
@@ -1482,7 +1472,7 @@ int RunThread::Run()
 							AfxMessageBox("can not fetch ip address of endpoint2!");
 							return -1;
 						}
-						t_item.SSID = ChariotParameter.profile1;
+						strcpy_s(t_item.SSID, ChariotParameter.profile1);
 						//else{
 						//	AfxMessageBox(ChariotParameter.e2);
 						//}
@@ -1523,7 +1513,7 @@ int RunThread::Run()
 							AfxMessageBox("can not fetch ip address of endpoint2!");
 							return -1;
 						}
-						t_item.SSID = ChariotParameter.profile2;
+						strcpy_s(t_item.SSID, ChariotParameter.profile2);
 					}//End if(k % 2 == 1){
 					
 				}//End if(ChariotParameter.use_case == 1)
@@ -1594,7 +1584,7 @@ int RunThread::Run()
 							return -1;
 						}
 					}//End if(k % 2 == 1){
-					t_item.SSID = ChariotParameter.profile1;
+					strcpy_s(t_item.SSID, ChariotParameter.profile1);
 				}
 
 				//return 0;
