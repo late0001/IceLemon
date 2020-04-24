@@ -38,6 +38,7 @@ bool CIceLemonDlg::CheckEndpointIP()
 			//ClearCardInitialState(); //Stop Rtllib, Socket, unload 8187DLL
 
 			PrintlnToMemo("<<<<<<<<<<<<<<<<< Please enter the IP address of the PC connected to AP1 through LAN port(Test Abort!!) >>>>>>>>>>>>>>>>>");
+
 			return 0;
 		}
 		ChariotParameter.card1_index = m_page_chariot.m_cbx_card1.GetCurSel();

@@ -549,7 +549,6 @@ void RunThread::GetThroughput(int AttIndex, int x, int h)
 		pIceLemonDlg->PrintlnToMemo("");
 		DisplayWord.Format("Endpoint1 -> Endpoint2 throughput: %3.2f Mbps", avg3);
 		pIceLemonDlg->PrintlnToMemo(DisplayWord);
-
 		avg4 = 0;
 
 		for (k=PairNum+1; k<=PairNum*2; k++)
@@ -649,14 +648,80 @@ void RunThread::GetThroughput(int AttIndex, int x, int h)
 	//pIceLemonDlg->SendMessage(WM_UPDATEUSERDATA, false, 0);
 }
 
-void RunThread::SaveOneToDb()
+void RunThread::SaveOneToDb(unsigned long saveFormat)
 {
-	Test1_item item;
-	item.e1_ip = ChariotParameter.e1;
-	item.e2_ip = ChariotParameter.e2;
-	item.throughput = th_curve.th_val;
-	item.time = time(NULL);
-	pIceLemonDlg->InsertRecord(&item);
+	//Test1_item item;
+	//item.e1_ip = ChariotParameter.e1;
+	//item.e2_ip = ChariotParameter.e2;
+	//item.throughput = th_curve.th_val;
+	//item.time = time(NULL);
+	Test1_item *item = &t_item;
+	CString sql;
+	switch(saveFormat)
+	{
+	case 1:   //E1->E2
+		sql.Format("INSERT INTO test1(SSID, endpoint1_ip,endpoint2_ip,[E1->E2], time1)"
+			"VALUES ('%s', '%s','%s', %f, Format(Now(),'hh:mm:ss'))",
+			item->SSID.GetBuffer(item->SSID.GetLength()),
+			item->e1_ip.GetBuffer(item->e1_ip.GetLength()), 
+			item->e2_ip.GetBuffer(item->e2_ip.GetLength()),
+			item->e1_e2
+			);
+
+		break;
+	case 2:    //E2->E1
+		sql.Format("INSERT INTO test1(SSID, endpoint1_ip,endpoint2_ip, [E2->E1], time1)"
+			"VALUES ('%s', '%s','%s', %f, Format(Now(),'hh:mm:ss'))",
+			item->SSID.GetBuffer(item->SSID.GetLength()),
+			item->e1_ip.GetBuffer(item->e1_ip.GetLength()), 
+			item->e2_ip.GetBuffer(item->e2_ip.GetLength()),
+			item->e2_e1
+			);
+
+		break;
+	case 3:  //E1<->E2
+		sql.Format("INSERT INTO test1(SSID, endpoint1_ip,endpoint2_ip, [#E1->E2], [#E2->E1], [#E1<->E2], time1)"
+			"VALUES ('%s', '%s','%s', %f, %f, %f, Format(Now(),'hh:mm:ss'))",
+			item->SSID.GetBuffer(item->SSID.GetLength()),
+			item->e1_ip.GetBuffer(item->e1_ip.GetLength()), 
+			item->e2_ip.GetBuffer(item->e2_ip.GetLength()),
+			item->e1s_e2, item->e2s_e1, item->two_way
+			);
+
+		break;
+
+	case 4:   //Est Load Test File
+		sql.Format("INSERT INTO test1(SSID, endpoint1_ip,endpoint2_ip,[E1->E2], [#E1->E2], [#E2->E1], [#E1<->E2], time1)"
+			"VALUES ('%s', '%s','%s', %f, %f, %f, %f, Format(Now(),'hh:mm:ss'))",
+			item->SSID.GetBuffer(item->SSID.GetLength()),
+			item->e1_ip.GetBuffer(item->e1_ip.GetLength()), 
+			item->e2_ip.GetBuffer(item->e2_ip.GetLength()),
+			item->e1_e2, item->e1s_e2, item->e2s_e1, item->two_way
+			);
+
+		break;
+	case 5:   //Est Load Test File
+		sql.Format("INSERT INTO test1(SSID, endpoint1_ip,endpoint2_ip,[E2->E1], [#E1->E2], [#E2->E1], [#E1<->E2], time1)"
+			"VALUES ('%s', '%s','%s', %f, %f, %f, %f, Format(Now(),'hh:mm:ss'))",
+			item->SSID.GetBuffer(item->SSID.GetLength()),
+			item->e1_ip.GetBuffer(item->e1_ip.GetLength()), 
+			item->e2_ip.GetBuffer(item->e2_ip.GetLength()),
+			item->e2_e1, item->e1s_e2, item->e2s_e1, item->two_way
+			);
+
+		break;
+	case 6:
+		sql.Format("INSERT INTO test1(SSID, endpoint1_ip,endpoint2_ip,[E1->E2], [E2->E1], [#E1->E2], [#E2->E1], [#E1<->E2], time1)"
+			"VALUES ('%s', '%s','%s', %f, %f, %f, %f, %f, Format(Now(),'hh:mm:ss'))",
+			item->SSID.GetBuffer(item->SSID.GetLength()),
+			item->e1_ip.GetBuffer(item->e1_ip.GetLength()), 
+			item->e2_ip.GetBuffer(item->e2_ip.GetLength()),
+			item->e1_e2, item->e2_e1, item->e1s_e2, item->e2s_e1, item->two_way
+			);
+		break;
+	}  // end for "switch(ChariotParameter.Test_Direction[i])"
+
+	pIceLemonDlg->InsertRecord(sql);
 }
 
 void RunThread::GetThroughput(int x, int h)
@@ -726,7 +791,7 @@ void RunThread::GetThroughput(int x, int h)
 
 		avg2 *=0.944;
 //		DisplayWord.Format("Endpoint2 -> Endpoint1 throughput: %3.2f Mbps", avg2);
-		pIceLemonDlg->PrintlnToMemo(DisplayWord);
+//		pIceLemonDlg->PrintlnToMemo(DisplayWord);
 
 		// set flag for throughput > MaxThroughput
 		if (avg2 > pIceLemonDlg->maxThroughput)
@@ -1243,7 +1308,7 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j, int k)
 			GetDateTime(buf, 0);
 			fprintf(TmpFile, "Date: %s\n",buf);
 			if(ChariotParameter.use_case == 1){
-				fprintf(TmpFile,"SSID: %s\n", k%2 == 1?ChariotParameter.profile1:ChariotParameter.profile2 );
+				fprintf(TmpFile,"SSID: %s\n", k%2 == 1? ChariotParameter.profile1:ChariotParameter.profile2 );
 			}
 			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
 			fprintf(TmpFile,"Att      E2->E1\n");
@@ -1319,6 +1384,12 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j, int k)
 		break;
 	} //end for switch (saveformat)
 	fclose(TmpFile);
+	t_item.e1_e2 = avg1;
+	t_item.e2_e1 = avg2;
+	t_item.e1s_e2 = avg3;
+	t_item.e2s_e1 = avg4;
+	t_item.two_way = avg3+avg4;
+	SaveOneToDb(saveFormat);
 }
 
 int RunThread::Run()
@@ -1411,11 +1482,12 @@ int RunThread::Run()
 							AfxMessageBox("can not fetch ip address of endpoint2!");
 							return -1;
 						}
+						t_item.SSID = ChariotParameter.profile1;
 						//else{
 						//	AfxMessageBox(ChariotParameter.e2);
 						//}
-					}else{
-					//pIceLemonDlg->OnConnect();
+					}else{//if(k % 2 == 1){
+
 						int retry = 5;
 						while(retry--){
 							pIceLemonDlg->OnConnect(ChariotParameter.card1_index, ChariotParameter.profile2 , 1);
@@ -1451,7 +1523,9 @@ int RunThread::Run()
 							AfxMessageBox("can not fetch ip address of endpoint2!");
 							return -1;
 						}
+						t_item.SSID = ChariotParameter.profile2;
 					}//End if(k % 2 == 1){
+					
 				}//End if(ChariotParameter.use_case == 1)
 				else if (ChariotParameter.use_case == 2){
 					if(k % 2 == 1){
@@ -1520,9 +1594,12 @@ int RunThread::Run()
 							return -1;
 						}
 					}//End if(k % 2 == 1){
+					t_item.SSID = ChariotParameter.profile1;
 				}
 
 				//return 0;
+				t_item.e1_ip = ChariotParameter.e1;
+				t_item.e2_ip = ChariotParameter.e2;
 				pIceLemonDlg->m_page_main.SetTimer(1, 200, NULL); //Enable Timer
 				SetDataTmpFile(j,k);  // Set Data Tmp Filename, (The filename varies with "k")
 

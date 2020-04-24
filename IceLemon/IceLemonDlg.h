@@ -80,7 +80,7 @@ public:
 	DWORD GetProfileList(int index);
 	DWORD Card2GetProfileList(int index);
 	void UpdateIPAddressListItem();
-	void InsertRecord(Test1_item *item);
+	void InsertRecord(CString sql);
 	// Define Chariot struct varibles
 	struct Chariot ChariotParameter;
 	// Define flag varibles

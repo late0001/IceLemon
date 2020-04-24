@@ -65,9 +65,14 @@ typedef struct _Through_Curve_X{
 }Through_Curve_X, *PThrough_Curve_X;
 
 typedef struct _Test1_item{
+	CString SSID;
 	CString e1_ip;
 	CString e2_ip;
-	double throughput;
+	double e1_e2;
+	double e2_e1;
+	double e1s_e2;
+	double e2s_e1;
+	double two_way;
 	long time;
 }Test1_item;
 
@@ -95,6 +100,7 @@ private:
 	 double avg1, avg2, avg3, avg4,avg5, avg6;
 	 Through_Curve_X th_curve;
 	 list<CV_META> xl;
+	 Test1_item t_item;
 	 CString datFileName;
 	 char  DataTmpFileList[512];
 public:
@@ -108,7 +114,7 @@ public:
 	 void GetThroughput(int x, int h);
 	 void GetThroughputMax(int x, int h);
 	 void GetThroughput(int AttIndex, int x, int h);
-	 void SaveOneToDb();
+	 void SaveOneToDb(unsigned long saveFormat);
 	 bool EndChariotTest();
 	 void Creat_Test();
 	 void Creat_Pair(unsigned int n);

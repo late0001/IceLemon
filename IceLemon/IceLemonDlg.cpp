@@ -559,17 +559,12 @@ BOOL CIceLemonDlg::OnInitDialog()
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
-void CIceLemonDlg::InsertRecord(Test1_item *item)
+void CIceLemonDlg::InsertRecord(CString sql)
 {
 	///往表格里面添加记录
 	 _variant_t RecordsAffected;
-	CString sql;
 #if 1
-	sql.Format("INSERT INTO test1(endpoint1_ip,endpoint2_ip,throughput_avg,time1) VALUES ( '%s','%s',%f,Format(Now(),'hh:mm:ss'))",
-		item->e1_ip.GetBuffer(item->e1_ip.GetLength()), 
-		item->e2_ip.GetBuffer(item->e2_ip.GetLength()),
-		item->throughput
-		);
+
 #else 
 	sql = "INSERT INTO test1(endpoint1_ip,endpoint2_ip,throughput_avg,time1) VALUES ( 'ss','bb',1,Format(Now(),'hh:mm:ss'))";
 #endif
@@ -578,7 +573,7 @@ void CIceLemonDlg::InsertRecord(Test1_item *item)
 		if(m_pConnection == NULL)
 			InitDBConn();
 		//m_pConnection->Execute(_bstr_t(sql),&RecordsAffected,adCmdText);
-		m_pConnection->Execute(_bstr_t(sql),NULL,adCmdText);
+		m_pConnection->Execute(_bstr_t(sql),&RecordsAffected,adCmdText);
 	}catch(_com_error e){
 		CString errormessage;
 		errormessage.Format("失败!\r\n错误信息:%s",e.ErrorMessage());
