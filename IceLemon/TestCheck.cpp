@@ -37,7 +37,7 @@ bool CIceLemonDlg::CheckEndpointIP()
 			m_page_chariot.m_ip_ap1.SetFocus();
 			//ClearCardInitialState(); //Stop Rtllib, Socket, unload 8187DLL
 
-			PrintlnToMemo("<<<<<<<<<<<<<<<<< please input endpoint ip (Test Abort!!) >>>>>>>>>>>>>>>>>");
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< Please enter the IP address of the PC connected to AP1 through LAN port(Test Abort!!) >>>>>>>>>>>>>>>>>");
 			return 0;
 		}
 		ChariotParameter.card1_index = m_page_chariot.m_cbx_card1.GetCurSel();
@@ -78,19 +78,35 @@ bool CIceLemonDlg::CheckEndpointIP()
 		strcpy_s(ChariotParameter.profile2 ,str_p2.GetBuffer(str_p2.GetLength()));
 
 	}
+	if(ChariotParameter.use_case == 0 ){
+		if (ChariotParameter.e1 == "" ||  ChariotParameter.e2 == "" )
+		{
+			sprintf_s(msg,"Endpoint must not be null!!\nPlease recheck!!");
+			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);
+			DisplayPage(1);
+			m_page_chariot.GetDlgItem(IDC_CBO_ENTPOINT1)->SetFocus();
+			//ClearCardInitialState(); //Stop Rtllib, Socket, unload 8187DLL
 
-	if (ChariotParameter.e1 == "" || (ChariotParameter.use_case ==0 && ChariotParameter.e2 == "" ))
-	{
-		sprintf_s(msg,"Endpoint must not be null!!\nPlease recheck!!");
-		MessageBox(msg, "Error", MB_OK | MB_ICONERROR);
-		DisplayPage(1);
-		m_page_chariot.GetDlgItem(IDC_CBO_ENTPOINT1)->SetFocus();
-		//ClearCardInitialState(); //Stop Rtllib, Socket, unload 8187DLL
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< please input endpoint ip (Test Abort!!) >>>>>>>>>>>>>>>>>");
 
-		PrintlnToMemo("<<<<<<<<<<<<<<<<< please input endpoint ip (Test Abort!!) >>>>>>>>>>>>>>>>>");
-
-		return 0;
+			return 0;
+		}
 	}
+	if(ChariotParameter.use_case == 2 ){
+		if (ChariotParameter.e1 == "" )
+		{
+			sprintf_s(msg,"Endpoint must not be null!!\nPlease recheck!!");
+			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);
+			DisplayPage(1);
+			m_page_chariot.GetDlgItem(IDC_CBO_ENTPOINT1)->SetFocus();
+			//ClearCardInitialState(); //Stop Rtllib, Socket, unload 8187DLL
+
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< please input endpoint ip (Test Abort!!) >>>>>>>>>>>>>>>>>");
+
+			return 0;
+		}
+	}
+	
 	
 	return 1;
 }
@@ -129,7 +145,7 @@ bool CIceLemonDlg::CheckTestDuration()
 			PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>", 1);
 			return 0;
 		}
-		cnt = ChariotParameter.testduration / ChariotParameter.duration_single;
+		cnt = ChariotParameter.testduration / (ChariotParameter.duration_single *ChariotParameter.Pair_Count);
 		cnt = cnt%2 == 0 ? cnt: cnt-1;
 		if(cnt == 0) {
 			sprintf_s(msg,"Error! total time equal to single time!!\nPlease recheck!!");

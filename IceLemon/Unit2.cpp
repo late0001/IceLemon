@@ -665,7 +665,7 @@ void RunThread::GetThroughput(int x, int h)
 	int rc, PairNum, k;
 	unsigned long i;
 	double avg;
-	char tmp[128];
+	//char tmp[128];
 	//pIceLemonDlg->SendMessage(WM_UPDATEUSERDATA, true, 0);
 	switch(x)
 	{
@@ -692,8 +692,8 @@ void RunThread::GetThroughput(int x, int h)
 		if ((h != 1) || (ChariotParameter.Round_Count != 2))
 		{
 			//pIceLemonDlg->PrintlnToMemo("");
-			DisplayWord.Format("Endpoint1 -> Endpoint2 throughput: %3.2f Mbps", avg1);
-			pIceLemonDlg->PrintlnToMemo(DisplayWord,1);
+//			DisplayWord.Format("Endpoint1 -> Endpoint2 throughput: %3.2f Mbps", avg1);
+//			pIceLemonDlg->PrintlnToMemo(DisplayWord,1);
 		}
 
 		// set flag for throughput > MaxThroughput
@@ -725,7 +725,7 @@ void RunThread::GetThroughput(int x, int h)
 		}
 
 		avg2 *=0.944;
-		DisplayWord.Format("Endpoint2 -> Endpoint1 throughput: %3.2f Mbps", avg2);
+//		DisplayWord.Format("Endpoint2 -> Endpoint1 throughput: %3.2f Mbps", avg2);
 		pIceLemonDlg->PrintlnToMemo(DisplayWord);
 
 		// set flag for throughput > MaxThroughput
@@ -743,7 +743,7 @@ void RunThread::GetThroughput(int x, int h)
 	case 3:  //E1<->E2
 		PairNum = pIceLemonDlg->m_page_chariot.E1221PairCount;
 
-		pIceLemonDlg->PrintlnToMemo("--- Down&Up Link test ---");
+//		pIceLemonDlg->PrintlnToMemo("--- Down&Up Link test ---");
 
 		avg3 = 0;
 
@@ -760,9 +760,9 @@ void RunThread::GetThroughput(int x, int h)
 
 
 		avg3 *=0.944;
-		pIceLemonDlg->PrintlnToMemo("");
-		DisplayWord.Format("Endpoint1 -> Endpoint2 throughput: %3.2f Mbps", avg3);
-		pIceLemonDlg->PrintlnToMemo(DisplayWord);
+	//	pIceLemonDlg->PrintlnToMemo("");
+	//	DisplayWord.Format("Endpoint1 -> Endpoint2 throughput: %3.2f Mbps", avg3);
+	//	pIceLemonDlg->PrintlnToMemo(DisplayWord);
 
 		avg4 = 0;
 
@@ -777,13 +777,13 @@ void RunThread::GetThroughput(int x, int h)
 			avg4 = avg4 + avg;
 		}
 		avg4 *=0.944;
-		pIceLemonDlg->PrintlnToMemo("");
-		DisplayWord.Format("Endpoint2 -> Endpoint1 throughput: %3.2f Mbps", avg4);
-		pIceLemonDlg->PrintlnToMemo(DisplayWord);
-
-		pIceLemonDlg->PrintlnToMemo("");
-		DisplayWord.Format("Sum of Bi-direction throughput: %3.2f Mbps", avg3+avg4);
-		pIceLemonDlg->PrintlnToMemo(DisplayWord);
+// 		pIceLemonDlg->PrintlnToMemo("");
+// 		DisplayWord.Format("Endpoint2 -> Endpoint1 throughput: %3.2f Mbps", avg4);
+// 		pIceLemonDlg->PrintlnToMemo(DisplayWord);
+// 
+// 		pIceLemonDlg->PrintlnToMemo("");
+// 		DisplayWord.Format("Sum of Bi-direction throughput: %3.2f Mbps", avg3+avg4);
+// 		pIceLemonDlg->PrintlnToMemo(DisplayWord);
 
 		if ((avg3 + avg4) > pIceLemonDlg->maxThroughput)
 		{
@@ -1148,7 +1148,7 @@ void RunThread::SetDataTmpFile(unsigned long jj, unsigned long k)
 
 
    //SetCurrentDir(Form1->WorkDictionary);
-   dataFullName = pIceLemonDlg->workDirectory + "\\" + HeadName + TypeName + TailName;
+   dataFullName = pIceLemonDlg->workDirectory + "\\test_result\\" + HeadName + TypeName + TailName;
    DataTmpFilename = dataFullName.GetBuffer(dataFullName.GetLength());
    if(k > 2) return ; //if k>2 have no need to create file
    // Delete the existing data in tmp file & new a data tmp file
@@ -1160,7 +1160,7 @@ void RunThread::SetDataTmpFile(unsigned long jj, unsigned long k)
 
       //Add DataTmpFile to DataTmpFileList
 
-      sprintf_s(DataTmpFileList, "%s\\DataTmpFileList.txt", pIceLemonDlg->workDirectory);
+      sprintf_s(DataTmpFileList, "%s\\test_result\\DataTmpFileList.txt", pIceLemonDlg->workDirectory);
        err = fopen_s(&tmpFile, DataTmpFileList,"a+t");
       fprintf(tmpFile,"%s\n",dataFullName);
       fclose(tmpFile);
@@ -1352,7 +1352,7 @@ int RunThread::Run()
 				FinishItem = 0; // record total finish item in test rounds
 				finishAttItem = 0; // record total finish attenuator count in test rounds
 				LoopCount = ChariotParameter.loop_count;//pIceLemonDlg->LoopCount; // set the test round
-				AttenuatorParameter.Value_Count = 2;
+				AttenuatorParameter.Value_Count = 1;//2;
 				j = 0;
 				state = 1;
 				break;

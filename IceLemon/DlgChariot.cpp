@@ -253,7 +253,7 @@ int CDlgChariot::InitConf(){
 BOOL CDlgChariot::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	InitConf();
+	//InitConf();
 	return TRUE;
 }
 
@@ -281,12 +281,13 @@ void CDlgChariot::OnClickedCkbSaveTst()
 void CDlgChariot::OnClickedBtnUpdateChariotParamData()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	CString ep1,ep2;
+	CString ep1,ep2,str;
 	UpdateData(TRUE);
 	cbxEndpoint1.GetWindowText(ep1);
 	cbxEndpoint2.GetWindowText(ep2);
-	pIceLemonDlg->ChariotParameter.e1 = ep1;
-	pIceLemonDlg->ChariotParameter.e2 = ep2;
+	struct Chariot *pChariotParameter = &pIceLemonDlg->ChariotParameter;
+	pChariotParameter->e1 = ep1;
+	pChariotParameter->e2 = ep2;
 	//ckbEndpoint12.SetCheck(1);
 	//E12PairCount = 5;
 	//ckbEndpoint21.SetCheck(1);
@@ -296,16 +297,26 @@ void CDlgChariot::OnClickedBtnUpdateChariotParamData()
 	pIceLemonDlg->m_page_chariot.lblScript.GetWindowText(fileName);
 	if(fileName == "")
 		fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\Scripts\\Throughput.scr";	//默认打开的文件名
-	strcpy_s(pIceLemonDlg->ChariotParameter.script, fileName);
+	strcpy_s(pChariotParameter->script, fileName);
 	int use_case = m_cbx_use_case.GetCurSel();
 	if(use_case <0){
 		AfxMessageBox("please recheck test mode that must be set");
 	}
-	pIceLemonDlg->ChariotParameter.use_case = use_case;
+	pChariotParameter->use_case = use_case;
+	if(use_case == 0){
+		if(ep1.Mid(0,3) != ep2.Mid(0,3)){
+			MessageBox("不在同一网段, 是否输入有误");
+		}
+	}
 	if(use_case == 1){
 		m_ip_ap2.GetWindowText(ep2);
-		pIceLemonDlg->ChariotParameter.e2 = ep2;
+		pChariotParameter->e2 = ep2;
 	}
+	pIceLemonDlg->CheckTestDirection();
+	//str.Format("pair count: %d", pChariotParameter->Pair_Count);
+	//AfxMessageBox(str);
+	if(pChariotParameter->Pair_Count < 1)
+		AfxMessageBox("please set direction at least one");
 	UpdateData(FALSE);
 }
 

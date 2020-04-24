@@ -90,7 +90,7 @@ private:
 	 struct Attenuator AttenuatorParameter;
 	 struct Chariot ChariotParameter;
 	 struct SFlag Flag;
-	 unsigned long test, run, pair[15];
+	 unsigned long test, run, pair[30];
 	 bool IsError;
 	 double avg1, avg2, avg3, avg4,avg5, avg6;
 	 Through_Curve_X th_curve;

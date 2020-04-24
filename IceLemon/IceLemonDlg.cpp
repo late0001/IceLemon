@@ -632,7 +632,7 @@ const TH_X_AXIS th_x_axis[] = {
 // 如果向对话框添加最小化按钮，则需要下面的代码
 //  来绘制该图标。对于使用文档/视图模型的 MFC 应用程序，
 //  这将由框架自动完成。
-
+#define CHART_Y_HEIGHT 150
 void CIceLemonDlg::OnPaint()
 {
 	if (IsIconic())
@@ -679,7 +679,7 @@ void CIceLemonDlg::OnPaint()
 	
 	//pOldBrush = pDC->SelectObject(pBrush);
 	//pDC->SetBkColor(RGB(0,0,0));
-	pDC->Rectangle(-25, -25, 710, 310);
+	pDC->Rectangle(-25, -25, 710, CHART_Y_HEIGHT+20);
 
 	pOldFont=pDC->SelectObject(&font);   //换字体
 
@@ -695,19 +695,19 @@ void CIceLemonDlg::OnPaint()
 	
 	//绘制坐标轴
 	pDC->MoveTo(0, 0);
-	pDC ->LineTo(0, 310); //竖起轴
+	pDC ->LineTo(0, CHART_Y_HEIGHT+20); //竖起轴
 	pDC->MoveTo(0, 0);
 	pDC ->LineTo(700,0); //水平轴
 
-	pDC->MoveTo(0-5,310-7);//y轴箭头
-	pDC->LineTo(0,310);
-	pDC->LineTo(0+5,310-7);
+	pDC->MoveTo(0-5,CHART_Y_HEIGHT+20-7);//y轴箭头
+	pDC->LineTo(0,CHART_Y_HEIGHT+20);
+	pDC->LineTo(0+5,CHART_Y_HEIGHT+20-7);
 	pDC->MoveTo(700-7,0-5);//x轴箭头
 	pDC->LineTo(700,0);
 	pDC->LineTo(700-7,0+5);
 
-	pDC->TextOut(27,310,"吞吐量");
-	pDC->TextOut(27,300,"(MBps)");
+	pDC->TextOut(27,CHART_Y_HEIGHT+20,"吞吐量");
+	pDC->TextOut(27,CHART_Y_HEIGHT+10,"(MBps)");
 	pDC->TextOut(650,-7,"时间轴");
 	
 
@@ -725,13 +725,15 @@ void CIceLemonDlg::OnPaint()
 // 		pDC->TextOut(7,50+4*40-5,"10");
 // 		pDC->TextOut(7,50+5*40-5,"5");
 // 		pDC->TextOut(7,50+6*40-5,"0");
-	int upper_ylimit_ord= 0,
+	static int upper_ylimit_ord= 0,
 		upper_xlimit_ord = 0;
 	if(th_Cx != NULL){
+		if(th_Cx->cur_idx == 0){ xl.clear(); upper_ylimit_ord = 0;}
 		int len = sizeof(th_y_axis)/sizeof(th_y_axis[0]);
 		for(i=0 ; i < len; i++){
 			if(th_Cx->th_val<th_y_axis[i].y_ulimit){
-				upper_ylimit_ord = i;
+				if(upper_ylimit_ord <=i)
+					upper_ylimit_ord = i;
 				break;
 			}
 		}
@@ -747,12 +749,12 @@ void CIceLemonDlg::OnPaint()
 	int y_fac = th_y_axis[upper_ylimit_ord].y_fac,
 		y_unit = 0,
 	upper_limit = th_y_axis[upper_ylimit_ord].y_ulimit;
-	y_unit = 290*1.0/y_fac;
+	y_unit = CHART_Y_HEIGHT*1.0/y_fac;
 	for(i = 0; i <= y_fac; i++){ //纵标
 		s.Format("%d", i*upper_limit/y_fac);
 		pDC->TextOut(-20,y_unit*i+5, s);
 	}
-	for (int i=1;i*y_unit<300;i++)  //行线
+	for (int i=1;i*y_unit<CHART_Y_HEIGHT+10;i++)  //行线
 	{
 		
 		pDC->MoveTo(0,y_unit*i);
@@ -768,14 +770,14 @@ void CIceLemonDlg::OnPaint()
 	}
 	for(i = 1; i <= 15; i++){ //竖线
 		pDC->MoveTo(i*40,0);
-		pDC->LineTo(i*40,290);
+		pDC->LineTo(i*40,CHART_Y_HEIGHT);
 	}
 	pPenRed->DeleteObject();
 	pPenRed->CreatePen(PS_SOLID, 2, RGB(255, 0, 0)); //红色画笔
 	pDC->SelectObject(pPenRed);    //换笔触
 
 	if(th_Cx != NULL){
-			if(th_Cx->cur_idx == 0){ xl.clear();}
+			
 		// 			pDC->MoveTo(0,0);
 		 CV_META cm;
 		 cm.idx = th_Cx->cur_idx;
@@ -786,12 +788,12 @@ void CIceLemonDlg::OnPaint()
 		list<CV_META>::iterator plist; 
 		plist = xl.begin();
 		POINT p1;
-		p1.y= (*plist).th_val/upper_limit*290;
+		p1.y= (*plist).th_val/upper_limit*CHART_Y_HEIGHT;
 		p1.x = (*plist).idx*x_unit;
 		pDC->MoveTo(p1);
 		for(plist = xl.begin(); plist != xl.end(); plist++) {  
 			POINT p2;
-			p2.y= (*plist).th_val/upper_limit*290;
+			p2.y= (*plist).th_val/upper_limit*CHART_Y_HEIGHT;
 			p2.x = (*plist).idx*x_unit;
 			pDC->LineTo(p2);
 		}
