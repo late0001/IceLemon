@@ -84,4 +84,7 @@ public:
 	afx_msg void OnLoadconf2();
 	afx_msg void OnLoadconf3();
 	afx_msg void OnSaveConf();
+	CComboBox m_cbx_card3;
+	CComboBox m_cbx_profile3;
+	CIPAddressCtrl m_ip_ap3;
 };

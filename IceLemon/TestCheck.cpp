@@ -18,14 +18,11 @@ bool CIceLemonDlg::CheckCardSetting()
 bool CIceLemonDlg::CheckEndpointIP()
 {
 	CString str;
-
+	m_page_chariot.cbxEndpoint1.GetWindowText(str);
+	ChariotParameter.e1 = str;
 	m_page_chariot.cbxEndpoint2.GetWindowText(str);
 	ChariotParameter.e2 = str;
-	if(ChariotParameter.use_case == 0){
-		//m_page_chariot.cbxEndpoint1.GetLBText()
-		m_page_chariot.cbxEndpoint1.GetWindowText(str);
-		ChariotParameter.e1 = str;
-	}
+	
 	if(ChariotParameter.use_case == 1){
 		m_page_chariot.m_ip_ap1.GetWindowText(ChariotParameter.str_ap1_addr);
 		m_page_chariot.m_ip_ap2.GetWindowText(ChariotParameter.str_ap2_addr);
@@ -41,43 +38,20 @@ bool CIceLemonDlg::CheckEndpointIP()
 
 			return 0;
 		}
-		ChariotParameter.card1_index = m_page_chariot.m_cbx_card1.GetCurSel();
-		//ChariotParameter.card2_index = m_page_chariot.m_cbx_card2.GetCurSel();
-		if(ChariotParameter.card1_index <0 /*|| ChariotParameter.card2_index < 0 */){
-			sprintf_s(msg,"card1 must not be null!!\nPlease recheck!!");
-			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);
-			DisplayPage(1);
-			m_page_chariot.m_cbx_card1.SetFocus();
-		
-			PrintlnToMemo("<<<<<<<<<<<<<<<<< please select card1  (Test Abort!!) >>>>>>>>>>>>>>>>>");
+		if(ChariotParameter.ap_count >2){
+			m_page_chariot.m_ip_ap3.GetWindowText(ChariotParameter.str_ap3_addr);
+			if (ChariotParameter.str_ap3_addr == "" )
+			{
+				sprintf_s(msg,"Endpoint must not be null!!\nPlease recheck!!");
+				MessageBox(msg, "Error", MB_OK | MB_ICONERROR);
+				DisplayPage(1);
+				m_page_chariot.m_ip_ap3.SetFocus();
 
-			return 0;
+				PrintlnToMemo("<<<<<<<<<<<<<<<<< Please enter the IP address of the PC connected to AP3 through LAN port(Test Abort!!) >>>>>>>>>>>>>>>>>");
+
+				return 0;
+			}
 		}
-		CString str_p1;
-		m_page_chariot.m_cbx_profile1.GetWindowText(str_p1);
-		if(str_p1 == ""){
-			sprintf_s(msg,"profile1 must not be null!!\nPlease recheck!!");
-			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);
-			DisplayPage(1);
-			m_page_chariot.m_cbx_profile1.SetFocus();
-
-			PrintlnToMemo("<<<<<<<<<<<<<<<<< please set profile1  (Test Abort!!) >>>>>>>>>>>>>>>>>");
-			return 0;
-		}
-		strcpy_s(ChariotParameter.profile1 ,str_p1.GetBuffer(str_p1.GetLength()));
-		CString str_p2;
-		m_page_chariot.m_cbx_profile2.GetWindowText(str_p2);
-		if(str_p2 == ""){
-			sprintf_s(msg,"profile2 must not be null!!\nPlease recheck!!");
-			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);
-			DisplayPage(1);
-			m_page_chariot.m_cbx_profile2.SetFocus();
-
-			PrintlnToMemo("<<<<<<<<<<<<<<<<< please set profile2  (Test Abort!!) >>>>>>>>>>>>>>>>>");
-			return 0;
-		}
-		strcpy_s(ChariotParameter.profile2 ,str_p2.GetBuffer(str_p2.GetLength()));
-
 	}
 	if(ChariotParameter.use_case == 0 ){
 		if (ChariotParameter.e1 == "" ||  ChariotParameter.e2 == "" )
@@ -194,26 +168,39 @@ bool CIceLemonDlg::CheckUseCase()
 			PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>",1);
 			return 0;
 		}
-	    m_page_chariot.m_cbx_profile1.GetWindowTextA(ChariotParameter.profile1,WLAN_MAX_NAME_LENGTH);
-		str = ChariotParameter.profile1;
-		if(str.Compare("")== 0){
-			sprintf_s(msg,"The profile1 must be set!!\nPlease recheck!!");
-			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);	
+		ChariotParameter.ap_count=0;
+		CString str_p1;
+		m_page_chariot.m_cbx_profile1.GetWindowText(str_p1);
+		if(str_p1 == ""){
+			sprintf_s(msg,"profile1 must not be null!!\nPlease recheck!!");
+			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);
 			DisplayPage(1);
 			m_page_chariot.m_cbx_profile1.SetFocus();
-			PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>",1);
+
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< please set profile1  (Test Abort!!) >>>>>>>>>>>>>>>>>");
 			return 0;
 		}
-		m_page_chariot.m_cbx_profile2.GetWindowTextA(ChariotParameter.profile2,WLAN_MAX_NAME_LENGTH);
-		str = ChariotParameter.profile2;
-		if(str.Compare("") == 0){
-			sprintf_s(msg,"The profile2 must be set!!\nPlease recheck!!");
-			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);	
+		ChariotParameter.ap_count++;
+		strcpy_s(ChariotParameter.profile1 ,str_p1.GetBuffer(str_p1.GetLength()));
+		CString str_p2;
+		m_page_chariot.m_cbx_profile2.GetWindowText(str_p2);
+		if(str_p2 == ""){
+			sprintf_s(msg,"profile2 must not be null!!\nPlease recheck!!");
+			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);
 			DisplayPage(1);
 			m_page_chariot.m_cbx_profile2.SetFocus();
-			PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>",1);
+
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< please set profile2  (Test Abort!!) >>>>>>>>>>>>>>>>>");
 			return 0;
 		}
+		ChariotParameter.ap_count++;
+		strcpy_s(ChariotParameter.profile2 ,str_p2.GetBuffer(str_p2.GetLength()));
+		CString str_p3;
+		m_page_chariot.m_cbx_profile3.GetWindowText(str_p3);
+		if(str_p3 != ""){
+			ChariotParameter.ap_count++;
+		}
+		strcpy_s(ChariotParameter.profile3 ,str_p3.GetBuffer(str_p3.GetLength()));
 	}else if (ChariotParameter.use_case == 2){
 		ChariotParameter.card1_index = m_page_chariot.m_cbx_card1.GetCurSel();
 		if(ChariotParameter.card1_index == -1) {
@@ -251,16 +238,7 @@ bool CIceLemonDlg::CheckUseCase()
 			PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>",1);
 			return 0;
 		}
-		m_page_chariot.m_cbx_profile2.GetWindowTextA(ChariotParameter.profile2,WLAN_MAX_NAME_LENGTH);
-		str = ChariotParameter.profile2;
-		if(str.Compare("")== 0){
-			sprintf_s(msg,"The profile1 must be set!!\nPlease recheck!!");
-			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);	
-			DisplayPage(1);
-			m_page_chariot.m_cbx_profile1.SetFocus();
-			PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>",1);
-			return 0;
-		}
+
 	}
 	return 1;
 }
@@ -326,7 +304,6 @@ void CIceLemonDlg::CalculateLoopCount()
 
 
 
-		LoopCount = 1;
 		LoopCount = 4;
 	
 }

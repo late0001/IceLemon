@@ -70,6 +70,9 @@ void CDlgChariot::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CBX_PROFILE2, m_cbx_profile2);
 	DDX_Control(pDX, IDC_IPADDR_AP1, m_ip_ap1);
 	DDX_Control(pDX, IDC_IPADDR_AP2, m_ip_ap2);
+	DDX_Control(pDX, IDC_CBX_CARD3, m_cbx_card3);
+	DDX_Control(pDX, IDC_CBX_PROFILE3, m_cbx_profile3);
+	DDX_Control(pDX, IDC_IPADDR_AP3, m_ip_ap3);
 }
 
 
@@ -442,7 +445,10 @@ void CDlgChariot::OnLoadconf2()
 		GetDlgItem(IDC_LB_CARD2)->ShowWindow(SW_HIDE);
 		m_cbx_card2.ShowWindow(SW_HIDE);
 	}
-	
+	if(m_cbx_card3.IsWindowVisible()){
+		GetDlgItem(IDC_LB_CARD3)->ShowWindow(SW_HIDE);
+		m_cbx_card3.ShowWindow(SW_HIDE);
+	}
 	ckbEndpoint12.SetCheck(1);
 	E12PairCount = 5;
 	cbxProtocol.SetCurSel(1);//TCP
@@ -472,6 +478,10 @@ void CDlgChariot::OnLoadconf3()
 	if(!m_cbx_card2.IsWindowVisible()){
 		GetDlgItem(IDC_LB_CARD2)->ShowWindow(SW_SHOW);
 		m_cbx_card2.ShowWindow(SW_SHOW);
+	}
+	if(!m_cbx_card3.IsWindowVisible()){
+		GetDlgItem(IDC_LB_CARD3)->ShowWindow(SW_SHOW);
+		m_cbx_card3.ShowWindow(SW_SHOW);
 	}
 	ckbEndpoint12.SetCheck(1);
 	E12PairCount = 5;

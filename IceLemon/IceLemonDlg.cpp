@@ -359,6 +359,7 @@ UINT enum_wlaninf_func(LPVOID param)
 	CComboBox *pCb = &pIceLemonDlg->m_page_main.m_cb_WlInf;
 	CComboBox *pCb1 = &pIceLemonDlg->m_page_chariot.m_cbx_card1;
 	CComboBox *pCb2 = &pIceLemonDlg->m_page_chariot.m_cbx_card2;
+	CComboBox *pCb3 = &pIceLemonDlg->m_page_chariot.m_cbx_card3;
 	pWlop->setContext(pIceLemonDlg);
 	count = pWlop->GetNumberOfInterfaces();
 	//CString str;
@@ -368,6 +369,7 @@ UINT enum_wlaninf_func(LPVOID param)
 		pCb->InsertString(i,desc);
 		pCb1->InsertString(i,desc);
 		pCb2->InsertString(i,desc);
+		pCb3->InsertString(i,desc);
 	}
 	return 0;
 }
@@ -390,6 +392,7 @@ DWORD CIceLemonDlg::GetProfileList(int index)
 	CComboBox *pCb = &m_page_main.m_cb_profile; 
 	CComboBox *pCb1 = &m_page_chariot.m_cbx_profile1;
 	CComboBox *pCb2 = &m_page_chariot.m_cbx_profile2;
+	CComboBox *pCb3 = &m_page_chariot.m_cbx_profile3;
 	if(index == -1) index = 0;
 	pGuid = pWlOp->GetInterfaceGuid(index);
 	dwResult = pWlOp->GetProfileList(pGuid, &pProfileList);
@@ -402,6 +405,7 @@ DWORD CIceLemonDlg::GetProfileList(int index)
 		pCb->InsertString(i, profileName);
 		pCb1->InsertString(i, profileName);
 		pCb2->InsertString(i, profileName);
+		pCb3->InsertString(i, profileName);
 	}
 	return dwResult;
 }

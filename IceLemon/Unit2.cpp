@@ -1327,7 +1327,7 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j, int k)
 			fprintf(TmpFile,"===  %-20s    =======   =======   =======   ======\n", "=======");
 		}
 		GetDateTime(buf, 1);
-		fprintf(TmpFile,"%3d %-20s %9.2f %9.2f %9.2f    %-15s\n",0, t_item.SSID,
+		fprintf(TmpFile,"%3d  %-20s %9.2f %9.2f %9.2f    %-15s\n",0, t_item.SSID,
 			avg3, avg4, avg3+avg4, buf);
 		break;
 	case 4:
@@ -1381,6 +1381,46 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j, int k)
 	t_item.two_way = avg3+avg4;
 	SaveOneToDb(saveFormat);
 }
+int RunThread::ConnectAndGetIP(int card_index, char *profile, CString &str_ap_addr)
+{
+	CString DisplayWord;
+	int retry = 5;
+	while(retry--){
+		pIceLemonDlg->OnConnect(card_index, profile , 1);
+		if(pIceLemonDlg->cur_is_connected == 1) break;
+		Sleep(200);
+	}
+	if(!pIceLemonDlg->cur_is_connected) {
+		AfxMessageBox("can not connect to network!");
+		return -1;
+	}
+
+	ChariotParameter.e1 = str_ap_addr;
+	ChariotParameter.e2 = "";//
+	retry = 5;
+	do{
+		pIceLemonDlg->GetLocalIPInfo(card_index, ChariotParameter.e2);
+
+		if(ChariotParameter.e2 == "" ){
+			DisplayWord.Format("[%d/5] Try to get ip address",6-retry);
+			pIceLemonDlg->PrintlnToMemo(DisplayWord);
+			Sleep(1000);
+			continue;
+		}else if(ChariotParameter.e2.Mid(0,3) != ChariotParameter.e1.Mid(0,3)){
+			DisplayWord.Format("[%d/5] Try to get ip address",6-retry);
+			pIceLemonDlg->PrintlnToMemo(DisplayWord);
+			Sleep(1000);
+			continue;
+		}else{
+			break;
+		}
+	}while(retry--);
+	if(ChariotParameter.e2 ==""){
+		AfxMessageBox("can not fetch ip address of endpoint2!");
+		return -1;
+	}
+	strcpy_s(t_item.SSID, profile);
+}
 
 int RunThread::Run()
 {
@@ -1397,6 +1437,7 @@ int RunThread::Run()
 	int k=0,LoopCount;
 	int FinishTmpRound;
 	CString DisplayWord;
+	int ap_count = ChariotParameter.ap_count;
 	//while(!Terminate){
 	if(Flag.Run)
 	{
@@ -1436,86 +1477,19 @@ int RunThread::Run()
 				}
 				pIceLemonDlg->CurrentLoopCount = k; //to set what loop the program run now.
 				if(ChariotParameter.use_case == 1){
-					if(k % 2 == 1){
+					if(k % ap_count == 1){
 					//Á¬Ïß
-						int retry = 5;
-						while(retry--){
-							pIceLemonDlg->OnConnect(ChariotParameter.card1_index, ChariotParameter.profile1 , 1);
-							if(pIceLemonDlg->cur_is_connected == 1)break;
-							Sleep(200);
-						}
-						if(!pIceLemonDlg->cur_is_connected) {
-							AfxMessageBox("can not connect to network!");
-							return -1;
-						}
-						//Sleep(1000);
-						ChariotParameter.e1 = ChariotParameter.str_ap1_addr;
-						ChariotParameter.e2 = "";//
-						retry = 5;
-						do{
-							pIceLemonDlg->GetLocalIPInfo(ChariotParameter.card1_index,ChariotParameter.e2);
-							if(ChariotParameter.e2 == ""){
-								DisplayWord.Format("[%d/5] Try to get ip address",6-retry);
-								pIceLemonDlg->PrintlnToMemo(DisplayWord);
-								Sleep(1000);
-								continue;
-							} else if(ChariotParameter.e2.Mid(0,3) != ChariotParameter.e1.Mid(0,3)){
-								DisplayWord.Format("[%d/5] Try to get ip address",6-retry);
-								pIceLemonDlg->PrintlnToMemo(DisplayWord);
-								Sleep(1000);
-								continue;
-							} else{
-								break;
-							}
-						}while(retry--);
-						if(ChariotParameter.e2 ==""){
-							AfxMessageBox("can not fetch ip address of endpoint2!");
-							return -1;
-						}
-						strcpy_s(t_item.SSID, ChariotParameter.profile1);
-						//else{
-						//	AfxMessageBox(ChariotParameter.e2);
-						//}
-					}else{//if(k % 2 == 1){
-
-						int retry = 5;
-						while(retry--){
-							pIceLemonDlg->OnConnect(ChariotParameter.card1_index, ChariotParameter.profile2 , 1);
-							if(pIceLemonDlg->cur_is_connected == 1)break;
-							Sleep(200);
-						}
-						if(!pIceLemonDlg->cur_is_connected) {
-							AfxMessageBox("can not connect to network!");
-							return -1;
-						}
+						ConnectAndGetIP(ChariotParameter.card1_index, ChariotParameter.profile1, ChariotParameter.str_ap1_addr);
+					}else if(k % ap_count == 2){
+						ConnectAndGetIP(ChariotParameter.card1_index, ChariotParameter.profile2, ChariotParameter.str_ap2_addr);
 						
-						ChariotParameter.e1 = ChariotParameter.str_ap2_addr;
-						ChariotParameter.e2 = "";//
-						retry = 5;
-						do{
-							pIceLemonDlg->GetLocalIPInfo(ChariotParameter.card1_index,ChariotParameter.e2);
-				
-							if(ChariotParameter.e2 == "" ){
-								DisplayWord.Format("[%d/5] Try to get ip address",6-retry);
-								pIceLemonDlg->PrintlnToMemo(DisplayWord);
-								Sleep(1000);
-								continue;
-							}else if(ChariotParameter.e2.Mid(0,3) != ChariotParameter.e1.Mid(0,3)){
-								DisplayWord.Format("[%d/5] Try to get ip address",6-retry);
-								pIceLemonDlg->PrintlnToMemo(DisplayWord);
-								Sleep(1000);
-								continue;
-							}else{
-								break;
-							}
-						}while(retry--);
-						if(ChariotParameter.e2 ==""){
-							AfxMessageBox("can not fetch ip address of endpoint2!");
-							return -1;
+					}else {// if(k % ap_count == ...){
+						if(ap_count == 2){
+							ConnectAndGetIP(ChariotParameter.card1_index, ChariotParameter.profile2, ChariotParameter.str_ap2_addr);
+						}else{
+							ConnectAndGetIP(ChariotParameter.card1_index, ChariotParameter.profile3, ChariotParameter.str_ap3_addr);
 						}
-						strcpy_s(t_item.SSID, ChariotParameter.profile2);
 					}//End if(k % 2 == 1){
-					
 				}//End if(ChariotParameter.use_case == 1)
 				else if (ChariotParameter.use_case == 2){
 					if(k % 2 == 1){

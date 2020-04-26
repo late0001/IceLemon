@@ -29,10 +29,13 @@ struct Chariot
 	unsigned long PairNum[3]; //how many Pair Numbers in each direction  //2008/3/20
 	int card1_index;
 	int card2_index;
+	int  ap_count;
 	char profile1[WLAN_MAX_NAME_LENGTH];
 	char profile2[WLAN_MAX_NAME_LENGTH];
+	char profile3[WLAN_MAX_NAME_LENGTH];
 	CString str_ap1_addr;
 	CString str_ap2_addr;
+	CString str_ap3_addr;
 };
 
 struct Attenuator
@@ -129,6 +132,7 @@ public:
 	 void Set_Chariot(struct Chariot chariotP);
 	 void SetDataTmpFile(unsigned long jj, unsigned long k);
 	 void SaveTmpData(unsigned long saveFormat, unsigned long j, int k);
+	 int ConnectAndGetIP(int card_index, char *profile, CString &str_ap_addr);
 	 int Run();
 	 bool IsPreRun; 
 	 virtual BOOL InitInstance();
