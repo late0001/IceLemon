@@ -87,4 +87,7 @@ public:
 	CComboBox m_cbx_card3;
 	CComboBox m_cbx_profile3;
 	CIPAddressCtrl m_ip_ap3;
+	POINT old;
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	void ReSize(void);
 };

@@ -98,6 +98,7 @@ ON_COMMAND(ID_LOADCONF1, &CDlgChariot::OnLoadconf1)
 ON_COMMAND(ID_LOADCONF2, &CDlgChariot::OnLoadconf2)
 ON_COMMAND(ID_LOADCONF3, &CDlgChariot::OnLoadconf3)
 ON_COMMAND(ID_SAVE_CONF, &CDlgChariot::OnSaveConf)
+ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
@@ -257,6 +258,10 @@ BOOL CDlgChariot::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	//InitConf();
+	CRect m_rect;
+	GetClientRect(&m_rect);  //获取对话框的大小
+	old.x=m_rect.right-m_rect.left;  
+	old.y=m_rect.bottom-m_rect.top;
 	return TRUE;
 }
 
@@ -451,6 +456,10 @@ void CDlgChariot::OnLoadconf2()
 	}
 	ckbEndpoint12.SetCheck(1);
 	E12PairCount = 5;
+	ckbEndpoint21.SetCheck(1);
+	E21PairCount = 5;
+	ckb2way.SetCheck(1);
+	E1221PairCount = 5;
 	cbxProtocol.SetCurSel(1);//TCP
 	char tmpBuf[255] = { 0 };
 	GetCurrentDirectory(255, tmpBuf);
@@ -458,11 +467,11 @@ void CDlgChariot::OnLoadconf2()
 	fileName.Format("%s\\Scripts\\Throughput.scr", tmpBuf);	//默认打开的文件名
 	pIceLemonDlg->m_page_chariot.lblScript.SetWindowText(fileName);
 	m_edit_hour = 0;
-	m_edit_min = 1;
+	m_edit_min = 6;
 	m_edit_sec = 0;
 	m_edit_hour_s = 0;
 	m_edit_min_s = 0;
-	m_edit_sec_s = 30;
+	m_edit_sec_s = 20;
 	m_cbx_card1.SetCurSel(0);
 	m_cbx_use_case.SetCurSel(1);
 	m_ip_ap2.SetWindowTextA("192.168.1.100");
@@ -485,6 +494,10 @@ void CDlgChariot::OnLoadconf3()
 	}
 	ckbEndpoint12.SetCheck(1);
 	E12PairCount = 5;
+	ckbEndpoint21.SetCheck(1);
+	E21PairCount = 5;
+	ckb2way.SetCheck(1);
+	E1221PairCount = 5;
 	cbxProtocol.SetCurSel(1);//TCP
 	char tmpBuf[255] = { 0 };
 	GetCurrentDirectory(255, tmpBuf);
@@ -492,11 +505,11 @@ void CDlgChariot::OnLoadconf3()
 	fileName.Format("%s\\Scripts\\Throughput.scr", tmpBuf);	//默认打开的文件名
 	pIceLemonDlg->m_page_chariot.lblScript.SetWindowText(fileName);
 	m_edit_hour = 0;
-	m_edit_min = 1;
+	m_edit_min = 6;
 	m_edit_sec = 0;
 	m_edit_hour_s = 0;
 	m_edit_min_s = 0;
-	m_edit_sec_s = 30;
+	m_edit_sec_s = 20;
 	m_cbx_card1.SetCurSel(0);
 	m_cbx_use_case.SetCurSel(2);
 	m_ip_ap2.SetWindowTextA("192.168.1.100");
@@ -554,4 +567,51 @@ void CDlgChariot::OnSaveConf()
 	m_ip_ap2.GetWindowText(str);
 	::WritePrivateProfileString(_T("ChariotInfo"), _T("AP2"), str, strPath);	
 	MessageBox("完成!");
+}
+
+
+void CDlgChariot::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: 在此处添加消息处理程序代码
+	if(nType!=SIZE_MINIMIZED )  
+	{
+		ReSize();
+	}
+}
+
+
+void CDlgChariot::ReSize(void)
+{
+
+    float fsp[2];  
+    POINT Newp; //获取现在对话框的大小  
+    CRect recta;      
+    GetClientRect(&recta);     //取客户区大小    
+    Newp.x=recta.right-recta.left;  
+    Newp.y=recta.bottom-recta.top;  
+    fsp[0]=(float)Newp.x/old.x;  
+    fsp[1]=(float)Newp.y/old.y;  
+    CRect Rect;  
+    int woc;  
+    CPoint OldTLPoint,TLPoint; //左上角  
+    CPoint OldBRPoint,BRPoint; //右下角  
+    HWND  hwndChild=::GetWindow(m_hWnd,GW_CHILD);  //列出所有控件    
+    while(hwndChild){      
+        woc=::GetDlgCtrlID(hwndChild);//取得ID  
+        GetDlgItem(woc)->GetWindowRect(Rect);    
+        ScreenToClient(Rect);    
+        OldTLPoint = Rect.TopLeft();    
+        TLPoint.x = long(OldTLPoint.x*fsp[0]);    
+        TLPoint.y = long(OldTLPoint.y*fsp[1]);    
+        OldBRPoint = Rect.BottomRight();    
+        BRPoint.x = long(OldBRPoint.x *fsp[0]);    
+        BRPoint.y = long(OldBRPoint.y *fsp[1]);    
+        Rect.SetRect(TLPoint,BRPoint);    
+        GetDlgItem(woc)->MoveWindow(Rect,TRUE);  
+        hwndChild=::GetWindow(hwndChild, GW_HWNDNEXT);      
+    }
+    old=Newp;  
+
 }

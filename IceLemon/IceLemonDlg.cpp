@@ -580,8 +580,7 @@ void CIceLemonDlg::InsertRecord(CString sql)
 		m_pConnection->Execute((_bstr_t)sql,NULL,adCmdText);
 	}catch(_com_error e){
 		CString errormessage;
-		errormessage.Format("失败!\r\n错误信息:%s",e.ErrorMessage());
-		
+		errormessage.Format("失败!\r\n错误信息:%s",e.ErrorMessage());	
 	}
 
 }

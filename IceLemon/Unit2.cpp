@@ -1277,7 +1277,7 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j, int k)
 			GetDateTime(buf, 0);
 			fprintf(TmpFile, "Date: %s\n",buf);
 		
-			fprintf(TmpFile,"Throughput(unit: Mbps)\n");
+			fprintf(TmpFile, "Throughput(unit: Mbps)\n");
 
 //			if (Form1->ckbLoadTestFile->Checked == true)
 //			{               
@@ -1286,8 +1286,8 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j, int k)
 //			}
 //			else
 //			{
-				fprintf(TmpFile,"Att  %-20s     E1->E2     k      time\n", "SSID");
-				fprintf(TmpFile,"===  %-20s    ========	  =====	  =====\n", "=======");
+				fprintf(TmpFile, "Att  %-20s     E1->E2     k      time\n", "SSID");
+				fprintf(TmpFile, "===  %-20s    ========	  =====	  =====\n", "=======");
 //			}
 		}
 
@@ -1381,6 +1381,7 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j, int k)
 	t_item.two_way = avg3+avg4;
 	SaveOneToDb(saveFormat);
 }
+
 int RunThread::ConnectAndGetIP(int card_index, char *profile, CString &str_ap_addr)
 {
 	CString DisplayWord;
