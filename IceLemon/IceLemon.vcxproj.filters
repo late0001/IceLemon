@@ -54,6 +54,9 @@
     <ClInclude Include="DlgTestOnly.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="DlgChariot2.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IceLemon.cpp">
@@ -90,6 +93,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="DlgTestOnly.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgChariot2.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

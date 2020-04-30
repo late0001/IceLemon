@@ -6,6 +6,7 @@
 #include "afxcmn.h"
 #include "DlgMain.h"
 #include "DlgChariot.h"
+#include "DlgChariot2.h"
 #include "DlgTestOnly.h"
 #include "xcommon.h"
 #include "afxwin.h"
@@ -42,9 +43,10 @@ public:
 	CTabCtrl m_tab;
 	CDlgMain m_page_main;
 	CDlgChariot m_page_chariot;
+	CDlgChariot2 m_page_chariot2;
 	CDlgTestOnly m_page_testonly;
 	int m_curSelTab;
-	CDialogEx *pDlg[3];
+	CDialogEx *pDlg[4];
 	afx_msg void OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	void DisplayPage(int i);
@@ -72,6 +74,7 @@ public:
 	bool CheckChariotSetting();
 	void CalculateTotalTestTime();
 	void CorrectTimeRemain(int h);
+	void CorrectTimeRemain2(Chariot2_Item *item);
 	void SetTotalTestTime();
 	void UpdateProgress(int FinishRound);
 	int OnConnect( int index, char *profile, int wait);
@@ -81,10 +84,12 @@ public:
 	DWORD Card2GetProfileList(int index);
 	void UpdateIPAddressListItem();
 	void InsertRecord(CString sql);
+	PWLAN_PROFILE_INFO_LIST pProfileList;
 	// Define Chariot struct varibles
 	struct Chariot ChariotParameter;
 	// Define flag varibles
 	struct SFlag Flag;
+	int cur_sel_card;
 	int saveFormat;
 	bool IsSave;
 	CString workDirectory;
@@ -125,4 +130,5 @@ public:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnDestroy();
 	afx_msg void OnImportConf();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 };

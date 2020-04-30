@@ -13,6 +13,7 @@ void RunThread::SetContext(CIceLemonDlg *pDlg)
 }
 RunThread::RunThread()
 {
+	run_flag = 1;
 }
 
 void RunThread::Creat_Test()
@@ -61,10 +62,10 @@ void ChariotCheck(CHR_HANDLE handle, CHR_API_RC code, CHR_STRING where)
     {
        if (code != CHR_OK)
         {
-           pIceLemonDlg->m_page_main.m_redit.SetSel(-1,-1);
-		   pIceLemonDlg->m_page_main.m_redit.ReplaceSel("****** Chariot: Error Message ******\r\n");
-           DisplayWord.Format("%s failed: rc = %d \n", where, code);
-           pIceLemonDlg->m_page_main.m_redit.ReplaceSel(DisplayWord);
+          
+		   pIceLemonDlg->PrintlnToMemo("****** Chariot: Error Message ******");
+           DisplayWord.Format("%s failed: rc = %d", where, code);
+           pIceLemonDlg->PrintlnToMemo(DisplayWord);
         }
     }
    else
@@ -76,10 +77,9 @@ void ChariotCheck(CHR_HANDLE handle, CHR_API_RC code, CHR_STRING where)
        if (rc != CHR_OK)
         {
            // Could not get the message: show why
-		   pIceLemonDlg->m_page_main.m_redit.SetSel(-1,-1);
-           pIceLemonDlg->m_page_main.m_redit.ReplaceSel("****** Chariot: Error Message ******\r\n");
-           DisplayWord.Format("%s failed\nUnable to get message for return code %d, rc = %d\n", where, code, rc);
-           pIceLemonDlg->m_page_main.m_redit.ReplaceSel(DisplayWord);
+           pIceLemonDlg->PrintlnToMemo("****** Chariot: Error Message ******");
+           DisplayWord.Format("%s failed\nUnable to get message for return code %d, rc = %d", where, code, rc);
+           pIceLemonDlg->PrintlnToMemo(DisplayWord);
         }
        else
         {
@@ -102,10 +102,9 @@ void ChariotCheck(CHR_HANDLE handle, CHR_API_RC code, CHR_STRING where)
                                               errorInfo,
                                               CHR_MAX_ERROR_INFO,
                                               &errorLen);
-			   pIceLemonDlg->m_page_main.m_redit.SetSel(-1,-1);
-               pIceLemonDlg->m_page_main.m_redit.ReplaceSel("****** Chariot: Error Message ******\r\n");
-               DisplayWord.Format("%s failed: rc = %d (%s)\n errorInfo: %s\n", where, code, msg, errorInfo);
-               pIceLemonDlg->m_page_main.m_redit.ReplaceSel(DisplayWord);
+               pIceLemonDlg->PrintlnToMemo("****** Chariot: Error Message ******");
+               DisplayWord.Format("%s failed: rc = %d (%s)\n errorInfo: %s", where, code, msg, errorInfo);
+               pIceLemonDlg->PrintlnToMemo(DisplayWord);
             }
         }
     }
@@ -121,10 +120,8 @@ void RunThread::Creat_Pair(unsigned int n)
 
 	if ( rc != CHR_OK )
 	{
-		DisplayWord.Format("Creat_Pair: pair_new fail rc = %d\n", rc);
-		pIceLemonDlg->m_page_main.m_redit.SetSel(-1, -1);
-		pIceLemonDlg->m_page_main.m_redit.ReplaceSel(DisplayWord);
-		pIceLemonDlg->m_page_main.m_redit.ReplaceSel("\r\n");
+		DisplayWord.Format("Creat_Pair: pair_new fail rc = %d", rc);
+		pIceLemonDlg->PrintlnToMemo(DisplayWord);
 		IsError = true;
 	}
 
@@ -138,8 +135,8 @@ void RunThread::Creat_Pair(unsigned int n)
 
 	if ( rc != CHR_OK)
 	{
-		DisplayWord.Format("Creat_Pair: pair_use_script_filename fail rc = %d\n", rc); 
-		pIceLemonDlg->m_page_main.m_redit.ReplaceSel(DisplayWord);
+		DisplayWord.Format("Creat_Pair: pair_use_script_filename fail rc = %d", rc); 
+		pIceLemonDlg->PrintlnToMemo(DisplayWord);
 		IsError = true;
 	}
 
@@ -150,8 +147,8 @@ void RunThread::Creat_Pair(unsigned int n)
 		ChariotCheck(pair[n], rc, "pair_use_Qos_name");
 
 		if ( rc != CHR_OK) {
-			DisplayWord.Format("Creat_Pair: pair_use_Qos_name fail rc = %d\n", rc); 	
-			pIceLemonDlg->m_page_main.m_redit.ReplaceSel(DisplayWord);
+			DisplayWord.Format("Creat_Pair: pair_use_Qos_name fail rc = %d", rc); 	
+			pIceLemonDlg->PrintlnToMemo(DisplayWord);
 			IsError = true;
 		}
 	}
@@ -263,8 +260,7 @@ bool RunThread::SetupChariot(int x, unsigned long TestDuration)
 
 		if (pIceLemonDlg->ExtTstPairCount == 0)
 		{
-			pIceLemonDlg->m_page_main.m_redit.SetSel(-1, -1);
-			pIceLemonDlg->m_page_main.m_redit.ReplaceSel("Error!! No Paris found in the Ext-loaded .tst file\r\n");
+			pIceLemonDlg->PrintlnToMemo("Error!! No Paris found in the Ext-loaded .tst file");
 			return false;
 		}
 		else
@@ -284,7 +280,36 @@ bool RunThread::SetupChariot(int x, unsigned long TestDuration)
 	return true;
 }
 
-void RunThread::Save_ChariotTestFile(unsigned long direction, unsigned loopcount,
+bool RunThread::SetupChariot2(Chariot2_Item *item)
+{
+	unsigned long i;
+	//pIceLemonDlg->m_page_chariot.UpdateData(true);
+		Creat_Test();
+
+		// Set Chariot test duration
+		CHR_runopts_set_test_duration(run, item->testduration);
+
+		for (i=1; i<=item->pairNum; i++)
+		{
+			Creat_Pair(i);
+
+			if (IsError == true)
+				return false;
+
+			// Set IP address for Endpoint1 to Endpoint2
+			CHR_pair_set_e1_addr(pair[i], item->e1.GetBuffer(item->e1.GetLength()), item->e1.GetLength());
+
+			CHR_pair_set_e2_addr(pair[i], item->e2.GetBuffer(item->e2.GetLength()), item->e2.GetLength());
+
+			// Add the pair to the test
+			CHR_test_add_pair(test, pair[i]);
+		}
+
+
+	return true;
+}
+
+void RunThread::Save_ChariotTestFile(unsigned long direction, unsigned long loopcount,
 									 unsigned long j, unsigned long k)
 {
 	CString  HeadName = ChariotParameter.testfile,
@@ -345,6 +370,54 @@ void RunThread::Save_ChariotTestFile(unsigned long direction, unsigned loopcount
 	rc = CHR_test_set_filename(test, FullName.GetBuffer(FullName.GetLength()), FullName.GetLength());
 	ChariotCheck(test, rc, "set_test_filename");
 }
+void RunThread::Save_ChariotTestFile2(Chariot2_Item *item, unsigned loopcount,
+									 unsigned long j, unsigned long k)
+{
+	CString  HeadName = item->testfile,
+		TypeName = "",
+		FullName = "",
+		DirectionName = "";
+	char *ExtendName;
+	int length, rc;
+
+	//remove sub-filename .xxx to avoid error
+
+	if (HeadName.Mid(HeadName.GetLength()-3, 1) == ".")
+	{
+		HeadName = HeadName.Mid(1, HeadName.GetLength()-4);
+	}
+
+	length = HeadName.GetLength();
+
+	DirectionName = "_Pair12";
+
+
+
+	if (loopcount >1)
+	{
+		DirectionName = DirectionName + "_Att%d_Round%d";
+		ExtendName = DirectionName.GetBuffer(100);
+		DirectionName.ReleaseBuffer();
+		TypeName.Format(ExtendName, 0, k);
+	}
+	else
+	{
+		DirectionName = DirectionName + "_Att%d";
+		ExtendName = DirectionName.GetBuffer(100);
+		DirectionName.ReleaseBuffer();
+		TypeName.Format(ExtendName, 0);
+	}
+
+
+	FullName = HeadName + TypeName;
+
+	FullName = FullName + ".tst";
+
+	pIceLemonDlg->m_page_chariot.lbl_saveName.SetWindowText(FullName);
+	rc = CHR_test_set_filename(test, FullName.GetBuffer(FullName.GetLength()), FullName.GetLength());
+	ChariotCheck(test, rc, "set_test_filename");
+}
+
 
 CString RunThread::GetChariotStatus(char x)
 {
@@ -435,13 +508,18 @@ void RunThread::Set_Chariot(struct Chariot chariotP)
 	ChariotParameter = chariotP;
 }
 
+void RunThread::Set_Chariot2(list<Chariot2_Item> clist)
+{
+	m_chariot2_List = clist;
+}
+
 void RunThread::GetThroughput(int AttIndex, int x, int h)
 {
 	CString DisplayWord;
 	int rc, PairNum, k;
 	unsigned long i;
 	double avg;
-	char tmp[128];
+	//char tmp[128];
 	//pIceLemonDlg->SendMessage(WM_UPDATEUSERDATA, true, 0);
 	switch(x)
 	{
@@ -648,6 +726,43 @@ void RunThread::GetThroughput(int AttIndex, int x, int h)
 	//pIceLemonDlg->SendMessage(WM_UPDATEUSERDATA, false, 0);
 }
 
+void RunThread::GetThroughput2(Chariot2_Item *item, int AttIndex)
+{
+	CString DisplayWord;
+	int rc, pairNum, k;
+	unsigned long i;
+	double avg;
+	//char tmp[128];
+	//pIceLemonDlg->SendMessage(WM_UPDATEUSERDATA, true, 0);
+		pairNum = item->pairNum;
+		avg1 = 0;
+
+		for (k=1; k<=pairNum; k++)
+		{
+			avg = 0;
+			rc = CHR_pair_results_get_average(pair[k], CHR_RESULTS_THROUGHPUT, &avg);
+
+			if (rc != CHR_OK)
+				avg = 0;
+
+			avg1 = avg1 + avg;
+		}
+
+		if ( (avg1 < 0.0001) || (avg1 > 1000) )
+		{
+			avg1 = 0;
+		}
+		avg1 *=0.944;
+
+
+		for (k=1; k<=pairNum; k++)
+			CHR_pair_delete(pair[k]);
+
+		CHR_test_delete(test);
+
+	//pIceLemonDlg->SendMessage(WM_UPDATEUSERDATA, false, 0);
+}
+
 void RunThread::SaveOneToDb(unsigned long saveFormat)
 {
 	//Test1_item item;
@@ -728,7 +843,7 @@ void RunThread::GetThroughput(int x, int h)
 {
 	CString DisplayWord;
 	int rc, PairNum, k;
-	unsigned long i;
+//	unsigned long i;
 	double avg;
 	//char tmp[128];
 	//pIceLemonDlg->SendMessage(WM_UPDATEUSERDATA, true, 0);
@@ -870,7 +985,7 @@ void RunThread::GetThroughputMax(int x, int h)
 {
 	CString DisplayWord;
 	int rc, PairNum, k;
-	unsigned long i;
+//	unsigned long i;
 	double avg;
 	char tmp[128];
 	//pIceLemonDlg->SendMessage(WM_UPDATEUSERDATA, true, 0);
@@ -1018,7 +1133,7 @@ int RunThread::GetSaveDataFileName(unsigned long direction, unsigned loop_count,
 		FullName = "",
 		DirectionName = "";
 	char *ExtendName;
-	int length, rc;
+	int length;
 	char pBuf[MAX_PATH];
 	if(HeadName == ""){
 		 //´æ·ÅÂ·¾¶
@@ -1079,6 +1194,8 @@ int RunThread::GetSaveDataFileName(unsigned long direction, unsigned loop_count,
 	fileName = FullName;
 	return 0;
 }
+
+
 
 int RunThread::SaveTPToFile()
 {
@@ -1236,6 +1353,92 @@ void RunThread::SetDataTmpFile(unsigned long jj, unsigned long k)
     }
 
 }
+
+void RunThread::SetDataTmpFile2(unsigned long jj, unsigned long k)
+{
+   /* Define tmp file pointer for save data
+    * Name Rule: FullName = HeadName + TypeName (if required) + TailName
+    * General Filename: C:/DataTmp_Typexx.txt
+    * HeadName-> "DataTmp" ;
+    * TypeName->  "_Typexx", Type means Round or Rate or Angle, xx means type value;
+    * TailName->  ".txt",
+    * Example1: C:\DataTmp_Round2.txt   --> Round2 test data
+    * Example2: C:\DataTmp_RateOFDM 12M.txt  --> 54Mbps test data
+    * Example3: C:\DataTmp_Angle180.txt --> 180 degree test data
+    * Example4: C:\DataTmp_Parameter1.txt --> Parameter1 test data
+    * Example4: C:\DataTmp_Temperature30.txt --> tempaerature test data
+    */
+
+   /* Also Define Chariot test file pointer
+    * Name Rule: FullName = HeadName + TypeName (if required)
+    * HeadName-> ChariotParameter.testfile (String format-> path/****.tst)
+    * TypeName-> "_Type1xx_Type2yy_Type3zz"
+    * Type1-> Pair  xx: 12 or 21 or #(2way)
+    * Type2-> Att   yy: 0~119
+    * Type3-> Round or Rate or Angle  zz: 1~3 or 54~1 or 15~360 or -10~+80
+    * Example1: C:\Program Files\NetIQ\Chariot\Tests\****_Pair12_Att25_Rate36.tst
+    */
+
+   CString HeadName = "DataTmp",
+          TypeName,
+          TailName = ".txt",
+          DisplayWord;
+   int LoopCount, LoopType, i, j, ks;
+   char *DataTmpFilename;
+   FILE *tmpFile;
+   errno_t err;
+   LoopCount = pIceLemonDlg->LoopCount;
+
+ 
+       LoopType = 3;
+
+       // build the tmp data filename for iteration test
+       if (LoopCount == 1)  // if only one iteration, no type-name required!!
+        {
+           TypeName = "";
+        }
+       else
+        {
+
+           pIceLemonDlg->PrintlnToMemo(DisplayWord);
+           DisplayWord.Format("<<< Iteraion: %d >>>", k);
+           pIceLemonDlg->PrintlnToMemo(DisplayWord);
+		   //if(ChariotParameter.use_case == 1){
+#if 0
+		   if(k %2 == 1) 
+			    ks =1;
+		   else
+				ks =2;
+#else
+		   ks = 1;
+#endif
+		   //}
+           TypeName.Format( "_Round%d", ks);
+		 
+        }
+
+
+   //SetCurrentDir(Form1->WorkDictionary);
+   dataFullName = pIceLemonDlg->workDirectory + "\\test_result\\" + HeadName + TypeName + TailName;
+   DataTmpFilename = dataFullName.GetBuffer(dataFullName.GetLength());
+   if(k > 1) return ; //if k>2 have no need to create file
+   // Delete the existing data in tmp file & new a data tmp file
+   if (jj == 1)       //create new file if the first att value
+    {
+      err = fopen_s(&tmpFile, DataTmpFilename,"w+t");
+
+      fclose(tmpFile);
+
+      //Add DataTmpFile to DataTmpFileList
+
+      sprintf_s(DataTmpFileList, "%s\\test_result\\DataTmpFileList.txt", pIceLemonDlg->workDirectory);
+       err = fopen_s(&tmpFile, DataTmpFileList,"a+t");
+      fprintf(tmpFile,"%s\n",dataFullName);
+      fclose(tmpFile);
+    }
+
+}
+
 //---------------------------------------------------------------------------
 void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j, int k)
 {
@@ -1382,6 +1585,60 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j, int k)
 	SaveOneToDb(saveFormat);
 }
 
+void RunThread::SaveTmpData2(unsigned long j, int k)
+{
+	FILE *TmpFile;
+	char *DataTmpFilename;
+	CString xValName;
+	errno_t err;
+	char buf[255]={0};
+	DataTmpFilename = dataFullName.GetBuffer(dataFullName.GetLength());
+	//Form1->Label1->Caption = DataFullName;
+	// Save test result to tmp file (the current attenuator value)
+
+	//if ( (Form1->ckbRotatorEnable->Checked == true) && (Form1->ckbEnableFieldTryMode->Checked == true) )
+	//	xValName = "Ang    Ofs    Ang    ";
+	//else
+
+	err = fopen_s(&TmpFile, DataTmpFilename,"a+t"); // open temp file for append data
+
+		if (j==1 && k==1)
+		{
+			GetDateTime(buf, 0);
+			fprintf(TmpFile, "Date: %s\n",buf);
+
+			fprintf(TmpFile, "Throughput(unit: Mbps)\n");
+
+			//			if (Form1->ckbLoadTestFile->Checked == true)
+			//			{               
+			//				fprintf(TmpFile,"%sExt_ALL    Ext_DLP    Ext_ULP\n", xValName);
+			//				fprintf(TmpFile, "===    ===    ===   ========   ========   ========\n");
+			//			}
+			//			else
+			//			{
+			fprintf(TmpFile, "Att  %-20s     E1->E2     k      time\n", "SSID");
+			fprintf(TmpFile, "===  %-20s    ========	  =====	  =====\n", "=======");
+			//			}
+		}
+
+		//		if (Form1->ckbLoadTestFile->Checked == true)
+		//			fprintf(TmpFile,"%3d %6d %6d %9.2f %9.2f %9.2f\n", AttenuatorParameter.Attenuator_Value[j],
+		//			AttenuatorParameter.Ext_Attenuation,
+		//			AttenuatorParameter.Attenuator_Value[j]+AttenuatorParameter.Ext_Attenuation,
+		//			avg4, avg5, avg6);
+		//		else
+		GetDateTime(buf, 1);
+		fprintf(TmpFile,"%d %-20s %9.2f  %9d       %-15s\n", 0, t_item.SSID,
+			avg1, k, buf);
+	fclose(TmpFile);
+	//t_item.e1_e2 = avg1;
+	//t_item.e2_e1 = avg2;
+	//t_item.e1s_e2 = avg3;
+	//t_item.e2s_e1 = avg4;
+	//t_item.two_way = avg3+avg4;
+	//SaveOneToDb(saveFormat);
+}
+
 int RunThread::ConnectAndGetIP(int card_index, char *profile, CString &str_ap_addr)
 {
 	CString DisplayWord;
@@ -1423,7 +1680,55 @@ int RunThread::ConnectAndGetIP(int card_index, char *profile, CString &str_ap_ad
 	strcpy_s(t_item.SSID, profile);
 }
 
+int RunThread::ConnectAndGetIP2(int card_index, char *profile, CString &str, CString lanIP)
+{
+	CString DisplayWord;
+	int retry = 5;
+	while(retry--){
+		pIceLemonDlg->OnConnect(card_index, profile , 1);
+		if(pIceLemonDlg->cur_is_connected == 1) break;
+		Sleep(200);
+	}
+	if(!pIceLemonDlg->cur_is_connected) {
+		AfxMessageBox("can not connect to network!");
+		return -1;
+	}
+
+	retry = 5;
+	do{
+		pIceLemonDlg->GetLocalIPInfo(card_index, str);
+
+		if(str == "" ){
+			DisplayWord.Format("[%d/5] Try to get ip address",6-retry);
+			pIceLemonDlg->PrintlnToMemo(DisplayWord);
+			Sleep(1000);
+			continue;
+		}else if(str.Mid(0,3) != lanIP.Mid(0,3)){
+			DisplayWord.Format("[%d/5] Try to get ip address",6-retry);
+			pIceLemonDlg->PrintlnToMemo(DisplayWord);
+			Sleep(1000);
+			continue;
+		}else{
+			break;
+		}
+	}while(retry--);
+	if(str ==""){
+		AfxMessageBox("can not fetch ip address of endpoint!");
+		return -1;
+	}
+}
 int RunThread::Run()
+{
+	int ret;
+	if(run_flag == 1){
+		ret = Run1();
+	}else{
+		ret = Run2();
+	}
+	return ret;
+}
+
+int RunThread::Run1()
 {
 	char ChariotStatus;
 	int FinishItem, finishAttItem;
@@ -1825,5 +2130,143 @@ int RunThread::Run()
 	//pIceLemonDlg->SendMessage(WM_UPDATE_STEXT,(WPARAM)&s,0);
 	//AfxMessageBox("Test Completed!");
 	//}
+	return 0;
+}
+
+int RunThread::Run2()
+{
+	int card_idx;
+	int i, k = 0;
+	card_idx = pIceLemonDlg->cur_sel_card;
+	list<Chariot2_Item>::iterator plist; 
+	bool status;
+	time_t tStart,tNow;
+	unsigned long  testDuration;  
+	int loopCount = 2;
+	int state = -1;
+	char ChariotStatus;
+	FILE *tmpFile;
+	int j = 0;
+	int outLoop = false;
+	++j;
+	for(k = 0; k < loopCount ; k++){
+		//for(j=0; j < 1;j++){ 
+		//next j
+		pIceLemonDlg->CurrentLoopCount = k; //to set what loop the program run now.
+		for(plist = m_chariot2_List.begin(); plist != m_chariot2_List.end(); plist++) {  
+			Chariot2_Item xItem = *plist;
+			testDuration = xItem.testduration;
+			//DisplayWord.Format("i = %d, TestDuration = %d", i, testDuration);
+			if(xItem.proflag == 1){
+				ConnectAndGetIP2(card_idx, xItem.profile_e1, xItem.e1, xItem.e2);
+			}else if(xItem.proflag == 2){
+				ConnectAndGetIP2(card_idx, xItem.profile_e2, xItem.e2, xItem.e1);
+			}
+			SetDataTmpFile2(j,k);
+			status = SetupChariot2(&xItem);
+			if (xItem.testfile != "")
+				Save_ChariotTestFile2(&xItem, loopCount, 0, k);
+			CHR_test_start(test);  //  Start Test!!
+			time(&tStart);
+			time(&tNow);
+			//tCntSec = 0;
+			pIceLemonDlg->CorrectTimeRemain2(&xItem);
+			pIceLemonDlg->m_page_main.RestartTimeRemain();
+			state = 5;
+			do{
+				switch(state){
+				case 5:
+					if(difftime(tNow, tStart) > testDuration)//test finish
+					{
+						state = 6;
+						break;
+					}else{
+						if ( (Flag.Halt == true) || (Flag.Abort == true) ) // if press halt, stop the current pair test!!
+						{
+							pIceLemonDlg->m_page_main.FreezeTimeRemain();
+							EndChariotTest();
+
+							if (Flag.Halt == true)
+							{
+								pIceLemonDlg->PrintlnToMemo("Wait for halt....", 1);
+								state = 18;
+								break;
+							}
+
+							if (Flag.Abort == true)
+							{
+								pIceLemonDlg->PrintlnToMemo("");
+								pIceLemonDlg->PrintlnToMemo("Wait for stop....", 1);
+								CHR_test_force_delete(test);
+								state = 95;
+								break;
+							}
+
+						}  // end for "if ( (Flag.Halt == true) || (Flag.Abort == true))"
+						else {
+							CHR_pair_get_runStatus(pair[1], &ChariotStatus);
+
+							//error occurs at start, if error occurs within 1 second
+							if ( ((int) ChariotStatus == 8) && (difftime(tNow,tStart) <= 1) )
+							{
+								pIceLemonDlg->PrintlnToMemo("");
+								pIceLemonDlg->PrintlnToMemo("*******Charior error: IP address unreachable !!*******");
+								pIceLemonDlg->PrintlnToMemo("");
+								pIceLemonDlg->PrintlnToMemo("--> Please check IP address setting & AP/cable connection!!");
+								IsError = true;
+								//IsStopped = true;
+								
+								CHR_test_force_delete(test);
+								state = 99;
+								break;
+							}
+
+							Sleep(300);  //Bryant Add 2009/10
+							time(&tNow);
+							state = 5;
+							break;
+						}
+					}
+					break;
+				case 6://h-loop  stop  process (Get card statistics, throughput)
+					pIceLemonDlg->m_page_main.FreezeTimeRemain();
+
+					CHR_pair_get_runStatus(pair[1], &ChariotStatus);
+
+					// Deal with the case: "not finished or error while test duration time up"
+					if ( ((int) ChariotStatus != 11) && ((int) ChariotStatus != 8) )
+						EndChariotTest();
+
+					if (xItem.testfile != "")
+						CHR_test_save(test); //save Chariot test file *.tst
+					//GetThroughput(j, ChariotParameter.Test_Direction[i], h); //Get Throughput ane delete test object
+					GetThroughput2(&xItem, j); //Get Throughput ane delete test object
+					
+					state = 80;
+					break;
+				case 80: //i-loop (chariot pair) finish process
+					//SaveTmpData(saveformat, j);  //save tmp data
+					SaveTmpData2(j, k);  //save tmp data		
+
+					//state = 2;  // to the next-k (loop)
+					outLoop = false;
+					break;
+				}//switch(state){
+			}while(!outLoop);
+
+
+		}//for(plist = m_chariot2_List.begin(); plist != m_chariot2_List.end(); plist++)
+		//}//for(j=0; j < 1;j++){
+
+	}//for(k = 0; k < loopCount ; k++){
+	//	errno_t err= fopen_s(&tmpFile, dataFullName.GetBuffer(dataFullName.GetLength()),"a+t");
+	//	fprintf(tmpFile,"### %6d", finishAttItem + 1);  //how many att item in this loop
+	//	fclose(tmpFile);
+	errno_t err= fopen_s(&tmpFile, dataFullName.GetBuffer(dataFullName.GetLength()),"a+t");
+	fprintf(tmpFile,"### finish ###");  //how many att item in this loop
+	fclose(tmpFile);
+	
+
+	
 	return 0;
 }

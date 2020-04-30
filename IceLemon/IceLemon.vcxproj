@@ -191,6 +191,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DlgChariot.h" />
+    <ClInclude Include="DlgChariot2.h" />
     <ClInclude Include="DlgMain.h" />
     <ClInclude Include="DlgTestOnly.h" />
     <ClInclude Include="IceLemon.h" />
@@ -205,6 +206,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DlgChariot.cpp" />
+    <ClCompile Include="DlgChariot2.cpp" />
     <ClCompile Include="DlgMain.cpp" />
     <ClCompile Include="DlgTestOnly.cpp" />
     <ClCompile Include="IceLemon.cpp" />

@@ -388,9 +388,8 @@ bool CIceLemonDlg::CheckChariotSetting()
 			//btnSaveChariotTest->SetFocus();
 
 			//ClearCardInitialState(); //Stop Rtllib, Socket, unload 8187DLL
-			m_page_main.m_redit.SetSel(-1,-1);
-			m_page_main.m_redit.ReplaceSel("\r\n");
-			m_page_main.m_redit.ReplaceSel("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>\r\n");
+			PrintlnToMemo("");
+			PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>");
 
 			return 0;
 		}
@@ -405,8 +404,8 @@ bool CIceLemonDlg::CheckChariotSetting()
 
 		//ClearCardInitialState(); //Stop Rtllib, Socket, unload 8187DLL
 
-		m_page_main.m_redit.ReplaceSel("\r\n");
-		m_page_main.m_redit.ReplaceSel("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>\r\n");
+		PrintlnToMemo("");
+		PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>");
 		return 0;
 	}
 
@@ -418,31 +417,27 @@ bool CIceLemonDlg::CheckChariotSetting()
 
 	if (rc != CHR_OK)
 	{
-		m_page_main.m_redit.ReplaceSel("Chariot Initialize: fail !!\r\n");
+		PrintlnToMemo("Chariot Initialize: fail !!\r\n");
 
-		m_page_main.m_redit.ReplaceSel(errorInfo);
-		m_page_main.m_redit.ReplaceSel("\r\n");
+		PrintlnToMemo(errorInfo);
 
 		//ClearCardInitialState(); //Stop Rtllib, Socket, unload 8187DLL
 
-		m_page_main.m_redit.ReplaceSel("\r\n");
-		m_page_main.m_redit.ReplaceSel("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>\r\n");
+		PrintlnToMemo("");
+		PrintlnToMemo("<<<<<<<<<<<<<<<<< Finish (Test Abort!!) >>>>>>>>>>>>>>>>>");
 
 		return 0;
 	}
 	else
-		m_page_main.m_redit.ReplaceSel("Chariot Initialize: ok !!\r\n");
+		PrintlnToMemo("Chariot Initialize: ok !!\r\n");
 
 
 	// Check Chariot Version
 	rc = CHR_api_get_version(msg, CHR_MAX_RETURN_MSG, &msgLen);
 	ChariotCheck((CHR_HANDLE) NULL, rc, "Get_Chariot_Version");
 
-
 	DisplayWord.Format("The Chariot version: %s", msg);
-	m_page_main.m_redit.ReplaceSel(DisplayWord);
-	m_page_main.m_redit.ReplaceSel("\r\n");
-
+	PrintlnToMemo(DisplayWord);
 
 	return 1;
 }

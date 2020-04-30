@@ -37,6 +37,18 @@ struct Chariot
 	CString str_ap2_addr;
 	CString str_ap3_addr;
 };
+typedef struct _Chariot2_Item
+{
+	CString e1,e2;
+	int proflag;
+	char profile_e1[WLAN_MAX_NAME_LENGTH];
+	char profile_e2[WLAN_MAX_NAME_LENGTH];
+	char script[256];  
+	char protocol;
+	unsigned long testduration;
+	unsigned long pairNum;
+	CString testfile;
+}Chariot2_Item;
 
 struct Attenuator
 {
@@ -106,25 +118,33 @@ private:
 	 Test1_item t_item;
 	 CString datFileName;
 	 char  DataTmpFileList[512];
+	 list<Chariot2_Item> m_chariot2_List;
 public:
 	 CString dataFullName;
+	 int run_flag;
 public:
 	 RunThread();
 	 RunThread(CIceLemonDlg *pDlg, bool CreateSuspended);
 	 void SetContext(CIceLemonDlg *pDlg);
 	 bool SetupChariot(int x, unsigned long TestDuration);
+	 bool SetupChariot2(Chariot2_Item *item);
+
 	 CString GetChariotStatus(char x);
 	 void GetThroughput(int x, int h);
 	 void GetThroughputMax(int x, int h);
 	 void GetThroughput(int AttIndex, int x, int h);
+	 void GetThroughput2(Chariot2_Item *item, int AttIndex);
 	 void SaveOneToDb(unsigned long saveFormat);
 	 bool EndChariotTest();
 	 void Creat_Test();
 	 void Creat_Pair(unsigned int n);
-	 void Save_ChariotTestFile(unsigned long direction, unsigned loopcount,
+	 void Save_ChariotTestFile(unsigned long direction, unsigned long loopcount,
+		 unsigned long j, unsigned long k);
+	 void Save_ChariotTestFile2(Chariot2_Item *item, unsigned loopcount,
 		 unsigned long j, unsigned long k);
 	 int GetSaveDataFileName(unsigned long direction, unsigned loop_count,
 		 unsigned long j, unsigned long k, CString &fileName);
+	 void SetDataTmpFile2(unsigned long jj, unsigned long k);
 	 void TouchFile(int k);
 	 int SaveTPToFile();
 	 int GetDateTime(char (&buf)[255], int fmt);
@@ -132,8 +152,13 @@ public:
 	 void Set_Chariot(struct Chariot chariotP);
 	 void SetDataTmpFile(unsigned long jj, unsigned long k);
 	 void SaveTmpData(unsigned long saveFormat, unsigned long j, int k);
+	 void SaveTmpData2(unsigned long j, int k);
 	 int ConnectAndGetIP(int card_index, char *profile, CString &str_ap_addr);
+	 int ConnectAndGetIP2(int card_index, char *profile, CString &str, CString lanIP);
+	 void Set_Chariot2(list<Chariot2_Item> clist);
 	 int Run();
+	 int Run1();
+	 int Run2();
 	 bool IsPreRun; 
 	 virtual BOOL InitInstance();
 	 virtual int ExitInstance();
