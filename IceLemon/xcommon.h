@@ -39,6 +39,7 @@ struct Chariot
 };
 typedef struct _Chariot2_Item
 {
+	int id;
 	CString e1,e2;
 	int proflag;
 	char profile_e1[WLAN_MAX_NAME_LENGTH];
@@ -49,6 +50,16 @@ typedef struct _Chariot2_Item
 	unsigned long pairNum;
 	CString testfile;
 }Chariot2_Item;
+
+typedef struct _Chariot2_result
+{
+	float att;
+	int kcnt;
+	int item_id;
+	float throughput;
+	time_t start;
+	time_t end;
+}Chariot2_result;
 
 struct Attenuator
 {
@@ -119,6 +130,7 @@ private:
 	 CString datFileName;
 	 char  DataTmpFileList[512];
 	 list<Chariot2_Item> m_chariot2_List;
+	 
 public:
 	 CString dataFullName;
 	 int run_flag;
@@ -128,31 +140,34 @@ public:
 	 void SetContext(CIceLemonDlg *pDlg);
 	 bool SetupChariot(int x, unsigned long TestDuration);
 	 bool SetupChariot2(Chariot2_Item *item);
+	 int SetRunFlag(int flag);
 
 	 CString GetChariotStatus(char x);
 	 void GetThroughput(int x, int h);
 	 void GetThroughputMax(int x, int h);
 	 void GetThroughput(int AttIndex, int x, int h);
-	 void GetThroughput2(Chariot2_Item *item, int AttIndex);
+	 void GetThroughput2(Chariot2_Item *item, int AttIndex, Chariot2_result *pResult);
 	 void SaveOneToDb(unsigned long saveFormat);
 	 bool EndChariotTest();
 	 void Creat_Test();
 	 void Creat_Pair(unsigned int n);
+	 void Creat_Pair2(Chariot2_Item *item, unsigned int n);
 	 void Save_ChariotTestFile(unsigned long direction, unsigned long loopcount,
 		 unsigned long j, unsigned long k);
 	 void Save_ChariotTestFile2(Chariot2_Item *item, unsigned loopcount,
 		 unsigned long j, unsigned long k);
 	 int GetSaveDataFileName(unsigned long direction, unsigned loop_count,
 		 unsigned long j, unsigned long k, CString &fileName);
-	 void SetDataTmpFile2(unsigned long jj, unsigned long k);
+	 void SetDataTmpFile2(unsigned long jj, unsigned long k, int t);
 	 void TouchFile(int k);
 	 int SaveTPToFile();
-	 int GetDateTime(char (&buf)[255], int fmt);
+	 int GetDateTimeNow(char (&buf)[255], int fmt);
+	 int GetDateTime(time_t time, char (&buf)[255], int fmt);
 	 void Set_Flag(struct SFlag flag);
 	 void Set_Chariot(struct Chariot chariotP);
 	 void SetDataTmpFile(unsigned long jj, unsigned long k);
 	 void SaveTmpData(unsigned long saveFormat, unsigned long j, int k);
-	 void SaveTmpData2(unsigned long j, int k);
+	 void SaveTmpData2(Chariot2_result *pResult,unsigned long j, int k, int t);
 	 int ConnectAndGetIP(int card_index, char *profile, CString &str_ap_addr);
 	 int ConnectAndGetIP2(int card_index, char *profile, CString &str, CString lanIP);
 	 void Set_Chariot2(list<Chariot2_Item> clist);

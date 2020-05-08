@@ -54,6 +54,8 @@ public:
 	void InitTabCtrl();
 	void InitDBConn();
 	void onBtnRun();
+	void Run1();
+	void Run2();
 	void OnKillfocusCbxProtocol();
 	void OnClickedBtnScript();
 	void OnClickedCkbSaveTst();
