@@ -76,6 +76,7 @@ public:
 	CIPAddressCtrl m_IPAddr8_e2;
 	CIPAddressCtrl m_IPAddr9_e2;
 //	CString m_hour_c1;
+	int m_hour_total;
 	int m_hour_c1;
 	int m_hour_c10;
 	int m_hour_c2;
@@ -86,6 +87,7 @@ public:
 	int m_hour_c7;
 	int m_hour_c8;
 	int m_hour_c9;
+	int m_min_total;
 	int m_min_c1;
 	int m_min_c10;
 	int m_min_c2;
@@ -96,6 +98,7 @@ public:
 	int m_min_c7;
 	int m_min_c8;
 	int m_min_c9;
+	int m_sec_total;
 	int m_sec_c1;
 	int m_sec_c10;
 	int m_sec_c2;
@@ -146,6 +149,9 @@ public:
 	afx_msg void OnDeltaposSpinHc10(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnDeltaposSpinMc10(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnDeltaposSpinSc10(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnDeltaposSpinHc11(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnDeltaposSpinMc11(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnDeltaposSpinSc11(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedBtnC2ok();
 	afx_msg void OnBnClickedCkbC2savetst();
 	CButton m_ckbSaveChariotTest;

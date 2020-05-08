@@ -13,6 +13,7 @@ IMPLEMENT_DYNAMIC(CDlgChariot2, CDialogEx)
 
 CDlgChariot2::CDlgChariot2(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CDlgChariot2::IDD, pParent)
+	, m_hour_total(0)
 	, m_hour_c1(0)
 	, m_hour_c10(0)
 	, m_hour_c2(0)
@@ -23,6 +24,7 @@ CDlgChariot2::CDlgChariot2(CWnd* pParent /*=NULL*/)
 	, m_hour_c7(0)
 	, m_hour_c8(0)
 	, m_hour_c9(0)
+	, m_min_total(0)
 	, m_min_c1(0)
 	, m_min_c10(0)
 	, m_min_c2(0)
@@ -33,6 +35,7 @@ CDlgChariot2::CDlgChariot2(CWnd* pParent /*=NULL*/)
 	, m_min_c7(0)
 	, m_min_c8(0)
 	, m_min_c9(0)
+	, m_sec_total(0)
 	, m_sec_c1(0)
 	, m_sec_c10(0)
 	, m_sec_c2(0)
@@ -95,6 +98,8 @@ void CDlgChariot2::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_IPADDR8_E2, m_IPAddr8_e2);
 	DDX_Control(pDX, IDC_IPADDR9_E2, m_IPAddr9_e2);
 	//  DDX_Text(pDX, IDC_EDT_HOURC1, m_hour_c1);
+	DDX_Text(pDX, IDC_EDT_HOURC11, m_hour_total);
+	DDV_MinMaxInt(pDX, m_hour_total, 0, 60);
 	DDX_Text(pDX, IDC_EDT_HOURC1, m_hour_c1);
 	DDV_MinMaxInt(pDX, m_hour_c1, 0, 60);
 	DDX_Text(pDX, IDC_EDT_HOURC10, m_hour_c10);
@@ -115,6 +120,8 @@ void CDlgChariot2::DoDataExchange(CDataExchange* pDX)
 	DDV_MinMaxInt(pDX, m_hour_c8, 0, 60);
 	DDX_Text(pDX, IDC_EDT_HOURC9, m_hour_c9);
 	DDV_MinMaxInt(pDX, m_hour_c9, 0, 60);
+	DDX_Text(pDX, IDC_EDT_MINC11, m_min_total);
+	DDV_MinMaxInt(pDX, m_min_total, 0, 60);
 	DDX_Text(pDX, IDC_EDT_MINC1, m_min_c1);
 	DDV_MinMaxInt(pDX, m_min_c1, 0, 60);
 	DDX_Text(pDX, IDC_EDT_MINC10, m_min_c10);
@@ -135,6 +142,8 @@ void CDlgChariot2::DoDataExchange(CDataExchange* pDX)
 	DDV_MinMaxInt(pDX, m_min_c8, 0, 60);
 	DDX_Text(pDX, IDC_EDT_MINC9, m_min_c9);
 	DDV_MinMaxInt(pDX, m_min_c9, 0, 60);
+	DDX_Text(pDX, IDC_EDT_SECC11, m_sec_total);
+	DDV_MinMaxInt(pDX, m_sec_total, 0, 60);
 	DDX_Text(pDX, IDC_EDT_SECC1, m_sec_c1);
 	DDV_MinMaxInt(pDX, m_sec_c1, 0, 60);
 	DDX_Text(pDX, IDC_EDT_SECC2, m_sec_c2);
@@ -202,6 +211,9 @@ BEGIN_MESSAGE_MAP(CDlgChariot2, CDialogEx)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_HC10, &CDlgChariot2::OnDeltaposSpinHc10)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_MC10, &CDlgChariot2::OnDeltaposSpinMc10)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_SC10, &CDlgChariot2::OnDeltaposSpinSc10)
+	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_HC11, &CDlgChariot2::OnDeltaposSpinHc11)
+	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_MC11, &CDlgChariot2::OnDeltaposSpinMc11)
+	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_SC11, &CDlgChariot2::OnDeltaposSpinSc11)
 	ON_BN_CLICKED(IDC_BTN_C2OK, &CDlgChariot2::OnBnClickedBtnC2ok)
 	ON_BN_CLICKED(IDC_CKB_C2SAVETST, &CDlgChariot2::OnBnClickedCkbC2savetst)
 END_MESSAGE_MAP()
@@ -708,6 +720,49 @@ void CDlgChariot2::OnDeltaposSpinSc10(NMHDR *pNMHDR, LRESULT *pResult)
 	UpdateData(false);
 	*pResult = 0;
 }
+void CDlgChariot2::OnDeltaposSpinHc11(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	UpdateData(true);
+	if(pNMUpDown->iDelta == -1){
+		m_hour_total +=1;
+
+	}else if(pNMUpDown->iDelta == 1){
+		m_hour_total -=1;
+	}
+	UpdateData(false);
+	*pResult = 0;
+}
+
+
+void CDlgChariot2::OnDeltaposSpinMc11(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	UpdateData(true);
+	if(pNMUpDown->iDelta == -1){
+		m_min_total +=1;
+
+	}else if(pNMUpDown->iDelta == 1){
+		m_min_total -=1;
+	}
+	UpdateData(false);
+	*pResult = 0;
+}
+
+
+void CDlgChariot2::OnDeltaposSpinSc11(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	UpdateData(true);
+	if(pNMUpDown->iDelta == -1){
+		m_sec_total +=1;
+
+	}else if(pNMUpDown->iDelta == 1){
+		m_sec_total -=1;
+	}
+	UpdateData(false);
+	*pResult = 0;
+}
 
 int CDlgChariot2::CheckItem(int i, Chariot2_Item &xItem,
 			CIPAddressCtrl &IPAddr_e1,
@@ -799,7 +854,7 @@ DWORD CDlgChariot2::GetProfileList()
 		pCb[i]->ResetContent();
 		for(k = 0; k < pProfileList->dwNumberOfItems; k++){
 			pProfileInfo = &pProfileList->ProfileInfo[k];
-			WideCharToMultiByte(CP_ACP, 0, pProfileInfo->strProfileName, WLAN_MAX_NAME_LENGTH, profileName, WLAN_MAX_NAME_LENGTH,NULL,NULL) ;
+			WideCharToMultiByte(CP_ACP, 0, pProfileInfo->strProfileName, WLAN_MAX_NAME_LENGTH, profileName, WLAN_MAX_NAME_LENGTH, NULL, NULL) ;
 			pCb[i]->InsertString(k, profileName);
 
 		}
