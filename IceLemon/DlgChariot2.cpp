@@ -6,7 +6,7 @@
 #include "DlgChariot2.h"
 #include "afxdialogex.h"
 #include "IceLemonDlg.h"
-
+#include "ChariotParaDlg.h"
 // CDlgChariot2 对话框
 
 IMPLEMENT_DYNAMIC(CDlgChariot2, CDialogEx)
@@ -14,38 +14,10 @@ IMPLEMENT_DYNAMIC(CDlgChariot2, CDialogEx)
 CDlgChariot2::CDlgChariot2(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CDlgChariot2::IDD, pParent)
 	, m_hour_total(0)
-	, m_hour_c1(0)
-	, m_hour_c10(0)
-	, m_hour_c2(0)
-	, m_hour_c3(0)
-	, m_hour_c4(0)
-	, m_hour_c5(0)
-	, m_hour_c6(0)
-	, m_hour_c7(0)
-	, m_hour_c8(0)
-	, m_hour_c9(0)
 	, m_min_total(0)
-	, m_min_c1(0)
-	, m_min_c10(0)
-	, m_min_c2(0)
-	, m_min_c3(0)
-	, m_min_c4(0)
-	, m_min_c5(0)
-	, m_min_c6(0)
-	, m_min_c7(0)
-	, m_min_c8(0)
-	, m_min_c9(0)
 	, m_sec_total(0)
-	, m_sec_c1(0)
-	, m_sec_c10(0)
-	, m_sec_c2(0)
-	, m_sec_c3(0)
-	, m_sec_c4(0)
-	, m_sec_c5(0)
-	, m_sec_c6(0)
-	, m_sec_c7(0)
-	, m_sec_c8(0)
-	, m_sec_c9(0)
+	, item_id(0)
+	
 {
 
 }
@@ -57,165 +29,73 @@ CDlgChariot2::~CDlgChariot2()
 void CDlgChariot2::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_CBO_PROF1_E1, m_cbo_p1e1);
-	DDX_Control(pDX, IDC_CBO_PROF1_E2, m_cbo_p1e2);
-	DDX_Control(pDX, IDC_CBO_PROF2_E1, m_cbo_p2e1);
-	DDX_Control(pDX, IDC_CBO_PROF2_E2, m_cbo_p2e2);
-	DDX_Control(pDX, IDC_CBO_PROF3_E1, m_cbo_p3e1);
-	DDX_Control(pDX, IDC_CBO_PROF3_E2, m_cbo_p3e2);
-	DDX_Control(pDX, IDC_CBO_PROF4_E1, m_cbo_p4e1);
-	DDX_Control(pDX, IDC_CBO_PROF4_E2, m_cbo_p4e2);
-	DDX_Control(pDX, IDC_CBO_PROF5_E1, m_cbo_p5e1);
-	DDX_Control(pDX, IDC_CBO_PROF5_E2, m_cbo_p5e2);
-	DDX_Control(pDX, IDC_CBO_PROF6_E1, m_cbo_p6e1);
-	DDX_Control(pDX, IDC_CBO_PROF6_E2, m_cbo_p6e2);
-	DDX_Control(pDX, IDC_CBO_PROF7_E1, m_cbo_p7e1);
-	DDX_Control(pDX, IDC_CBO_PROF7_E2, m_cbo_p7e2);
-	DDX_Control(pDX, IDC_CBO_PROF8_E1, m_cbo_p8e1);
-	DDX_Control(pDX, IDC_CBO_PROF8_E2, m_cbo_p8e2);
-	DDX_Control(pDX, IDC_CBO_PROF9_E1, m_cbo_p9e1);
-	DDX_Control(pDX, IDC_CBO_PROF9_E2, m_cbo_p9e2);
-	DDX_Control(pDX, IDC_CBO_PROF10_E1, m_cbo_p10e1);
-	DDX_Control(pDX, IDC_CBO_PROF10_E2, m_cbo_p10e2);
-	DDX_Control(pDX, IDC_IPADDR1_E1, m_IPAddr1_e1);
-	DDX_Control(pDX, IDC_IPADDR1_E2, m_IPAddr1_e2);
-	DDX_Control(pDX, IDC_IPADDR10_E1, m_IPAddr10_e1);
-	DDX_Control(pDX, IDC_IPADDR10_E2, m_IPAddr10_e2);
-	DDX_Control(pDX, IDC_IPADDR2_E1, m_IPAddr2_e1);
-	DDX_Control(pDX, IDC_IPADDR2_E2, m_IPAddr2_e2);
-	DDX_Control(pDX, IDC_IPADDR3_E1, m_IPAddr3_e1);
-	DDX_Control(pDX, IDC_IPADDR3_E2, m_IPAddr3_e2);
-	DDX_Control(pDX, IDC_IPADDR4_E1, m_IPAddr4_e1);
-	DDX_Control(pDX, IDC_IPADDR4_E2, m_IPAddr4_e2);
-	DDX_Control(pDX, IDC_IPADDR5_E1, m_IPAddr5_e1);
-	DDX_Control(pDX, IDC_IPADDR5_E2, m_IPAddr5_e2);
-	DDX_Control(pDX, IDC_IPADDR6_E1, m_IPAddr6_e1);
-	DDX_Control(pDX, IDC_IPADDR6_E2, m_IPAddr6_e2);
-	DDX_Control(pDX, IDC_IPADDR7_E1, m_IPAddr7_e1);
-	DDX_Control(pDX, IDC_IPADDR7_E2, m_IPAddr7_e2);
-	DDX_Control(pDX, IDC_IPADDR8_E1, m_IPAddr8_e1);
-	DDX_Control(pDX, IDC_IPADDR9_E1, m_IPAddr9_e1);
-	DDX_Control(pDX, IDC_IPADDR8_E2, m_IPAddr8_e2);
-	DDX_Control(pDX, IDC_IPADDR9_E2, m_IPAddr9_e2);
+	//	DDX_Control(pDX, IDC_CBO_PROF1_E1, m_cbo_p1e1);
+	//	DDX_Control(pDX, IDC_CBO_PROF1_E2, m_cbo_p1e2);
+	// 	DDX_Control(pDX, IDC_CBO_PROF2_E1, m_cbo_p2e1);
+	// 	DDX_Control(pDX, IDC_CBO_PROF2_E2, m_cbo_p2e2);
+	// 	DDX_Control(pDX, IDC_CBO_PROF3_E1, m_cbo_p3e1);
+	// 	DDX_Control(pDX, IDC_CBO_PROF3_E2, m_cbo_p3e2);
+	// 	DDX_Control(pDX, IDC_CBO_PROF4_E1, m_cbo_p4e1);
+	// 	DDX_Control(pDX, IDC_CBO_PROF4_E2, m_cbo_p4e2);
+	// 	DDX_Control(pDX, IDC_CBO_PROF5_E1, m_cbo_p5e1);
+	// 	DDX_Control(pDX, IDC_CBO_PROF5_E2, m_cbo_p5e2);
+	// 	DDX_Control(pDX, IDC_CBO_PROF6_E1, m_cbo_p6e1);
+	// 	DDX_Control(pDX, IDC_CBO_PROF6_E2, m_cbo_p6e2);
+	// 	DDX_Control(pDX, IDC_CBO_PROF7_E1, m_cbo_p7e1);
+	// 	DDX_Control(pDX, IDC_CBO_PROF7_E2, m_cbo_p7e2);
+	// 	DDX_Control(pDX, IDC_CBO_PROF8_E1, m_cbo_p8e1);
+	// 	DDX_Control(pDX, IDC_CBO_PROF8_E2, m_cbo_p8e2);
+	// 	DDX_Control(pDX, IDC_CBO_PROF9_E1, m_cbo_p9e1);
+	// 	DDX_Control(pDX, IDC_CBO_PROF9_E2, m_cbo_p9e2);
+	// 	DDX_Control(pDX, IDC_CBO_PROF10_E1, m_cbo_p10e1);
+	// 	DDX_Control(pDX, IDC_CBO_PROF10_E2, m_cbo_p10e2);
+	// 	DDX_Control(pDX, IDC_IPADDR1_E1, m_IPAddr1_e1);
+	// 	DDX_Control(pDX, IDC_IPADDR1_E2, m_IPAddr1_e2);
+	// 	DDX_Control(pDX, IDC_IPADDR10_E1, m_IPAddr10_e1);
+	// 	DDX_Control(pDX, IDC_IPADDR10_E2, m_IPAddr10_e2);
+	// 	DDX_Control(pDX, IDC_IPADDR2_E1, m_IPAddr2_e1);
+	// 	DDX_Control(pDX, IDC_IPADDR2_E2, m_IPAddr2_e2);
+	// 	DDX_Control(pDX, IDC_IPADDR3_E1, m_IPAddr3_e1);
+	// 	DDX_Control(pDX, IDC_IPADDR3_E2, m_IPAddr3_e2);
+	// 	DDX_Control(pDX, IDC_IPADDR4_E1, m_IPAddr4_e1);
+	// 	DDX_Control(pDX, IDC_IPADDR4_E2, m_IPAddr4_e2);
+	// 	DDX_Control(pDX, IDC_IPADDR5_E1, m_IPAddr5_e1);
+	// 	DDX_Control(pDX, IDC_IPADDR5_E2, m_IPAddr5_e2);
+	// 	DDX_Control(pDX, IDC_IPADDR6_E1, m_IPAddr6_e1);
+	// 	DDX_Control(pDX, IDC_IPADDR6_E2, m_IPAddr6_e2);
+	// 	DDX_Control(pDX, IDC_IPADDR7_E1, m_IPAddr7_e1);
+	// 	DDX_Control(pDX, IDC_IPADDR7_E2, m_IPAddr7_e2);
+	// 	DDX_Control(pDX, IDC_IPADDR8_E1, m_IPAddr8_e1);
+	// 	DDX_Control(pDX, IDC_IPADDR9_E1, m_IPAddr9_e1);
+	// 	DDX_Control(pDX, IDC_IPADDR8_E2, m_IPAddr8_e2);
+	// 	DDX_Control(pDX, IDC_IPADDR9_E2, m_IPAddr9_e2);
 	//  DDX_Text(pDX, IDC_EDT_HOURC1, m_hour_c1);
 	DDX_Text(pDX, IDC_EDT_HOURC11, m_hour_total);
 	DDV_MinMaxInt(pDX, m_hour_total, 0, 60);
-	DDX_Text(pDX, IDC_EDT_HOURC1, m_hour_c1);
-	DDV_MinMaxInt(pDX, m_hour_c1, 0, 60);
-	DDX_Text(pDX, IDC_EDT_HOURC10, m_hour_c10);
-	DDV_MinMaxInt(pDX, m_hour_c10, 0, 60);
-	DDX_Text(pDX, IDC_EDT_HOURC2, m_hour_c2);
-	DDV_MinMaxInt(pDX, m_hour_c2, 0, 60);
-	DDX_Text(pDX, IDC_EDT_HOURC3, m_hour_c3);
-	DDV_MinMaxInt(pDX, m_hour_c3, 0, 60);
-	DDX_Text(pDX, IDC_EDT_HOURC4, m_hour_c4);
-	DDV_MinMaxInt(pDX, m_hour_c4, 0, 60);
-	DDX_Text(pDX, IDC_EDT_HOURC5, m_hour_c5);
-	DDV_MinMaxInt(pDX, m_hour_c5, 0, 60);
-	DDX_Text(pDX, IDC_EDT_HOURC6, m_hour_c6);
-	DDV_MinMaxInt(pDX, m_hour_c6, 0, 60);
-	DDX_Text(pDX, IDC_EDT_HOURC7, m_hour_c7);
-	DDV_MinMaxInt(pDX, m_hour_c7, 0, 60);
-	DDX_Text(pDX, IDC_EDT_HOURC8, m_hour_c8);
-	DDV_MinMaxInt(pDX, m_hour_c8, 0, 60);
-	DDX_Text(pDX, IDC_EDT_HOURC9, m_hour_c9);
-	DDV_MinMaxInt(pDX, m_hour_c9, 0, 60);
+
 	DDX_Text(pDX, IDC_EDT_MINC11, m_min_total);
 	DDV_MinMaxInt(pDX, m_min_total, 0, 60);
-	DDX_Text(pDX, IDC_EDT_MINC1, m_min_c1);
-	DDV_MinMaxInt(pDX, m_min_c1, 0, 60);
-	DDX_Text(pDX, IDC_EDT_MINC10, m_min_c10);
-	DDV_MinMaxInt(pDX, m_min_c10, 0, 60);
-	DDX_Text(pDX, IDC_EDT_MINC2, m_min_c2);
-	DDV_MinMaxInt(pDX, m_min_c2, 0, 60);
-	DDX_Text(pDX, IDC_EDT_MINC3, m_min_c3);
-	DDV_MinMaxInt(pDX, m_min_c3, 0, 60);
-	DDX_Text(pDX, IDC_EDT_MINC4, m_min_c4);
-	DDV_MinMaxInt(pDX, m_min_c4, 0, 60);
-	DDX_Text(pDX, IDC_EDT_MINC5, m_min_c5);
-	DDV_MinMaxInt(pDX, m_min_c5, 0, 60);
-	DDX_Text(pDX, IDC_EDT_MINC6, m_min_c6);
-	DDV_MinMaxInt(pDX, m_min_c6, 0, 60);
-	DDX_Text(pDX, IDC_EDT_MINC7, m_min_c7);
-	DDV_MinMaxInt(pDX, m_min_c7, 0, 60);
-	DDX_Text(pDX, IDC_EDT_MINC8, m_min_c8);
-	DDV_MinMaxInt(pDX, m_min_c8, 0, 60);
-	DDX_Text(pDX, IDC_EDT_MINC9, m_min_c9);
-	DDV_MinMaxInt(pDX, m_min_c9, 0, 60);
+
 	DDX_Text(pDX, IDC_EDT_SECC11, m_sec_total);
 	DDV_MinMaxInt(pDX, m_sec_total, 0, 60);
-	DDX_Text(pDX, IDC_EDT_SECC1, m_sec_c1);
-	DDV_MinMaxInt(pDX, m_sec_c1, 0, 60);
-	DDX_Text(pDX, IDC_EDT_SECC2, m_sec_c2);
-	DDV_MinMaxInt(pDX, m_sec_c2, 0, 60);
-	DDX_Text(pDX, IDC_EDT_SECC3, m_sec_c3);
-	DDV_MinMaxInt(pDX, m_sec_c3, 0, 60);
-	DDX_Text(pDX, IDC_EDT_SECC4, m_sec_c4);
-	DDV_MinMaxInt(pDX, m_sec_c4, 0, 60);
-	DDX_Text(pDX, IDC_EDT_SECC5, m_sec_c5);
-	DDV_MinMaxInt(pDX, m_sec_c5, 0, 60);
-	DDX_Text(pDX, IDC_EDT_SECC6, m_sec_c6);
-	DDV_MinMaxInt(pDX, m_sec_c6, 0, 60);
-	DDX_Text(pDX, IDC_EDT_SECC7, m_sec_c7);
-	DDV_MinMaxInt(pDX, m_sec_c7, 0, 60);
-	DDX_Text(pDX, IDC_EDT_SECC8, m_sec_c8);
-	DDV_MinMaxInt(pDX, m_sec_c8, 0, 60);
-	DDX_Text(pDX, IDC_EDT_SECC9, m_sec_c9);
-	DDV_MinMaxInt(pDX, m_sec_c9, 0, 60);
-	DDX_Text(pDX, IDC_EDT_SECC10, m_sec_c10);
-	DDV_MinMaxInt(pDX, m_sec_c10, 0, 60);
 
-	DDX_Control(pDX, IDC_CHECK21, m_ckb1);
-	DDX_Control(pDX, IDC_CHECK22, m_ckb2);
-	DDX_Control(pDX, IDC_CHECK23, m_ckb3);
-	DDX_Control(pDX, IDC_CHECK24, m_ckb4);
-	DDX_Control(pDX, IDC_CHECK25, m_ckb5);
-	DDX_Control(pDX, IDC_CHECK26, m_ckb6);
-	DDX_Control(pDX, IDC_CHECK27, m_ckb7);
-	DDX_Control(pDX, IDC_CHECK28, m_ckb8);
-	DDX_Control(pDX, IDC_CHECK29, m_ckb9);
-	DDX_Control(pDX, IDC_CHECK210, m_ckb10);
 	DDX_Control(pDX, IDC_CKB_C2SAVETST, m_ckbSaveChariotTest);
+	DDX_Control(pDX, IDC_LIST1, m_list);
+	//  DDX_Control(pDX, IDC_CBX_C2CARD, m_card);
+	DDX_Control(pDX, IDC_CBX_C2CARD, m_cbo_card);
 }
 
 
 BEGIN_MESSAGE_MAP(CDlgChariot2, CDialogEx)
 	ON_WM_SIZE()
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_HC1, &CDlgChariot2::OnDeltaposSpinHc1)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_MC1, &CDlgChariot2::OnDeltaposSpinMc1)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_SC1, &CDlgChariot2::OnDeltaposSpinSc1)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_HC2, &CDlgChariot2::OnDeltaposSpinHc2)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_MC2, &CDlgChariot2::OnDeltaposSpinMc2)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_SC2, &CDlgChariot2::OnDeltaposSpinSc2)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_HC3, &CDlgChariot2::OnDeltaposSpinHc3)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_MC3, &CDlgChariot2::OnDeltaposSpinMc3)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_SC3, &CDlgChariot2::OnDeltaposSpinSc3)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_HC4, &CDlgChariot2::OnDeltaposSpinHc4)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_MC4, &CDlgChariot2::OnDeltaposSpinMc4)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_SC4, &CDlgChariot2::OnDeltaposSpinSc4)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_HC5, &CDlgChariot2::OnDeltaposSpinHc5)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_MC5, &CDlgChariot2::OnDeltaposSpinMc5)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_SC5, &CDlgChariot2::OnDeltaposSpinSc5)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_HC6, &CDlgChariot2::OnDeltaposSpinHc6)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_MC6, &CDlgChariot2::OnDeltaposSpinMc6)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_SC6, &CDlgChariot2::OnDeltaposSpinSc6)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_HC7, &CDlgChariot2::OnDeltaposSpinHc7)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_MC7, &CDlgChariot2::OnDeltaposSpinMc7)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_SC7, &CDlgChariot2::OnDeltaposSpinSc7)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_HC8, &CDlgChariot2::OnDeltaposSpinHc8)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_MC8, &CDlgChariot2::OnDeltaposSpinMc8)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_SC8, &CDlgChariot2::OnDeltaposSpinSc8)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_HC9, &CDlgChariot2::OnDeltaposSpinHc9)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_MC9, &CDlgChariot2::OnDeltaposSpinMc9)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_SC9, &CDlgChariot2::OnDeltaposSpinSc9)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_HC10, &CDlgChariot2::OnDeltaposSpinHc10)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_MC10, &CDlgChariot2::OnDeltaposSpinMc10)
-	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_SC10, &CDlgChariot2::OnDeltaposSpinSc10)
+	ON_BN_CLICKED(IDC_BTN_C2OK, &CDlgChariot2::OnBnClickedBtnC2ok)
+	ON_BN_CLICKED(IDC_CKB_C2SAVETST, &CDlgChariot2::OnBnClickedCkbC2savetst)
+	ON_BN_CLICKED(IDC_BTN_ADDCI, &CDlgChariot2::OnBnClickedBtnAddci)
+	ON_CBN_KILLFOCUS(IDC_CBX_C2CARD, &CDlgChariot2::OnKillfocusCbxCard)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_HC11, &CDlgChariot2::OnDeltaposSpinHc11)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_MC11, &CDlgChariot2::OnDeltaposSpinMc11)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_SC11, &CDlgChariot2::OnDeltaposSpinSc11)
-	ON_BN_CLICKED(IDC_BTN_C2OK, &CDlgChariot2::OnBnClickedBtnC2ok)
-	ON_BN_CLICKED(IDC_CKB_C2SAVETST, &CDlgChariot2::OnBnClickedCkbC2savetst)
+	ON_BN_CLICKED(IDC_BTN_C2UPDATE, &CDlgChariot2::OnBnClickedBtnC2update)
 END_MESSAGE_MAP()
 
 
@@ -267,6 +147,13 @@ BOOL CDlgChariot2::OnInitDialog()
 	GetClientRect(&m_rect);  //获取对话框的大小
 	old.x=m_rect.right-m_rect.left;  
 	old.y=m_rect.bottom-m_rect.top;
+	m_list.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_CHECKBOXES); // 整行选择、网格线
+	m_list.InsertColumn(0,"id",LVCFMT_LEFT, 50);
+	m_list.InsertColumn(1,"E1 IP",LVCFMT_LEFT, 150);
+	m_list.InsertColumn(2,"E1 profile",LVCFMT_LEFT, 150);
+	m_list.InsertColumn(3,"E2 IP",LVCFMT_LEFT, 150);
+	m_list.InsertColumn(4,"E2 profile",LVCFMT_LEFT, 150);
+	m_list.InsertColumn(5,"time",LVCFMT_LEFT, 150);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 
@@ -282,456 +169,6 @@ void CDlgChariot2::OnSize(UINT nType, int cx, int cy)
 	{
 		ReSize();
 	}
-}
-
-
-void CDlgChariot2::OnDeltaposSpinHc1(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_hour_c1 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_hour_c1 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinMc1(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_min_c1 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_min_c1 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinSc1(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_sec_c1 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_sec_c1 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-void CDlgChariot2::OnDeltaposSpinHc2(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_hour_c2 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_hour_c2 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinMc2(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_min_c2 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_min_c2 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinSc2(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_sec_c2 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_sec_c2 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-void CDlgChariot2::OnDeltaposSpinHc3(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_hour_c3 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_hour_c3 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinMc3(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_min_c3 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_min_c3 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinSc3(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_sec_c3 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_sec_c3 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-void CDlgChariot2::OnDeltaposSpinHc4(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_hour_c4 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_hour_c4 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinMc4(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_min_c4 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_min_c4 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinSc4(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_sec_c4 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_sec_c4 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-void CDlgChariot2::OnDeltaposSpinHc5(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_hour_c5 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_hour_c5 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinMc5(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_min_c5 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_min_c5 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinSc5(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_sec_c5 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_sec_c5 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-void CDlgChariot2::OnDeltaposSpinHc6(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_hour_c6 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_hour_c6 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinMc6(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_min_c6 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_min_c6 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinSc6(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_sec_c6 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_sec_c6 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-void CDlgChariot2::OnDeltaposSpinHc7(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_hour_c7 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_hour_c7 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinMc7(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_min_c7 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_min_c7 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinSc7(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_sec_c7 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_sec_c7 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-void CDlgChariot2::OnDeltaposSpinHc8(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_hour_c8 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_hour_c8 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinMc8(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_min_c8 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_min_c8 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinSc8(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_sec_c8 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_sec_c8 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-void CDlgChariot2::OnDeltaposSpinHc9(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_hour_c9 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_hour_c9 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinMc9(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_min_c9 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_min_c9 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinSc9(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_sec_c9 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_sec_c9 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-void CDlgChariot2::OnDeltaposSpinHc10(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_hour_c10 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_hour_c10 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinMc10(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_min_c10 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_min_c10 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-
-
-void CDlgChariot2::OnDeltaposSpinSc10(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_sec_c10 +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_sec_c10 -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
-}
-void CDlgChariot2::OnDeltaposSpinHc11(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
-	UpdateData(true);
-	if(pNMUpDown->iDelta == -1){
-		m_hour_total +=1;
-
-	}else if(pNMUpDown->iDelta == 1){
-		m_hour_total -=1;
-	}
-	UpdateData(false);
-	*pResult = 0;
 }
 
 
@@ -828,40 +265,7 @@ void getScript(CString &script)
 	script.Format("%s\\Scripts\\Throughput.scr", tmpBuf);	//默认打开的文件名
 	
 }
-DWORD CDlgChariot2::GetProfileList()
-{
-	DWORD dwResult = 0;
-	int i=0, k=0,cbLen = 0;
-	char profileName[WLAN_MAX_NAME_LENGTH] ;
-	PWLAN_PROFILE_INFO_LIST pProfileList;
-	PWLAN_PROFILE_INFO pProfileInfo;
-	CComboBox *pCb[] ={ 
-		&m_cbo_p1e1, &m_cbo_p1e2,
-		&m_cbo_p2e1, &m_cbo_p2e2,
-		&m_cbo_p3e1, &m_cbo_p3e2,
-		&m_cbo_p4e1, &m_cbo_p4e2,
-		&m_cbo_p5e1, &m_cbo_p5e2,
-		&m_cbo_p6e1, &m_cbo_p6e2,
-		&m_cbo_p7e1, &m_cbo_p7e2,
-		&m_cbo_p8e1, &m_cbo_p8e2,
-		&m_cbo_p9e1, &m_cbo_p9e2,
-		&m_cbo_p10e1, &m_cbo_p10e2,
-		}; 
 
-	pProfileList = pIceLemonDlg->pProfileList;
-	cbLen = sizeof(pCb)/ sizeof(pCb[0]);
-	for(i = 0; i < cbLen; i++){
-		pCb[i]->ResetContent();
-		for(k = 0; k < pProfileList->dwNumberOfItems; k++){
-			pProfileInfo = &pProfileList->ProfileInfo[k];
-			WideCharToMultiByte(CP_ACP, 0, pProfileInfo->strProfileName, WLAN_MAX_NAME_LENGTH, profileName, WLAN_MAX_NAME_LENGTH, NULL, NULL) ;
-			pCb[i]->InsertString(k, profileName);
-
-		}
-	}
-	
-	return dwResult;
-}
 
 void CDlgChariot2::OnBnClickedBtnC2ok()
 {
@@ -876,6 +280,14 @@ void CDlgChariot2::OnBnClickedBtnC2ok()
 	getScript(script);
 	strcpy_s(xItem.script,script.GetBuffer(script.GetLength())); 
 	xItem.protocol = CHR_PROTOCOL_TCP;
+
+	list<Chariot2_Item>::iterator pItem;  //定义迭代器
+	for( pItem = m_chariot2_List.begin(); pItem != m_chariot2_List.end();pItem++){
+		strcpy_s(pItem->script,script.GetBuffer(script.GetLength())); 
+		pItem->protocol = CHR_PROTOCOL_TCP;
+	}
+
+#if 0
 	if( m_ckb1.GetCheck()){
 		CheckItem(1, xItem,m_IPAddr1_e1,m_IPAddr1_e2, m_cbo_p1e1, m_cbo_p1e2, m_hour_c1, m_min_c1, m_sec_c1, IDC_EDT_SECC1);
 		m_chariot2_List.push_back(xItem);
@@ -937,12 +349,44 @@ void CDlgChariot2::OnBnClickedBtnC2ok()
 		cnt++;
 	}else
 		return;
-	
+#endif	
 	
 	
 }
 
+void CDlgChariot2::Chariot2_itemAdd(Chariot2_Item *item)
+{
+	m_chariot2_List.push_back(*item);
+}
 
+void CDlgChariot2::C2AddItem(Chariot2_Item *item)
+{
+	CString str;
+	int i = m_list.GetItemCount();
+	m_list.InsertItem(i,"haha");
+	str.Format("%d",i);
+	m_list.SetItemText(i, 0, str );
+	m_list.SetItemText(i, 1, item->e1);
+	m_list.SetItemText(i, 2, item->profile_e1);
+	m_list.SetItemText(i, 3, item->e2);
+	m_list.SetItemText(i, 4, item->profile_e2);
+	m_list.SetItemText(i, 5, item->pszTestDuration);
+	item->lv_id = i;
+	m_chariot2_List.push_back(*item);
+}
+
+void CDlgChariot2::C2UpdateItem(Chariot2_Item *item,int i)
+{
+	CString str;
+	//m_list.InsertItem(i,"haha");
+	str.Format("%d",i);
+	m_list.SetItemText(i, 0, str );
+	m_list.SetItemText(i, 1, item->e1);
+	m_list.SetItemText(i, 2, item->profile_e1);
+	m_list.SetItemText(i, 3, item->e2);
+	m_list.SetItemText(i, 4, item->profile_e2);
+	m_list.SetItemText(i, 5, item->pszTestDuration);
+}
 void CDlgChariot2::OnBnClickedCkbC2savetst()
 {
 	// TODO: 在此添加控件通知处理程序代码
@@ -973,3 +417,75 @@ void CDlgChariot2::OnBnClickedCkbC2savetst()
 	else
 		testfile = "";
 }
+
+
+void CDlgChariot2::OnBnClickedBtnAddci()
+{
+	// TODO: 在此添加控件通知处理程序代码
+
+	if(pPrfList ==NULL){
+		MessageBox("Please select net card first!", "Info", MB_OK | MB_ICONINFORMATION);
+		return ;
+	}
+	CChariotParaDlg dlg = new CChariotParaDlg(this);
+	dlg.pPrfList = this->pPrfList;
+	dlg.bPreUpdate = FALSE;
+	if(IDOK == dlg.DoModal()){
+		C2AddItem(&dlg.item);
+	}
+}
+
+void CDlgChariot2::OnBnClickedBtnC2update()
+{
+	// TODO: 在此添加控件通知处理程序代码
+
+	POSITION pos =  m_list.GetFirstSelectedItemPosition();   
+	int sel_index = m_list.GetNextSelectedItem(pos); 
+	if(sel_index == -1) {
+		MessageBox("Not selected", "Error", MB_OK|MB_ICONERROR);
+		return;
+	}
+	Chariot2_Item *sel_item=NULL;
+	list<Chariot2_Item>::iterator iter;
+	for(iter=m_chariot2_List.begin();iter !=m_chariot2_List.end(); iter++)
+	{
+		if(iter->lv_id == sel_index){
+			sel_item = &(*iter);
+		}
+
+	}
+	CChariotParaDlg dlg = new CChariotParaDlg(this);
+	dlg.pPrfList = this->pPrfList;
+	dlg.pItem = sel_item;
+	dlg.bPreUpdate = TRUE;
+	if(IDOK == dlg.DoModal()){
+		C2UpdateItem(dlg.pItem, sel_index);
+	}
+}
+
+void CDlgChariot2::OnKillfocusCbxCard()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	int index = m_cbo_card.GetCurSel();
+	
+	pIceLemonDlg->CardNGetProfileList(index,&pPrfList);
+	 
+}
+
+
+void CDlgChariot2::OnDeltaposSpinHc11(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+	UpdateData(true);
+	if(pNMUpDown->iDelta == -1){
+		m_hour_total +=1;
+
+	}else if(pNMUpDown->iDelta == 1){
+		m_hour_total -=1;
+	}
+	UpdateData(false);
+	*pResult = 0;
+}
+
+
+

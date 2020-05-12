@@ -40,6 +40,7 @@ struct Chariot
 typedef struct _Chariot2_Item
 {
 	int id;
+	int lv_id;
 	CString e1,e2;
 	int proflag;
 	char profile_e1[WLAN_MAX_NAME_LENGTH];
@@ -47,6 +48,7 @@ typedef struct _Chariot2_Item
 	char script[256];  
 	char protocol;
 	unsigned long testduration;
+	char pszTestDuration[12];
 	unsigned long pairNum;
 	CString testfile;
 }Chariot2_Item;
@@ -73,6 +75,17 @@ struct Attenuator
 	int Dev3;
 	int Dev4;
 };
+
+typedef struct _IL_PROFILE_INFO {
+	char strProfileName[WLAN_MAX_NAME_LENGTH];
+} IL_PROFILE_INFO, *PIL_PROFILE_INFO;
+
+typedef struct _IL_PROFILE_INFO_LIST {
+	DWORD dwNumberOfItems;
+	//	DWORD dwIndex;
+	IL_PROFILE_INFO ProfileInfo[1];
+
+} IL_PROFILE_INFO_LIST, *PIL_PROFILE_INFO_LIST;
 
 // Define flag varibles
 struct SFlag

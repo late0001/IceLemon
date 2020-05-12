@@ -84,6 +84,7 @@ public:
 	int GetAvailableNetList();
 	DWORD GetProfileList(int index);
 	DWORD Card2GetProfileList(int index);
+	DWORD CardNGetProfileList(int index, PIL_PROFILE_INFO_LIST *ppPrfList);
 	void UpdateIPAddressListItem();
 	void InsertRecord(CString sql);
 	PWLAN_PROFILE_INFO_LIST pProfileList;
@@ -116,7 +117,8 @@ public:
 	CWlanOp *pWlOp;
 	GUID *pGuid;
 	int cur_is_connected;
-	
+	PIL_PROFILE_INFO_LIST pPrfList;
+
 	_ConnectionPtr m_pConnection;
 	
 

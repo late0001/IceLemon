@@ -190,6 +190,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChariotParaDlg.h" />
     <ClInclude Include="DlgChariot.h" />
     <ClInclude Include="DlgChariot2.h" />
     <ClInclude Include="DlgMain.h" />
@@ -198,13 +199,13 @@
     <ClInclude Include="IceLemonDlg.h" />
     <ClInclude Include="Ping.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="StatusDlg.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="WlanOp.h" />
     <ClInclude Include="xcommon.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ChariotParaDlg.cpp" />
     <ClCompile Include="DlgChariot.cpp" />
     <ClCompile Include="DlgChariot2.cpp" />
     <ClCompile Include="DlgMain.cpp" />
@@ -212,7 +213,6 @@
     <ClCompile Include="IceLemon.cpp" />
     <ClCompile Include="IceLemonDlg.cpp" />
     <ClCompile Include="Ping.cpp" />
-    <ClCompile Include="StatusDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
