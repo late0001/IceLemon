@@ -13,7 +13,7 @@ public:
 	CIceLemonDlg *pIceLemonDlg;
 	CDlgChariot2(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CDlgChariot2();
-	int setContext(CIceLemonDlg *context);
+	int SetContext(CIceLemonDlg *context);
 	void ReSize(void);
 // 对话框数据
 	enum { IDD = IDD_DLG_CHARIOTV2 };
@@ -43,9 +43,11 @@ public:
 	
 	int m_sec_total;
 	int item_id; 
-
+	CButton m_ckbSaveChariotTest;
+	CListCtrl m_list;
 	PIL_PROFILE_INFO_LIST pPrfList;
-
+	//	CComboBox m_card;
+	CComboBox m_cbo_card;
 	afx_msg void OnDeltaposSpinHc11(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnDeltaposSpinMc11(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnDeltaposSpinSc11(NMHDR *pNMHDR, LRESULT *pResult);
@@ -54,12 +56,9 @@ public:
 	void C2AddItem(Chariot2_Item *item);
 	afx_msg void OnBnClickedBtnC2ok();
 	afx_msg void OnBnClickedCkbC2savetst();
-	CButton m_ckbSaveChariotTest;
-	CListCtrl m_list;
 	afx_msg void OnBnClickedBtnAddci();
-//	CComboBox m_card;
-	CComboBox m_cbo_card;
 	afx_msg void OnKillfocusCbxCard();
-	
 	afx_msg void OnBnClickedBtnC2update();
+	afx_msg void OnBnClickedBtnC2del();
+	afx_msg void OnDestroy();
 };

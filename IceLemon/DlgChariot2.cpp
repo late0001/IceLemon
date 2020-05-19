@@ -96,12 +96,14 @@ BEGIN_MESSAGE_MAP(CDlgChariot2, CDialogEx)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_MC11, &CDlgChariot2::OnDeltaposSpinMc11)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_SC11, &CDlgChariot2::OnDeltaposSpinSc11)
 	ON_BN_CLICKED(IDC_BTN_C2UPDATE, &CDlgChariot2::OnBnClickedBtnC2update)
+	ON_BN_CLICKED(IDC_BTN_C2DEL, &CDlgChariot2::OnBnClickedBtnC2del)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
 // CDlgChariot2 消息处理程序
 
-int CDlgChariot2::setContext(CIceLemonDlg *context)
+int CDlgChariot2::SetContext(CIceLemonDlg *context)
 {
 	this->pIceLemonDlg = context;
 	return (this->pIceLemonDlg != NULL);
@@ -489,3 +491,26 @@ void CDlgChariot2::OnDeltaposSpinHc11(NMHDR *pNMHDR, LRESULT *pResult)
 
 
 
+
+
+void CDlgChariot2::OnBnClickedBtnC2del()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_list.DeleteAllItems();
+	m_chariot2_List.clear();
+}
+
+
+void CDlgChariot2::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	// TODO: 在此处添加消息处理程序代码
+	list<Chariot2_Item>::iterator iter;
+	for(iter=m_chariot2_List.begin();iter !=m_chariot2_List.end(); iter++)
+	{
+	
+		//m_chariot2_List.pop_back();
+	}
+	
+}

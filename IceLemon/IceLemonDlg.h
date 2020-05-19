@@ -8,6 +8,9 @@
 #include "DlgChariot.h"
 #include "DlgChariot2.h"
 #include "DlgTestOnly.h"
+#include "DlgAttenuator.h"
+#include "DlgRotator.h"
+#include "DlgReportInf.h"
 #include "xcommon.h"
 #include "afxwin.h"
 #include <list>
@@ -44,9 +47,12 @@ public:
 	CDlgMain m_page_main;
 	CDlgChariot m_page_chariot;
 	CDlgChariot2 m_page_chariot2;
+	CDlgAttenuator m_page_attenuator;
+	CDlgRotator m_page_rotator;
+	CDlgReportInf m_page_report;
 	CDlgTestOnly m_page_testonly;
 	int m_curSelTab;
-	CDialogEx *pDlg[4];
+	CDialogEx *pDlg[7];
 	afx_msg void OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	void DisplayPage(int i);

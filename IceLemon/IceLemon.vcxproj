@@ -191,9 +191,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChariotParaDlg.h" />
+    <ClInclude Include="DlgAttenuator.h" />
     <ClInclude Include="DlgChariot.h" />
     <ClInclude Include="DlgChariot2.h" />
     <ClInclude Include="DlgMain.h" />
+    <ClInclude Include="DlgReportInf.h" />
+    <ClInclude Include="DlgRotator.h" />
     <ClInclude Include="DlgTestOnly.h" />
     <ClInclude Include="IceLemon.h" />
     <ClInclude Include="IceLemonDlg.h" />
@@ -206,9 +209,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChariotParaDlg.cpp" />
+    <ClCompile Include="DlgAttenuator.cpp" />
     <ClCompile Include="DlgChariot.cpp" />
     <ClCompile Include="DlgChariot2.cpp" />
     <ClCompile Include="DlgMain.cpp" />
+    <ClCompile Include="DlgReportInf.cpp" />
+    <ClCompile Include="DlgRotator.cpp" />
     <ClCompile Include="DlgTestOnly.cpp" />
     <ClCompile Include="IceLemon.cpp" />
     <ClCompile Include="IceLemonDlg.cpp" />
