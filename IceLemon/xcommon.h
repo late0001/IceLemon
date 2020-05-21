@@ -47,11 +47,19 @@ typedef struct _Chariot2_Item
 	char profile_e2[WLAN_MAX_NAME_LENGTH];
 	char script[256];  
 	char protocol;
-	unsigned long testduration;
+	unsigned long test_duration;
 	char pszTestDuration[12];
 	unsigned long pairNum;
 	CString testfile;
 }Chariot2_Item;
+
+struct STest{
+	unsigned long total_time;
+	unsigned long single_time;
+	int card_idx;
+	char card_name[255];
+	list<Chariot2_Item> clist;
+};
 
 typedef struct _Chariot2_result
 {
@@ -143,6 +151,7 @@ private:
 	 CString datFileName;
 	 char  DataTmpFileList[512];
 	 list<Chariot2_Item> m_chariot2_List;
+	 STest sTest;
 	 
 public:
 	 CString dataFullName;
@@ -183,7 +192,7 @@ public:
 	 void SaveTmpData2(Chariot2_result *pResult,unsigned long j, int k, int t);
 	 int ConnectAndGetIP(int card_index, char *profile, CString &str_ap_addr);
 	 int ConnectAndGetIP2(int card_index, char *profile, CString &str, CString lanIP);
-	 void Set_Chariot2(list<Chariot2_Item> clist);
+	 void Set_Chariot2(STest test);
 	 int Run();
 	 int Run1();
 	 int Run2();

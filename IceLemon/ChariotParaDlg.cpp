@@ -112,9 +112,9 @@ int CChariotParaDlg::CheckItem(Chariot2_Item *xItem)
 		xItem->profile_e2[0]='\0';
 	}
 	UpdateData(TRUE);
-	xItem->testduration = (m_hour *3600 + m_min *60 + m_sec);
+	xItem->test_duration = (m_hour *3600 + m_min *60 + m_sec);
 	sprintf_s(xItem->pszTestDuration, "%02d:%02d:%02d", m_hour, m_min, m_sec); 
-	if (xItem->testduration == 0)
+	if (xItem->test_duration == 0)
 	{
 		sprintf_s(msg,"Test duration must not be zero!!\nPlease recheck!!");
 		MessageBox(msg, "Error", MB_OK | MB_ICONERROR);
@@ -138,7 +138,7 @@ int CChariotParaDlg::ShowItem(Chariot2_Item &xItem)
 	m_ip_e2.SetWindowText(xItem.e2);
 	m_cbo_e2_profile.SetWindowText(xItem.profile_e2);
 	
-	caculTimeToUI(xItem.testduration);
+	caculTimeToUI(xItem.test_duration);
 	//sprintf_s(xItem.pszTestDuration, "%02d:%02d:%02d", m_hour, m_min, m_sec); 
 	
 	//}

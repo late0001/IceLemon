@@ -48,12 +48,15 @@ public:
 	PIL_PROFILE_INFO_LIST pPrfList;
 	//	CComboBox m_card;
 	CComboBox m_cbo_card;
+	int  m_sel_card_idx;
+	STest simple_test;
 	afx_msg void OnDeltaposSpinHc11(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnDeltaposSpinMc11(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnDeltaposSpinSc11(NMHDR *pNMHDR, LRESULT *pResult);
 	void Chariot2_itemAdd(Chariot2_Item *item);
 	void C2UpdateItem(Chariot2_Item *item,int i);
 	void C2AddItem(Chariot2_Item *item);
+	void C2ClearAllItem();
 	afx_msg void OnBnClickedBtnC2ok();
 	afx_msg void OnBnClickedCkbC2savetst();
 	afx_msg void OnBnClickedBtnAddci();
@@ -61,4 +64,7 @@ public:
 	afx_msg void OnBnClickedBtnC2update();
 	afx_msg void OnBnClickedBtnC2del();
 	afx_msg void OnDestroy();
+	afx_msg void OnBnClickedBtnSaveitems();
+	afx_msg void OnBnClickedBtnLoadfromfile();
+
 };

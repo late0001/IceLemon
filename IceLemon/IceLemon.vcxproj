@@ -190,6 +190,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ADODbHelper.h" />
     <ClInclude Include="ChariotParaDlg.h" />
     <ClInclude Include="DlgAttenuator.h" />
     <ClInclude Include="DlgChariot.h" />
@@ -208,6 +209,7 @@
     <ClInclude Include="xcommon.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ADODbHelper.cpp" />
     <ClCompile Include="ChariotParaDlg.cpp" />
     <ClCompile Include="DlgAttenuator.cpp" />
     <ClCompile Include="DlgChariot.cpp" />

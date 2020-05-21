@@ -17,6 +17,7 @@ CDlgChariot2::CDlgChariot2(CWnd* pParent /*=NULL*/)
 	, m_min_total(0)
 	, m_sec_total(0)
 	, item_id(0)
+	, m_sel_card_idx(0)
 	
 {
 
@@ -98,6 +99,8 @@ BEGIN_MESSAGE_MAP(CDlgChariot2, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_C2UPDATE, &CDlgChariot2::OnBnClickedBtnC2update)
 	ON_BN_CLICKED(IDC_BTN_C2DEL, &CDlgChariot2::OnBnClickedBtnC2del)
 	ON_WM_DESTROY()
+	ON_BN_CLICKED(IDC_BTN_SAVEITEMS, &CDlgChariot2::OnBnClickedBtnSaveitems)
+	ON_BN_CLICKED(IDC_BTN_LOADFROMFILE, &CDlgChariot2::OnBnClickedBtnLoadfromfile)
 END_MESSAGE_MAP()
 
 
@@ -244,9 +247,9 @@ int CDlgChariot2::CheckItem(int i, Chariot2_Item &xItem,
 		}
 		xItem.e2 = ip_e2_str;
 		UpdateData(TRUE);
-		xItem.testduration = (hour *3600 + min *60 + sec);
+		xItem.test_duration = (hour *3600 + min *60 + sec);
 
-		if (xItem.testduration == 0)
+		if (xItem.test_duration == 0)
 		{
 			sprintf_s(msg,"Test duration must not be zero!!\nPlease recheck!!");
 			MessageBox(msg, "Error", MB_OK | MB_ICONERROR);
@@ -269,6 +272,7 @@ void getScript(CString &script)
 }
 
 
+
 void CDlgChariot2::OnBnClickedBtnC2ok()
 {
 	// TODO: 在此添加控件通知处理程序代码
@@ -279,16 +283,23 @@ void CDlgChariot2::OnBnClickedBtnC2ok()
 	int cnt = 0 ;
 
 	UpdateData(TRUE);
+	if(m_cbo_card.GetCurSel()== -1) {
+		MessageBox("Please choose card first", "Error", MB_OK|MB_ICONERROR);
+		return;
+	}
+	simple_test.card_idx = m_sel_card_idx;
+	simple_test.total_time = (m_hour_total *3600 + m_min_total *60 + m_sec_total);
+	simple_test.single_time = 0;
+	m_cbo_card.GetLBText(m_sel_card_idx, simple_test.card_name);
 	getScript(script);
-	strcpy_s(xItem.script,script.GetBuffer(script.GetLength())); 
-	xItem.protocol = CHR_PROTOCOL_TCP;
 
-	list<Chariot2_Item>::iterator pItem;  //定义迭代器
+	list<Chariot2_Item>::iterator pItem;  
 	for( pItem = m_chariot2_List.begin(); pItem != m_chariot2_List.end();pItem++){
 		strcpy_s(pItem->script,script.GetBuffer(script.GetLength())); 
 		pItem->protocol = CHR_PROTOCOL_TCP;
+		simple_test.single_time += pItem->test_duration;
 	}
-
+	simple_test.clist = m_chariot2_List;
 #if 0
 	if( m_ckb1.GetCheck()){
 		CheckItem(1, xItem,m_IPAddr1_e1,m_IPAddr1_e2, m_cbo_p1e1, m_cbo_p1e2, m_hour_c1, m_min_c1, m_sec_c1, IDC_EDT_SECC1);
@@ -377,6 +388,13 @@ void CDlgChariot2::C2AddItem(Chariot2_Item *item)
 	m_chariot2_List.push_back(*item);
 }
 
+void CDlgChariot2::C2ClearAllItem()
+{
+	m_list.DeleteAllItems();
+	
+	m_chariot2_List.clear();
+}
+
 void CDlgChariot2::C2UpdateItem(Chariot2_Item *item,int i)
 {
 	CString str;
@@ -407,7 +425,8 @@ void CDlgChariot2::OnBnClickedCkbC2savetst()
 	if (m_ckbSaveChariotTest.GetCheck())
 	{
 		fileName = "D:\\xv\\Projects\\IceLemon\\IceLemon\\test_result\\test1";
-		CFileDialog openFileDlg(FALSE, NULL,fileName, OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT, "文件(*.tst)| *.tst||", NULL);
+		CFileDialog openFileDlg(FALSE, NULL,fileName, OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT, 
+			"文件(*.tst)| *.tst||", NULL);
 		//openFileDlg.GetOFN().lpstrInitialDir = strFilename +"\\test1.tst";
 		INT_PTR result = openFileDlg.DoModal();
 		CString filePath = strFilename +"\\test1.tst";//defaultDir + "\\" + fileName;
@@ -429,12 +448,14 @@ void CDlgChariot2::OnBnClickedBtnAddci()
 		MessageBox("Please select net card first!", "Info", MB_OK | MB_ICONINFORMATION);
 		return ;
 	}
-	CChariotParaDlg dlg = new CChariotParaDlg(this);
-	dlg.pPrfList = this->pPrfList;
-	dlg.bPreUpdate = FALSE;
-	if(IDOK == dlg.DoModal()){
-		C2AddItem(&dlg.item);
+	CChariotParaDlg *dlg = new CChariotParaDlg(this);
+	dlg->pPrfList = this->pPrfList;
+	dlg->bPreUpdate = FALSE;
+	if(IDOK == dlg->DoModal()){
+		C2AddItem(&dlg->item);
 	}
+	delete dlg;
+
 }
 
 void CDlgChariot2::OnBnClickedBtnC2update()
@@ -456,12 +477,12 @@ void CDlgChariot2::OnBnClickedBtnC2update()
 		}
 
 	}
-	CChariotParaDlg dlg = new CChariotParaDlg(this);
-	dlg.pPrfList = this->pPrfList;
-	dlg.pItem = sel_item;
-	dlg.bPreUpdate = TRUE;
-	if(IDOK == dlg.DoModal()){
-		C2UpdateItem(dlg.pItem, sel_index);
+	CChariotParaDlg *dlg = new CChariotParaDlg(this);
+	dlg->pPrfList = this->pPrfList;
+	dlg->pItem = sel_item;
+	dlg->bPreUpdate = TRUE;
+	if(IDOK == dlg->DoModal()){
+		C2UpdateItem(dlg->pItem, sel_index);
 	}
 }
 
@@ -469,7 +490,7 @@ void CDlgChariot2::OnKillfocusCbxCard()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	int index = m_cbo_card.GetCurSel();
-	
+	m_sel_card_idx = index;
 	pIceLemonDlg->CardNGetProfileList(index,&pPrfList);
 	 
 }
@@ -513,4 +534,105 @@ void CDlgChariot2::OnDestroy()
 		//m_chariot2_List.pop_back();
 	}
 	
+}
+
+typedef struct _FChariot2_Item
+{
+	int id;
+	int lv_id;
+	char e1[16];
+	char e2[16];
+	int proflag;
+	char profile_e1[WLAN_MAX_NAME_LENGTH];
+	char profile_e2[WLAN_MAX_NAME_LENGTH];
+	char script[256];  
+	char protocol;
+	unsigned long test_duration;
+	char pszTestDuration[12];
+	unsigned long pairNum;
+	char testfile[256];
+}FChariot2_Item;
+
+FChariot2_Item PreSaveConvert(Chariot2_Item item)
+{
+	FChariot2_Item pFItem;
+	strcpy_s(pFItem.e1, item.e1.GetBuffer(item.e1.GetLength()));
+	strcpy_s(pFItem.e2, item.e2.GetBuffer(item.e2.GetLength()));
+	pFItem.id = item.id;
+	pFItem.lv_id = item.id;
+	pFItem.pairNum = item.pairNum;
+	strcpy_s(pFItem.profile_e1,item.profile_e1);
+	strcpy_s(pFItem.profile_e2,item.profile_e2);
+	pFItem.proflag = item.proflag;
+	pFItem.protocol = item.protocol;
+	strcpy_s(pFItem.pszTestDuration, item.pszTestDuration);
+	strcpy_s(pFItem.testfile, item.testfile.GetBuffer(item.testfile.GetLength()));
+	memcpy(pFItem.script, item.script, 256);
+	pFItem.test_duration = item.test_duration;
+	return pFItem;
+}
+
+Chariot2_Item RestoreConvert(FChariot2_Item fitem)
+{
+	Chariot2_Item item;
+	item.e1 = fitem.e1;
+	item.e2 = fitem.e2;
+	item.id = fitem.id;
+	item.lv_id = fitem.id;
+	item.pairNum = fitem.pairNum;
+	strcpy_s(item.profile_e1,fitem.profile_e1);
+	strcpy_s(item.profile_e2,fitem.profile_e2);
+	item.proflag = fitem.proflag;
+	item.protocol = fitem.protocol;
+	strcpy_s(item.pszTestDuration, fitem.pszTestDuration);
+	item.testfile = fitem.testfile;
+	memcpy(item.script, fitem.script,256);
+	item.test_duration = fitem.test_duration;
+	return item;
+}
+void CDlgChariot2::OnBnClickedBtnSaveitems()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CFile tempFile(_T("./LocalDatas.txt"),CFile::modeCreate|CFile::modeNoTruncate|
+		CFile::modeWrite);
+	CArchive ar(&tempFile, CArchive::store);
+	CString str;
+	int lsize = m_chariot2_List.size();
+	ar.Write(&lsize, sizeof(int));
+	list<Chariot2_Item>::iterator iter;
+	for(iter=m_chariot2_List.begin();iter !=m_chariot2_List.end(); iter++)
+	{
+		Chariot2_Item item = *iter;
+		FChariot2_Item fitem = PreSaveConvert(item);
+		ar.Write(&fitem, sizeof(fitem));
+	}
+	ar.Flush();
+	ar.Close();
+	tempFile.Close();
+	
+
+}
+
+
+void CDlgChariot2::OnBnClickedBtnLoadfromfile()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CFile tempFile(_T("./LocalDatas.txt"),CFile::modeCreate|CFile::modeNoTruncate|
+		CFile::modeReadWrite);
+	CArchive ar(&tempFile, CArchive::load);
+	Chariot2_Item item;
+	FChariot2_Item fitem;
+	int lsize = 0,
+		i = 0; 
+	C2ClearAllItem();
+	ar.Read(&lsize, sizeof(int));
+	if(lsize > 0){
+		for(i = 0; i < lsize; i++){
+			ar.Read(&fitem, sizeof(fitem));
+			item = RestoreConvert(fitem);
+			C2AddItem(&item);
+		}
+	}
+	ar.Close();
+	tempFile.Close();
 }

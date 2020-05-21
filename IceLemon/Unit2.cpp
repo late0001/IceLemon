@@ -333,7 +333,7 @@ bool RunThread::SetupChariot2(Chariot2_Item *item)
 		Creat_Test();
 
 		// Set Chariot test duration
-		CHR_runopts_set_test_duration(run, item->testduration);
+		CHR_runopts_set_test_duration(run, item->test_duration);
 
 		for (i=1; i<=item->pairNum; i++)
 		{
@@ -554,10 +554,12 @@ void RunThread::Set_Chariot(struct Chariot chariotP)
 	ChariotParameter = chariotP;
 }
 
-void RunThread::Set_Chariot2(list<Chariot2_Item> clist)
+void RunThread::Set_Chariot2(STest test)
 {
-	m_chariot2_List = clist;
+	sTest = test;
+	//m_chariot2_List = clist;
 }
+
 
 void RunThread::GetThroughput(int AttIndex, int x, int h)
 {
@@ -800,7 +802,9 @@ void RunThread::GetThroughput2(Chariot2_Item *item, int AttIndex, Chariot2_resul
 		}
 		avg1 *=0.944;
 		pResult->throughput = avg1;
-
+		pIceLemonDlg->PrintlnToMemo("");
+		DisplayWord.Format(" throughput: %3.2f Mbps", avg1);
+		pIceLemonDlg->PrintlnToMemo(DisplayWord);
 		for (k=1; k<=pairNum; k++)
 			CHR_pair_delete(pair[k]);
 
@@ -1368,7 +1372,7 @@ void RunThread::SetDataTmpFile(unsigned long jj, unsigned long k)
           TypeName,
           TailName = ".txt",
           DisplayWord;
-   int LoopCount, LoopType, i, j, ks;
+   int LoopCount, LoopType, ks;
    char *DataTmpFilename;
    FILE *tmpFile;
    errno_t err;
@@ -1453,7 +1457,7 @@ void RunThread::SetDataTmpFile2(unsigned long jj, unsigned long k, int t)
           TypeName,
           TailName = ".txt",
           DisplayWord;
-   int LoopCount, LoopType, i, j, ks;
+   int LoopCount, LoopType, ks;
    char *DataTmpFilename;
    FILE *tmpFile;
    errno_t err;
@@ -2217,19 +2221,24 @@ int RunThread::Run2()
 {
 	int card_idx;
 	int i, k = 0;
-	card_idx = pIceLemonDlg->cur_sel_card;
+	//card_idx = pIceLemonDlg->cur_sel_card;
+	card_idx = sTest.card_idx;
 	list<Chariot2_Item>::iterator plist; 
 	Chariot2_result re_info;
 	bool status;
 	time_t tStart,tNow;
 	unsigned long  testDuration;  
-	int loopCount = 2;
+	int loopCount = 1;
 	int state = -1;
 	char ChariotStatus;
 	FILE *tmpFile;
 	int j = 0;
 	int t = 0;// index of m_chariot2_List 
 	int outLoop = false;
+	list<Chariot2_Item> *pC2List  = &sTest.clist;
+	loopCount = sTest.total_time / sTest.single_time;
+	loopCount = loopCount > 0 ? loopCount:1;
+	//if(sTest.total_time % sTest.single_time > 0) loopCount++;
 	++j;
 	for(k = 1; k <= loopCount ; k++){
 		re_info.kcnt = k;
@@ -2237,11 +2246,11 @@ int RunThread::Run2()
 		//next j
 		pIceLemonDlg->CurrentLoopCount = k; //to set what loop the program run now.
 		t = 0;
-		for(plist = m_chariot2_List.begin(); plist != m_chariot2_List.end(); plist++) { 
+		for(plist = pC2List->begin(); plist != pC2List->end(); plist++) { 
 			Chariot2_Item xItem = *plist;
 			re_info.item_id = xItem.id;
 			t++;
-			testDuration = xItem.testduration;
+			testDuration = xItem.test_duration;
 			//DisplayWord.Format("i = %d, TestDuration = %d", i, testDuration);
 			if(xItem.proflag == 1){
 				ConnectAndGetIP2(card_idx, xItem.profile_e1, xItem.e1, xItem.e2);
@@ -2345,7 +2354,7 @@ int RunThread::Run2()
 			}while(!outLoop);
 
 
-		}//for(plist = m_chariot2_List.begin(); plist != m_chariot2_List.end(); plist++)
+		}//for(plist = pC2List->begin(); plist != pC2List->end(); plist++) { 
 		//}//for(j=0; j < 1;j++){
 
 	}//for(k = 0; k < loopCount ; k++){

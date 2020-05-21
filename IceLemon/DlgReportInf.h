@@ -1,4 +1,5 @@
 #pragma once
+#include "afxwin.h"
 
 class CIceLemonDlg;
 // CDlgReportInf ¶Ô»°¿ò
@@ -21,4 +22,7 @@ protected:
 public:
 	CIceLemonDlg *pIceLemonDlg;
 	int SetContext(CIceLemonDlg *context);
+	virtual BOOL OnInitDialog();
+	CComboBox m_cbo_tester;
+	CComboBox m_cbo_customer;
 };
