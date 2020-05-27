@@ -7,6 +7,7 @@
 #define AttValueCnt     60
 #include "wlanapi.h"
 #include <list>
+#include <vector>
 
 using namespace std;
 struct Chariot
@@ -37,6 +38,7 @@ struct Chariot
 	CString str_ap2_addr;
 	CString str_ap3_addr;
 };
+
 typedef struct _Chariot2_Item
 {
 	int id;
@@ -46,6 +48,7 @@ typedef struct _Chariot2_Item
 	char profile_e1[WLAN_MAX_NAME_LENGTH];
 	char profile_e2[WLAN_MAX_NAME_LENGTH];
 	char script[256];  
+	int TorR;
 	char protocol;
 	unsigned long test_duration;
 	char pszTestDuration[12];
@@ -65,10 +68,16 @@ typedef struct _Chariot2_result
 {
 	float att;
 	int kcnt;
+	int report_id;
 	int item_id;
 	float throughput;
-	time_t start;
-	time_t end;
+	char start_time[50];
+	char end_time[50];
+	int TorR;
+	int linkRate;
+	int channel;
+	char testLog[256];
+	char SSID[256];
 }Chariot2_result;
 
 struct Attenuator
@@ -151,8 +160,9 @@ private:
 	 CString datFileName;
 	 char  DataTmpFileList[512];
 	 list<Chariot2_Item> m_chariot2_List;
+	 vector<Chariot2_result> m_vec_Result;
 	 STest sTest;
-	 
+	 int result_cnt;
 public:
 	 CString dataFullName;
 	 int run_flag;
@@ -163,7 +173,10 @@ public:
 	 bool SetupChariot(int x, unsigned long TestDuration);
 	 bool SetupChariot2(Chariot2_Item *item);
 	 int SetRunFlag(int flag);
-
+	 void Set_Chariot2(STest test);
+	 int Run();
+	 int Run1();
+	 int Run2();
 	 CString GetChariotStatus(char x);
 	 void GetThroughput(int x, int h);
 	 void GetThroughputMax(int x, int h);
@@ -183,19 +196,18 @@ public:
 	 void SetDataTmpFile2(unsigned long jj, unsigned long k, int t);
 	 void TouchFile(int k);
 	 int SaveTPToFile();
-	 int GetDateTimeNow(char (&buf)[255], int fmt);
-	 int GetDateTime(time_t time, char (&buf)[255], int fmt);
+	 int GetDateTimeNow(char (&buf)[50], int fmt);
+	 int GetDateTime(time_t time, char (&buf)[50], int fmt);
 	 void Set_Flag(struct SFlag flag);
 	 void Set_Chariot(struct Chariot chariotP);
 	 void SetDataTmpFile(unsigned long jj, unsigned long k);
 	 void SaveTmpData(unsigned long saveFormat, unsigned long j, int k);
 	 void SaveTmpData2(Chariot2_result *pResult,unsigned long j, int k, int t);
+	 void SaveTmpDataOneTimes(unsigned long j, int k);
+	 void WriteResultCnt();
 	 int ConnectAndGetIP(int card_index, char *profile, CString &str_ap_addr);
-	 int ConnectAndGetIP2(int card_index, char *profile, CString &str, CString lanIP);
-	 void Set_Chariot2(STest test);
-	 int Run();
-	 int Run1();
-	 int Run2();
+	 int ConnectAndGetIP2(int card_index, char *profile, CString &str, CString lanIP, Chariot2_result *cResult);
+	 int SaveResult();
 	 bool IsPreRun; 
 	 virtual BOOL InitInstance();
 	 virtual int ExitInstance();

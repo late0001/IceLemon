@@ -93,6 +93,7 @@ public:
 	DWORD CardNGetProfileList(int index, PIL_PROFILE_INFO_LIST *ppPrfList);
 	void UpdateIPAddressListItem();
 	void InsertRecord(CString sql);
+	ULONG GetRxRate(Chariot2_result *cResult);
 	PWLAN_PROFILE_INFO_LIST pProfileList;
 	// Define Chariot struct varibles
 	struct Chariot ChariotParameter;

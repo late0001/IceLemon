@@ -45,4 +45,7 @@ public:
 	DWORD InitProfileComboBox();
 	int ShowItem(Chariot2_Item &xItem);
 	int caculTimeToUI(unsigned long testDuration);
+	int m_radio_tr;
+	afx_msg void OnBnClickedRdoTx();
+	afx_msg void OnBnClickedRdoRx();
 };

@@ -13,6 +13,13 @@ typedef struct _WLIfInfo{
 	char * ifName;
 }WLIfInfo, *PWLIfInfo;
 
+typedef struct _APInfo{
+	char  Ssid[32];
+	LONG  lRssi;
+	ULONG  uLinkQuality;
+	ULONG  ulChCenterFrequency;
+	int channel;
+}APInfo, *PAPInfo;
 
 class CWlanOp
 {
@@ -27,9 +34,18 @@ public:
 	int GetNumberOfInterfaces();
 	WLAN_INTERFACE_STATE GetInterfaceState(int index);
 	TCHAR *GetDescription(int index);
-	DWORD CWlanOp::GetConnectionAttributes(
+	DWORD GetConnectionAttributes(
 		IN GUID Guid, 
-		OUT PWLAN_CONNECTION_ATTRIBUTES *ppConnAttr
+		OUT PWLAN_CONNECTION_ATTRIBUTES *ppConnAttr,
+		int print
+		);
+	int GetChannelByFrequency(int frequency);
+	DWORD GetChCenterFrequency(
+		_In_ GUID Guid,
+		_In_opt_ CONST PDOT11_SSID pDot11Ssid,
+		_In_ DOT11_BSS_TYPE dot11BssType,
+		_In_ BOOL bSecurityEnabled,
+		_In_ PAPInfo pApInfo
 		);
 	DWORD GetAvailableNetworkList(GUID *pGuid, PWLAN_AVAILABLE_NETWORK_LIST *ppNetList);
 	DWORD GetProfileList(GUID *pGuid, PWLAN_PROFILE_INFO_LIST *ppProfileList);

@@ -47,4 +47,5 @@ public:
 	afx_msg void OnKillfocusCbAdapter();
 	CComboBox m_cb_profile;
 	afx_msg void OnCbnSelchangeCbProfile();
+	afx_msg void OnBnClickedBtnSaveresult();
 };

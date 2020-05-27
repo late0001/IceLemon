@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 #include "IceLemonDlg.h"
 #include "ChariotParaDlg.h"
+#include "ADODbHelper.h"
 // CDlgChariot2 对话框
 
 IMPLEMENT_DYNAMIC(CDlgChariot2, CDialogEx)
@@ -158,7 +159,9 @@ BOOL CDlgChariot2::OnInitDialog()
 	m_list.InsertColumn(2,"E1 profile",LVCFMT_LEFT, 150);
 	m_list.InsertColumn(3,"E2 IP",LVCFMT_LEFT, 150);
 	m_list.InsertColumn(4,"E2 profile",LVCFMT_LEFT, 150);
-	m_list.InsertColumn(5,"time",LVCFMT_LEFT, 150);
+	m_list.InsertColumn(5,"Pair Num",LVCFMT_LEFT, 150);
+	m_list.InsertColumn(6,"Direction",LVCFMT_LEFT, 150);
+	m_list.InsertColumn(7,"time",LVCFMT_LEFT, 150);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 
@@ -263,7 +266,8 @@ int CDlgChariot2::CheckItem(int i, Chariot2_Item &xItem,
 	//}
 	return 1;
 }
-void getScript(CString &script)
+
+void GetScript(CString &script)
 {
 	char tmpBuf[255] = { 0 };
 	GetCurrentDirectory(255, tmpBuf);
@@ -271,7 +275,30 @@ void getScript(CString &script)
 	
 }
 
+unsigned long GetIdFromDb()
+{
+	_RecordsetPtr m_pRs;
+	CADODbHelper m_AdoConn;
+	CString sql="select max(ItemId) from Item";
+	int ID = 0;
+	_variant_t vID;
+	try {
+		m_AdoConn.OnInitADOConn();
+		m_pRs=m_AdoConn.GetRecordSet((_bstr_t)sql);
 
+		if(!m_pRs->adoEOF)///这里为什么是adoEOF而不是EOF呢? 还记得rename("EOF","adoEOF")这一句吗?
+		{
+			vID =  m_pRs->GetCollect(_variant_t((long)0));
+			ID =vID.intVal;
+		}
+		m_AdoConn.ExitConn();
+	}catch(...)
+	{
+		AfxMessageBox("操作失败");
+		return -1;
+	}
+	return ID;
+}
 
 void CDlgChariot2::OnBnClickedBtnC2ok()
 {
@@ -279,9 +306,12 @@ void CDlgChariot2::OnBnClickedBtnC2ok()
 	Chariot2_Item xItem;
 	CString script;
 	CString ip_e1_str, ip_e2_str;
+	CString str;
 	char msg[255]={0};
 	int cnt = 0 ;
-
+	int cid;
+	int i = 0;
+	cid = GetIdFromDb()+1;
 	UpdateData(TRUE);
 	if(m_cbo_card.GetCurSel()== -1) {
 		MessageBox("Please choose card first", "Error", MB_OK|MB_ICONERROR);
@@ -291,15 +321,19 @@ void CDlgChariot2::OnBnClickedBtnC2ok()
 	simple_test.total_time = (m_hour_total *3600 + m_min_total *60 + m_sec_total);
 	simple_test.single_time = 0;
 	m_cbo_card.GetLBText(m_sel_card_idx, simple_test.card_name);
-	getScript(script);
+	GetScript(script);
 
 	list<Chariot2_Item>::iterator pItem;  
-	for( pItem = m_chariot2_List.begin(); pItem != m_chariot2_List.end();pItem++){
+	for( pItem = m_chariot2_List.begin(); pItem != m_chariot2_List.end();pItem++, i++){
+		pItem->id = cid++;
+		str.Format("%d",pItem->id);
+		m_list.SetItemText(i, 0, str);
 		strcpy_s(pItem->script,script.GetBuffer(script.GetLength())); 
 		pItem->protocol = CHR_PROTOCOL_TCP;
 		simple_test.single_time += pItem->test_duration;
 	}
 	simple_test.clist = m_chariot2_List;
+
 #if 0
 	if( m_ckb1.GetCheck()){
 		CheckItem(1, xItem,m_IPAddr1_e1,m_IPAddr1_e2, m_cbo_p1e1, m_cbo_p1e2, m_hour_c1, m_min_c1, m_sec_c1, IDC_EDT_SECC1);
@@ -383,7 +417,15 @@ void CDlgChariot2::C2AddItem(Chariot2_Item *item)
 	m_list.SetItemText(i, 2, item->profile_e1);
 	m_list.SetItemText(i, 3, item->e2);
 	m_list.SetItemText(i, 4, item->profile_e2);
-	m_list.SetItemText(i, 5, item->pszTestDuration);
+	str.Format("%d",item->pairNum);
+	m_list.SetItemText(i, 5, str);
+	if(item->TorR){
+		str = "Tx";
+	}else{
+		str = "Rx";
+	}
+	m_list.SetItemText(i, 6, str);
+	m_list.SetItemText(i, 7, item->pszTestDuration);
 	item->lv_id = i;
 	m_chariot2_List.push_back(*item);
 }
@@ -405,7 +447,15 @@ void CDlgChariot2::C2UpdateItem(Chariot2_Item *item,int i)
 	m_list.SetItemText(i, 2, item->profile_e1);
 	m_list.SetItemText(i, 3, item->e2);
 	m_list.SetItemText(i, 4, item->profile_e2);
-	m_list.SetItemText(i, 5, item->pszTestDuration);
+	str.Format("%d",item->pairNum);
+	m_list.SetItemText(i, 5, str);
+	if(item->TorR){
+		str = "Tx";
+	}else{
+		str = "Rx";
+	}
+	m_list.SetItemText(i, 6, str);
+	m_list.SetItemText(i, 7, item->pszTestDuration);
 }
 void CDlgChariot2::OnBnClickedCkbC2savetst()
 {
@@ -448,11 +498,11 @@ void CDlgChariot2::OnBnClickedBtnAddci()
 		MessageBox("Please select net card first!", "Info", MB_OK | MB_ICONINFORMATION);
 		return ;
 	}
-	CChariotParaDlg *dlg = new CChariotParaDlg(this);
-	dlg->pPrfList = this->pPrfList;
-	dlg->bPreUpdate = FALSE;
-	if(IDOK == dlg->DoModal()){
-		C2AddItem(&dlg->item);
+	CChariotParaDlg dlg(this);
+	dlg.pPrfList = this->pPrfList;
+	dlg.bPreUpdate = FALSE;
+	if(IDOK == dlg.DoModal()){
+		C2AddItem(&dlg.item);
 	}
 	delete dlg;
 
@@ -477,12 +527,12 @@ void CDlgChariot2::OnBnClickedBtnC2update()
 		}
 
 	}
-	CChariotParaDlg *dlg = new CChariotParaDlg(this);
-	dlg->pPrfList = this->pPrfList;
-	dlg->pItem = sel_item;
-	dlg->bPreUpdate = TRUE;
-	if(IDOK == dlg->DoModal()){
-		C2UpdateItem(dlg->pItem, sel_index);
+	CChariotParaDlg dlg(this);
+	dlg.pPrfList = this->pPrfList;
+	dlg.pItem = sel_item;
+	dlg.bPreUpdate = TRUE;
+	if(IDOK == dlg.DoModal()){
+		C2UpdateItem(dlg.pItem, sel_index);
 	}
 }
 
@@ -527,12 +577,6 @@ void CDlgChariot2::OnDestroy()
 	CDialogEx::OnDestroy();
 
 	// TODO: 在此处添加消息处理程序代码
-	list<Chariot2_Item>::iterator iter;
-	for(iter=m_chariot2_List.begin();iter !=m_chariot2_List.end(); iter++)
-	{
-	
-		//m_chariot2_List.pop_back();
-	}
 	
 }
 
@@ -545,7 +589,8 @@ typedef struct _FChariot2_Item
 	int proflag;
 	char profile_e1[WLAN_MAX_NAME_LENGTH];
 	char profile_e2[WLAN_MAX_NAME_LENGTH];
-	char script[256];  
+	char script[256];
+	int TorR;
 	char protocol;
 	unsigned long test_duration;
 	char pszTestDuration[12];
@@ -565,6 +610,7 @@ FChariot2_Item PreSaveConvert(Chariot2_Item item)
 	strcpy_s(pFItem.profile_e2,item.profile_e2);
 	pFItem.proflag = item.proflag;
 	pFItem.protocol = item.protocol;
+	pFItem.TorR = item.TorR;
 	strcpy_s(pFItem.pszTestDuration, item.pszTestDuration);
 	strcpy_s(pFItem.testfile, item.testfile.GetBuffer(item.testfile.GetLength()));
 	memcpy(pFItem.script, item.script, 256);
@@ -584,6 +630,7 @@ Chariot2_Item RestoreConvert(FChariot2_Item fitem)
 	strcpy_s(item.profile_e2,fitem.profile_e2);
 	item.proflag = fitem.proflag;
 	item.protocol = fitem.protocol;
+	item.TorR = fitem.TorR;
 	strcpy_s(item.pszTestDuration, fitem.pszTestDuration);
 	item.testfile = fitem.testfile;
 	memcpy(item.script, fitem.script,256);

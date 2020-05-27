@@ -17,7 +17,7 @@ void CADODbHelper::OnInitADOConn()
 	{
 		m_pCon.CreateInstance("ADODB.Connection");
 		m_pCon->ConnectionTimeout=3;
-		m_pCon->Open("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=D:\\xv\\Projects\\IceLemon\\IceLemon\\DAT.accdb","","",adModeUnknown);
+		m_pCon->Open("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=D:\\xv\\Projects\\IceLemon\\IceLemon\\DAT.accdb","","",adModeUnknown);
 	}
 	catch(_com_error e)
 	{

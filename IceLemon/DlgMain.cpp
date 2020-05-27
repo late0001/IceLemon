@@ -51,6 +51,7 @@ BEGIN_MESSAGE_MAP(CDlgMain, CDialogEx)
 	ON_WM_KILLFOCUS()
 	ON_CBN_KILLFOCUS(IDC_CB_ADAPTER, &CDlgMain::OnKillfocusCbAdapter)
 	ON_CBN_SELCHANGE(IDC_CB_PROFILE, &CDlgMain::OnCbnSelchangeCbProfile)
+	ON_BN_CLICKED(IDC_BTN_SAVERESULT, &CDlgMain::OnBnClickedBtnSaveresult)
 END_MESSAGE_MAP()
 
 
@@ -197,4 +198,35 @@ void CDlgMain::OnKillfocusCbAdapter()
 void CDlgMain::OnCbnSelchangeCbProfile()
 {
 	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void CDlgMain::OnBnClickedBtnSaveresult()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CFile file;
+	int cnt;
+	CString FileName=_T(".\\DatFile.txt");
+	CADODbHelper dbHelper;
+	CString sql;
+	Chariot2_result iResult;
+	dbHelper.OnInitADOConn();
+	file.Open(FileName, CFile::modeRead);
+	file.Read(&cnt,sizeof(int));
+	CString slinkRate;
+	for(int i=0; i < cnt; i++){
+		
+		memset(&iResult,0,sizeof(iResult));
+		file.Read(&iResult,sizeof(iResult));
+		slinkRate.Format("%dM",iResult.linkRate/1000);
+		sql.Format("insert into Result ( ReportId, ItemId, Throughput, SSID, Channel, LinkRate, StartTime, EndTime, TestLog) \
+				   values (%d, %d, %.02f, '%s', %d, '%s', '%s', '%s', '%s')",
+				   iResult.report_id, iResult.item_id, iResult.throughput, iResult.SSID, iResult.channel, slinkRate,iResult.start_time, iResult.end_time, iResult.testLog
+				   );
+		dbHelper.ExecuteSQL((_bstr_t)sql);
+	}
+	dbHelper.ExitConn();
+	file.Close();
+		
+	
 }

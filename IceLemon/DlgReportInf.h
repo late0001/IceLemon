@@ -1,6 +1,6 @@
 #pragma once
 #include "afxwin.h"
-
+#include "ADODbHelper.h"
 class CIceLemonDlg;
 // CDlgReportInf ¶Ô»°¿ò
 
@@ -25,4 +25,13 @@ public:
 	virtual BOOL OnInitDialog();
 	CComboBox m_cbo_tester;
 	CComboBox m_cbo_customer;
+	CEdit m_edit_equiment;
+	CEdit m_edit_environment;
+	CEdit m_edit_method;
+	CComboBox m_cbo_condition;
+	CEdit m_edit_purpose;
+	CEdit m_edit_workbench;
+	CADODbHelper m_dbHelper;
+	afx_msg void OnBnClickedOk();
+	CComboBox m_cbo_reporttype;
 };

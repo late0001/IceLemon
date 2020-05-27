@@ -1283,7 +1283,7 @@ int RunThread::SaveTPToFile()
 *	fmt if 0,return date, otherwise return time
 */
 
-int RunThread::GetDateTimeNow(char (&buf)[255], int fmt)
+int RunThread::GetDateTimeNow(char (&buf)[50], int fmt)
 {
 	//char *buf;
 	int ret = 0;
@@ -1302,17 +1302,20 @@ int RunThread::GetDateTimeNow(char (&buf)[255], int fmt)
 	case 1:
 		sprintf_s(buf, "%02d:%02d:%02d", p.tm_hour+8>=24? p.tm_hour+8-24: p.tm_hour+8, p.tm_min, p.tm_sec);
 		break;
+	case 3:
+		sprintf_s(buf, "%d%02d%02d%02d%02d%02d",(1900+p.tm_year), (1+p.tm_mon),p.tm_mday, p.tm_hour+8>=24? p.tm_hour+8-24: p.tm_hour+8, p.tm_min, p.tm_sec);
+		break;
 	}
 
 	return 0;
 }
 
-int RunThread::GetDateTime(time_t time, char (&buf)[255], int fmt)
+int RunThread::GetDateTime(time_t time, char (&buf)[50], int fmt)
 {
 	//char *buf;
 	int ret = 0;
 	//time_t t;
-	struct tm p ;
+	struct tm p;
 	char *wday[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 	//t = time(NULL);
 	ret=gmtime_s(&p , &time);
@@ -1325,6 +1328,12 @@ int RunThread::GetDateTime(time_t time, char (&buf)[255], int fmt)
 		break;
 	case 1:
 		sprintf_s(buf, "%02d:%02d:%02d", p.tm_hour+8>=24? p.tm_hour+8-24: p.tm_hour+8, p.tm_min, p.tm_sec);
+		break;
+	case 2:
+	default:
+		sprintf_s(buf, "%04d/%02d/%02d %02d:%02d:%02d", 
+			(1900+p.tm_year), (1+p.tm_mon),p.tm_mday, 
+			p.tm_hour+8>=24? p.tm_hour+8-24: p.tm_hour+8, p.tm_min, p.tm_sec);
 		break;
 	}
 
@@ -1459,13 +1468,14 @@ void RunThread::SetDataTmpFile2(unsigned long jj, unsigned long k, int t)
           DisplayWord;
    int LoopCount, LoopType, ks;
    char *DataTmpFilename;
+   char datetime[50] = {0};
    FILE *tmpFile;
    errno_t err;
    LoopCount = pIceLemonDlg->LoopCount;
 
  
        LoopType = 3;
-
+	  if(k > 1|| t > 1) return ; //if k>2 have no need to create file
        // build the tmp data filename for iteration test
        if (LoopCount == 1)  // if only one iteration, no type-name required!!
         {
@@ -1490,12 +1500,12 @@ void RunThread::SetDataTmpFile2(unsigned long jj, unsigned long k, int t)
            TypeName.Format( "_Round%d", ks);
 		 
         }
-
-
+	
+	GetDateTimeNow(datetime,3);
    //SetCurrentDir(Form1->WorkDictionary);
-   dataFullName = pIceLemonDlg->workDirectory + "\\test_result\\" + HeadName + TypeName + TailName;
+   dataFullName = pIceLemonDlg->workDirectory + "\\test_result\\" + HeadName + TypeName + datetime + TailName;
    DataTmpFilename = dataFullName.GetBuffer(dataFullName.GetLength());
-   if(k > 1|| t > 1) return ; //if k>2 have no need to create file
+ 
    // Delete the existing data in tmp file & new a data tmp file
    if (jj == 1)       //create new file if the first att value
     {
@@ -1520,7 +1530,7 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j, int k)
 	char *DataTmpFilename;
 	CString xValName;
 	errno_t err;
-	char buf[255]={0};
+	char buf[50]={0};
 	DataTmpFilename = dataFullName.GetBuffer(dataFullName.GetLength());
 	//Form1->Label1->Caption = DataFullName;
 	// Save test result to tmp file (the current attenuator value)
@@ -1658,43 +1668,45 @@ void RunThread::SaveTmpData(unsigned long saveFormat, unsigned long j, int k)
 	t_item.two_way = avg3+avg4;
 	SaveOneToDb(saveFormat);
 }
-
+void RunThread::WriteResultCnt()
+{
+	CFile file;
+	CString FileName=_T(".\\DatFile.txt");
+	file.Open(FileName, CFile::modeWrite);
+	file.Write(&result_cnt,sizeof(int));
+	file.Close();
+}
 void RunThread::SaveTmpData2(Chariot2_result *pResult,unsigned long j, int k, int t)
 {
 	FILE *TmpFile;
 	char *DataTmpFilename;
 	CString xValName;
 	errno_t err;
-	char buf[255]={0};
+	char start_time[255]={0};
 	char end_time[255]={0};
-	DataTmpFilename = dataFullName.GetBuffer(dataFullName.GetLength());
-	//Form1->Label1->Caption = DataFullName;
-	// Save test result to tmp file (the current attenuator value)
+	CFile file;
+//	DataTmpFilename = dataFullName.GetBuffer(dataFullName.GetLength());
 
-	//if ( (Form1->ckbRotatorEnable->Checked == true) && (Form1->ckbEnableFieldTryMode->Checked == true) )
-	//	xValName = "Ang    Ofs    Ang    ";
-	//else
+//	err = fopen_s(&TmpFile, DataTmpFilename,"a+t"); // open temp file for append data
 
-	err = fopen_s(&TmpFile, DataTmpFilename,"a+t"); // open temp file for append data
-
-		if (j==1 && k==1 && t==1)
-		{
-			GetDateTimeNow(buf, 0);
-			fprintf(TmpFile, "Date: %s\n",buf);
-
-			fprintf(TmpFile, "Throughput(unit: Mbps)\n");
-
-			//			if (Form1->ckbLoadTestFile->Checked == true)
-			//			{               
-			//				fprintf(TmpFile,"%sExt_ALL    Ext_DLP    Ext_ULP\n", xValName);
-			//				fprintf(TmpFile, "===    ===    ===   ========   ========   ========\n");
-			//			}
-			//			else
-			//			{
-			fprintf(TmpFile, "item_id        Att      	E1->E2		   k		 start          	end \n");
-			fprintf(TmpFile, "=======        ===        ========		 =====	   ========      	======== \n");
-			//			}
-		}
+// 		if (j==1 && k==1 && t==1)
+// 		{
+// 			GetDateTimeNow(buf, 0);
+// 			fprintf(TmpFile, "Date: %s\n",buf);
+// 
+// 			fprintf(TmpFile, "Throughput(unit: Mbps)\n");
+// 
+// 			//			if (Form1->ckbLoadTestFile->Checked == true)
+// 			//			{               
+// 			//				fprintf(TmpFile,"%sExt_ALL    Ext_DLP    Ext_ULP\n", xValName);
+// 			//				fprintf(TmpFile, "===      ========   ========   ========\n");
+// 			//			}
+// 			//			else
+// 			//			{
+// 			fprintf(TmpFile, "item_id        Att      	E1->E2	          k	     	 start          	end \n");
+// 			fprintf(TmpFile, "=======        ===       ========	     =====	   ========      	======== \n");
+// 			//			}
+// 		}
 
 		//		if (Form1->ckbLoadTestFile->Checked == true)
 		//			fprintf(TmpFile,"%3d %6d %6d %9.2f %9.2f %9.2f\n", AttenuatorParameter.Attenuator_Value[j],
@@ -1702,17 +1714,100 @@ void RunThread::SaveTmpData2(Chariot2_result *pResult,unsigned long j, int k, in
 		//			AttenuatorParameter.Attenuator_Value[j]+AttenuatorParameter.Ext_Attenuation,
 		//			avg4, avg5, avg6);
 		//		else
-		GetDateTime(pResult->start, buf, 1);
-		GetDateTime(pResult->end, end_time, 1);
-		fprintf(TmpFile,"%5d		%5d		%9.2f  %9d       %-15s\t%-15s\n",
-			pResult->item_id, 0, pResult->throughput, pResult->kcnt, buf, end_time);
-	fclose(TmpFile);
+
+		CString FileName=_T(".\\DatFile.txt");
+		file.Open(FileName, CFile::modeWrite);
+		file.SeekToEnd();
+		file.Write(pResult,sizeof(Chariot2_result));
+		result_cnt++;
+		file.Close();
+// 		fprintf(TmpFile,"%5d		%5d		%9.2f  %9d       %-15s\t%-15s\n",
+// 			pResult->item_id, 0, pResult->throughput, pResult->kcnt, buf, end_time);
+// 	fclose(TmpFile);
 	//t_item.e1_e2 = avg1;
 	//t_item.e2_e1 = avg2;
 	//t_item.e1s_e2 = avg3;
 	//t_item.e2s_e1 = avg4;
 	//t_item.two_way = avg3+avg4;
 	//SaveOneToDb(saveFormat);
+}
+typedef struct _Chariot2ResultTxtItem
+{
+	float att;
+	int kcnt;
+	float TxThroughput;
+	float RxThroughput;
+	char *pszSSID;
+}Chariot2ResultTxtItem;
+
+int  ssid_match(char *ssid, char (*p)[256], int size)
+{
+	for (int i =0; i < size; i++){
+		if(strcmp(ssid, p[i]) == 0)
+			return 1;
+	}
+	return 0;
+}
+
+void RunThread::SaveTmpDataOneTimes(unsigned long j, int k)
+{
+	FILE *TmpFile;
+	char *DataTmpFilename;
+	CString xValName;
+	errno_t err;
+	char buf[50]={0};
+	char end_time[255]={0};
+	int i=0,l=0;
+	Chariot2_result result;
+	Chariot2ResultTxtItem txtResult;
+	DataTmpFilename = dataFullName.GetBuffer(dataFullName.GetLength());
+
+	//if ( (Form1->ckbRotatorEnable->Checked == true) && (Form1->ckbEnableFieldTryMode->Checked == true) )
+	//	xValName = "Ang    Ofs    Ang    ";
+	//else
+
+	err = fopen_s(&TmpFile, DataTmpFilename,"a+t"); // open temp file for append data
+
+	//if (j==1 && k==1 && t==1)
+	if ( k==1 )
+	{
+		GetDateTimeNow(buf, 0);
+		fprintf(TmpFile, "Date: %s\n",buf);
+
+		fprintf(TmpFile, "Throughput(unit: Mbps)\n");
+
+		fprintf(TmpFile, "%-20s    Att      	TX	       	  RX	    k	    \n", "SSID");
+		fprintf(TmpFile, "%-20s    ===       ========	    =======    =====	    \n", "=============");
+
+	}
+	char (*p)[256] = (char (*)[256])malloc(256*m_vec_Result.size());
+	char (*q)[256] = p;
+	for(i = 0; i < m_vec_Result.size(); i++)
+	{
+		result = m_vec_Result[i];
+		txtResult.pszSSID = result.SSID;
+		if(ssid_match(txtResult.pszSSID, p,m_vec_Result.size()))
+			continue;
+		strcpy_s(*q++, result.SSID);
+		for (l= 0; l < m_vec_Result.size();l++){
+			if(strcmp(result.SSID,m_vec_Result[l].SSID) == 0){
+				txtResult.kcnt = m_vec_Result[l].kcnt;
+				if(m_vec_Result[l].TorR){
+					txtResult.TxThroughput = m_vec_Result[l].throughput;
+				}else{
+					txtResult.RxThroughput = m_vec_Result[l].throughput;
+				}
+
+			}
+		}
+		fprintf(TmpFile,"%-20s    %5d    %9.2f    %9.2f    %9d\n",
+			txtResult.pszSSID, 0, txtResult.TxThroughput, txtResult.RxThroughput, txtResult.kcnt);
+	}
+
+	free(p);
+	
+	fclose(TmpFile);
+
 }
 
 int RunThread::ConnectAndGetIP(int card_index, char *profile, CString &str_ap_addr)
@@ -1757,7 +1852,7 @@ int RunThread::ConnectAndGetIP(int card_index, char *profile, CString &str_ap_ad
 	return 0;
 }
 
-int RunThread::ConnectAndGetIP2(int card_index, char *profile, CString &str, CString lanIP)
+int RunThread::ConnectAndGetIP2(int card_index, char *profile, CString &str, CString lanIP, Chariot2_result *cResult)
 {
 	CString DisplayWord;
 	int retry = 5;
@@ -1793,6 +1888,40 @@ int RunThread::ConnectAndGetIP2(int card_index, char *profile, CString &str, CSt
 		AfxMessageBox("can not fetch ip address of endpoint!");
 		return -1;
 	}
+	pIceLemonDlg->GetRxRate(cResult);
+	return 0;
+}
+
+int RunThread::SaveResult()
+{
+    CADODbHelper dbHelper;
+	CString sql;
+	vector<Chariot2_result>::iterator iter;
+	char start_time[50],
+		end_time[50];
+//	CString end_time;
+	
+	//GetDateTime(pResult->end, end_time, 1);
+	try{
+		dbHelper.OnInitADOConn();
+		for(iter = m_vec_Result.begin(); iter != m_vec_Result.end(); iter++){
+			Chariot2_result iResult = *iter;
+			//GetDateTime(pResult->start, start_time, 1);
+			sql.Format("insert into Result ( ReportId, ItemId, Throughput, StartTime, EndTime, TestLog) \
+				   values (%d, %d, %.02f, '%s', '%s', '%s')",
+				   iResult.report_id, iResult.item_id, iResult.throughput, iResult.start_time, iResult.end_time, iResult.testLog
+			);
+			dbHelper.ExecuteSQL((_bstr_t)sql);
+		}
+		dbHelper.ExitConn();
+	}
+	catch(...)
+	{
+		AfxMessageBox("²Ù×÷Ê§°Ü");
+		return -1;
+	}
+	
+
 	return 0;
 }
 
@@ -2235,10 +2364,17 @@ int RunThread::Run2()
 	int j = 0;
 	int t = 0;// index of m_chariot2_List 
 	int outLoop = false;
+	
 	list<Chariot2_Item> *pC2List  = &sTest.clist;
 	loopCount = sTest.total_time / sTest.single_time;
 	loopCount = loopCount > 0 ? loopCount:1;
 	//if(sTest.total_time % sTest.single_time > 0) loopCount++;
+	CFile file;
+	CString FileName=_T(".\\DatFile.txt");
+	file.Open(FileName, CFile::modeCreate|CFile::modeWrite);
+	result_cnt=0;
+	file.Write(&result_cnt,sizeof(int));
+	file.Close();
 	++j;
 	for(k = 1; k <= loopCount ; k++){
 		re_info.kcnt = k;
@@ -2249,13 +2385,16 @@ int RunThread::Run2()
 		for(plist = pC2List->begin(); plist != pC2List->end(); plist++) { 
 			Chariot2_Item xItem = *plist;
 			re_info.item_id = xItem.id;
+			re_info.TorR = xItem.TorR;
 			t++;
 			testDuration = xItem.test_duration;
 			//DisplayWord.Format("i = %d, TestDuration = %d", i, testDuration);
 			if(xItem.proflag == 1){
-				ConnectAndGetIP2(card_idx, xItem.profile_e1, xItem.e1, xItem.e2);
+				strcpy_s(re_info.SSID, xItem.profile_e1);
+				ConnectAndGetIP2(card_idx, xItem.profile_e1, xItem.e1, xItem.e2, &re_info);
 			}else if(xItem.proflag == 2){
-				ConnectAndGetIP2(card_idx, xItem.profile_e2, xItem.e2, xItem.e1);
+				strcpy_s(re_info.SSID, xItem.profile_e2);
+				ConnectAndGetIP2(card_idx, xItem.profile_e2, xItem.e2, xItem.e1, &re_info);
 			}
 			SetDataTmpFile2(j,k,t);
 			status = SetupChariot2(&xItem);
@@ -2264,7 +2403,7 @@ int RunThread::Run2()
 			CHR_test_start(test);  //  Start Test!!
 			time(&tStart);
 			time(&tNow);
-			re_info.start = tStart;
+			GetDateTime(tStart, re_info.start_time, 3);
 			//tCntSec = 0;
 			pIceLemonDlg->CorrectTimeRemain2(&xItem);
 			pIceLemonDlg->m_page_main.RestartTimeRemain();
@@ -2276,7 +2415,7 @@ int RunThread::Run2()
 				case 5:
 					if(difftime(tNow, tStart) > testDuration)//test finish
 					{
-						re_info.end = tNow;
+						GetDateTime(tNow,re_info.end_time, 3);
 						state = 6;
 						break;
 					}else{
@@ -2346,7 +2485,7 @@ int RunThread::Run2()
 				case 80: //i-loop (chariot pair) finish process
 					//SaveTmpData(saveformat, j);  //save tmp data
 					SaveTmpData2(&re_info, j, k, t);  //save tmp data		
-
+					m_vec_Result.push_back(re_info);
 					//state = 2;  // to the next-k (loop)
 					outLoop = true;
 					break;
@@ -2356,11 +2495,12 @@ int RunThread::Run2()
 
 		}//for(plist = pC2List->begin(); plist != pC2List->end(); plist++) { 
 		//}//for(j=0; j < 1;j++){
-
+		SaveTmpDataOneTimes(j,k);
 	}//for(k = 0; k < loopCount ; k++){
 	//	errno_t err= fopen_s(&tmpFile, dataFullName.GetBuffer(dataFullName.GetLength()),"a+t");
 	//	fprintf(tmpFile,"### %6d", finishAttItem + 1);  //how many att item in this loop
 	//	fclose(tmpFile);
+	WriteResultCnt();
 	errno_t err= fopen_s(&tmpFile, dataFullName.GetBuffer(dataFullName.GetLength()),"a+t");
 	fprintf(tmpFile,"### finish ###");  //how many att item in this loop
 	fclose(tmpFile);

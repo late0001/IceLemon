@@ -163,7 +163,8 @@ TCHAR *CWlanOp::GetDescription(int index)
 
 DWORD CWlanOp::GetConnectionAttributes(
 	IN GUID Guid, 
-	OUT PWLAN_CONNECTION_ATTRIBUTES *ppConnAttr
+	OUT PWLAN_CONNECTION_ATTRIBUTES *ppConnAttr,
+	int print
 	)
 {
 	DWORD dwDataSize = 0;
@@ -212,12 +213,122 @@ DWORD CWlanOp::GetConnectionAttributes(
 		str = "Unknown state ";
 		break;
 	}
-	PrintlnToMemo(str,1);
+	if(print)
+		PrintlnToMemo(str,1);
 	//if(isConnected )
 	//dwRet = errorState;
+
 	return dwRet;
 }
 
+DWORD CWlanOp::GetChCenterFrequency(
+	_In_ GUID Guid,
+	_In_opt_ CONST PDOT11_SSID pDot11Ssid,
+	_In_ DOT11_BSS_TYPE dot11BssType,
+	_In_ BOOL bSecurityEnabled,
+	_In_ PAPInfo pApInfo
+	)
+{
+	DWORD dwDataSize = 0;
+	DWORD dwRet = 0;//ERROR_SUCCESS;
+	CString str;
+	BOOL isConnected = FALSE;
+	PWLAN_BSS_LIST pWlanBssList;
+	int channel = 0;
+	PWLAN_CONNECTION_ATTRIBUTES pConnAttr = NULL;
+
+	pWlanBssList = (PWLAN_BSS_LIST)GlobalAlloc(GMEM_ZEROINIT,sizeof(WLAN_BSS_LIST));
+	WlanGetNetworkBssList(hClientHandle, &Guid,pDot11Ssid,dot11BssType, bSecurityEnabled, NULL, &pWlanBssList);
+	str = "SSID           lRssi         uLinkQuality       ulChCenterFrequency     channel";
+	PrintlnToMemo(str, 1);
+	PWLAN_BSS_ENTRY  p;
+	for(int i=0; i < pWlanBssList->dwNumberOfItems; i++){
+		p = &pWlanBssList->wlanBssEntries[i];	
+		 channel = GetChannelByFrequency(p->ulChCenterFrequency/1000);
+		 str.Format("%s %ld %lu %lu %d", p->dot11Ssid.ucSSID, p->lRssi, p->uLinkQuality, p->ulChCenterFrequency, channel);
+		 PrintlnToMemo(str);
+		 if(i = 0){
+			 pApInfo->channel = channel;
+			 memcpy(pApInfo->Ssid,p->dot11Ssid.ucSSID, p->dot11Ssid.uSSIDLength);
+			 pApInfo->lRssi = p->lRssi;
+			 pApInfo->uLinkQuality = p->uLinkQuality;
+			 pApInfo->ulChCenterFrequency = p->ulChCenterFrequency;
+		 }
+	}
+	
+	GlobalFree(pWlanBssList);
+	return dwRet;
+}
+/**
+* 根据频率获得信道
+* 
+* @param frequency
+* @return
+*/
+int CWlanOp::GetChannelByFrequency(int frequency)
+{
+         int channel = -1;
+         switch (frequency) {
+         case 2412:
+             channel = 1;
+             break;
+         case 2417:
+             channel = 2;
+             break;
+         case 2422:
+             channel = 3;
+             break;
+         case 2427:
+             channel = 4;
+             break;
+         case 2432:
+             channel = 5;
+             break;
+         case 2437:
+             channel = 6;
+             break;
+         case 2442:
+             channel = 7;
+             break;
+         case 2447:
+             channel = 8;
+             break;
+         case 2452:
+             channel = 9;
+             break;
+         case 2457:
+             channel = 10;
+             break;
+         case 2462:
+             channel = 11;
+             break;
+         case 2467:
+             channel = 12;
+             break;
+         case 2472:
+             channel = 13;
+             break;
+         case 2484:
+             channel = 14;
+             break;
+         case 5745:
+             channel = 149;
+             break;
+         case 5765:
+             channel = 153;
+             break;
+         case 5785:
+             channel = 157;
+             break;
+         case 5805:
+             channel = 161;
+             break;
+         case 5825:
+             channel = 165;
+             break;
+         }
+         return channel;
+}
 DWORD CWlanOp::GetAvailableNetworkList(GUID *pGuid, PWLAN_AVAILABLE_NETWORK_LIST *ppNetList)
 {
 	DWORD dwResult;

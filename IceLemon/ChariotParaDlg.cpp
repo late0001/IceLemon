@@ -15,6 +15,7 @@ CChariotParaDlg::CChariotParaDlg(CWnd* pParent /*=NULL*/)
 	, m_hour(0)
 	, m_min(0)
 	, m_sec(0)
+	, m_radio_tr(0)
 {
 
 }
@@ -54,6 +55,8 @@ BEGIN_MESSAGE_MAP(CChariotParaDlg, CDialogEx)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_MC1, &CChariotParaDlg::OnDeltaposSpinMc1)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_HC1, &CChariotParaDlg::OnDeltaposSpinHc1)
 	ON_BN_CLICKED(IDOK, &CChariotParaDlg::OnBnClickedOk)
+	ON_BN_CLICKED(IDC_RDO_TX, &CChariotParaDlg::OnBnClickedRdoTx)
+	ON_BN_CLICKED(IDC_RDO_RX, &CChariotParaDlg::OnBnClickedRdoRx)
 END_MESSAGE_MAP()
 
 
@@ -123,6 +126,7 @@ int CChariotParaDlg::CheckItem(Chariot2_Item *xItem)
 	}
 
 	xItem->pairNum = 5;
+	xItem->TorR = m_radio_tr;
 	//}
 	return 1;
 }
@@ -256,3 +260,17 @@ BOOL CChariotParaDlg::OnInitDialog()
 
 
 
+
+
+void CChariotParaDlg::OnBnClickedRdoTx()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_radio_tr = 1;
+}
+
+
+void CChariotParaDlg::OnBnClickedRdoRx()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_radio_tr = 0;
+}
