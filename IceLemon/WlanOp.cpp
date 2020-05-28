@@ -247,12 +247,13 @@ DWORD CWlanOp::GetChCenterFrequency(
 		 channel = GetChannelByFrequency(p->ulChCenterFrequency/1000);
 		 str.Format("%s %ld %lu %lu %d", p->dot11Ssid.ucSSID, p->lRssi, p->uLinkQuality, p->ulChCenterFrequency, channel);
 		 PrintlnToMemo(str);
-		 if(i = 0){
+		 if(i == 0){
 			 pApInfo->channel = channel;
 			 memcpy(pApInfo->Ssid,p->dot11Ssid.ucSSID, p->dot11Ssid.uSSIDLength);
 			 pApInfo->lRssi = p->lRssi;
 			 pApInfo->uLinkQuality = p->uLinkQuality;
 			 pApInfo->ulChCenterFrequency = p->ulChCenterFrequency;
+
 		 }
 	}
 	
