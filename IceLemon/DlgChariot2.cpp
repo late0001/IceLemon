@@ -420,10 +420,12 @@ void CDlgChariot2::C2AddItem(Chariot2_Item *item)
 	m_list.SetItemText(i, 4, item->profile_e2);
 	str.Format("%d",item->pairNum);
 	m_list.SetItemText(i, 5, str);
-	if(item->TorR){
-		str = "Tx";
-	}else{
+	if(item->TorR == 0){
 		str = "Rx";
+	}else if(item->TorR == 1){
+		str = "Tx";
+	}else if(item->TorR == 2){
+		str = "Tx + Rx";
 	}
 	m_list.SetItemText(i, 6, str);
 	m_list.SetItemText(i, 7, item->pszTestDuration);

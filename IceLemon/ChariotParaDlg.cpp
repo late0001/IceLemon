@@ -26,6 +26,7 @@ CChariotParaDlg::CChariotParaDlg(CDlgChariot2 *pDlgChariot2,CWnd* pParent /*=NUL
 	, m_hour(0)
 	, m_min(0)
 	, m_sec(0)
+	, m_pair_num(5)
 	, bPreUpdate(FALSE)
 {
 	this->pDlgChariot2 = pDlgChariot2;
@@ -59,6 +60,7 @@ BEGIN_MESSAGE_MAP(CChariotParaDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CChariotParaDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDC_RDO_TX, &CChariotParaDlg::OnBnClickedRdoTx)
 	ON_BN_CLICKED(IDC_RDO_RX, &CChariotParaDlg::OnBnClickedRdoRx)
+	ON_BN_CLICKED(IDC_RDO_TRX, &CChariotParaDlg::OnBnClickedRdoTRx)
 END_MESSAGE_MAP()
 
 
@@ -147,8 +149,10 @@ int CChariotParaDlg::ShowItem(Chariot2_Item &xItem)
 	caculTimeToUI(xItem.test_duration);
 	if(xItem.TorR == 0){
 		((CButton*)GetDlgItem(IDC_RDO_RX))->SetCheck(1);
-	} else{
+	} else if(xItem.TorR == 1){
 		((CButton*)GetDlgItem(IDC_RDO_TX))->SetCheck(1);
+	}else if(xItem.TorR == 2){
+		((CButton*)GetDlgItem(IDC_RDO_TRX))->SetCheck(1);
 	}
 	UpdateData(FALSE);
 	//sprintf_s(xItem.pszTestDuration, "%02d:%02d:%02d", m_hour, m_min, m_sec); 
@@ -281,4 +285,11 @@ void CChariotParaDlg::OnBnClickedRdoRx()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	m_radio_tr = 0;
+}
+
+
+void CChariotParaDlg::OnBnClickedRdoTRx()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_radio_tr = 2;
 }

@@ -329,7 +329,12 @@ bool RunThread::SetupChariot(int x, unsigned long TestDuration)
 bool RunThread::SetupChariot2(Chariot2_Item *item)
 {
 	unsigned long i;
+	int pair_num;
 	//pIceLemonDlg->m_page_chariot.UpdateData(true);
+	switch(item->TorR)
+	{
+	case 0:
+	case 1:
 		Creat_Test();
 
 		// Set Chariot test duration
@@ -350,8 +355,38 @@ bool RunThread::SetupChariot2(Chariot2_Item *item)
 			// Add the pair to the test
 			CHR_test_add_pair(test, pair[i]);
 		}
+		break;
+	case 2:
+		Creat_Test();
 
+		// Set Chariot test duration
+		CHR_runopts_set_test_duration(run, item->test_duration);
 
+		pair_num = item->pairNum;
+
+		for (i=1; i<=pair_num; i++)  //create pair for up-link or down-link
+		{
+			Creat_Pair2(item, i);
+			if (IsError == true)
+				return false;
+			CHR_pair_set_e1_addr(pair[i], item->e1.GetBuffer(item->e1.GetLength()), item->e1.GetLength());
+			CHR_pair_set_e2_addr(pair[i], item->e2.GetBuffer(item->e2.GetLength()), item->e2.GetLength());
+			// Add the pair1 to the test
+			CHR_test_add_pair(test, pair[i]);
+		}
+
+		for (i=pair_num+1; i<=pair_num*2; i++)  //create pair for up-link or down-link
+		{
+			Creat_Pair2(item, i);
+			if (IsError == true)
+				return false;	
+			CHR_pair_set_e1_addr(pair[i], item->e2.GetBuffer(item->e2.GetLength()), item->e2.GetLength());
+			CHR_pair_set_e2_addr(pair[i], item->e1.GetBuffer(item->e1.GetLength()), item->e1.GetLength());
+			// Add the pair1 to the test
+			CHR_test_add_pair(test, pair[i]);
+		}
+		break;
+	}
 	return true;
 }
 
@@ -774,7 +809,7 @@ void RunThread::GetThroughput(int AttIndex, int x, int h)
 	//pIceLemonDlg->SendMessage(WM_UPDATEUSERDATA, false, 0);
 }
 
-void RunThread::GetThroughput2(Chariot2_Item *item, int AttIndex, Chariot2_result *pResult)
+void RunThread::GetThroughput2(Chariot2_Item *item, int AttIndex, Chariot2_result *pResult, int needPrint)
 {
 	CString DisplayWord;
 	int rc, pairNum, k;
@@ -782,34 +817,113 @@ void RunThread::GetThroughput2(Chariot2_Item *item, int AttIndex, Chariot2_resul
 	double avg;
 	//char tmp[128];
 	//pIceLemonDlg->SendMessage(WM_UPDATEUSERDATA, true, 0);
-		pairNum = item->pairNum;
-		avg1 = 0;
-
-		for (k=1; k<=pairNum; k++)
+	pairNum = item->pairNum;
+	switch (item->TorR)
+	{
+	case 0:
+	case 1:
 		{
-			avg = 0;
-			rc = CHR_pair_results_get_average(pair[k], CHR_RESULTS_THROUGHPUT, &avg);
 
-			if (rc != CHR_OK)
-				avg = 0;
-
-			avg1 = avg1 + avg;
-		}
-
-		if ( (avg1 < 0.0001) || (avg1 > 1000) )
-		{
 			avg1 = 0;
+
+			for (k=1; k<=pairNum; k++)
+			{
+				avg = 0;
+				rc = CHR_pair_results_get_average(pair[k], CHR_RESULTS_THROUGHPUT, &avg);
+
+				if (rc != CHR_OK)
+					avg = 0;
+
+				avg1 = avg1 + avg;
+			}
+
+			if ( (avg1 < 0.0001) || (avg1 > 1000) )
+			{
+				avg1 = 0;
+			}
+			avg1 *=0.944;
+			th_curve.th_val = avg1;
+			pResult->throughput = avg1;
+			if(needPrint){
+				pIceLemonDlg->PrintlnToMemo("");
+				DisplayWord.Format(" throughput: %3.2f Mbps", avg1);
+
+				pIceLemonDlg->PrintlnToMemo(DisplayWord);
+			}
+			for (k=1; k<=pairNum; k++)
+				CHR_pair_delete(pair[k]);
+
+			CHR_test_delete(test);
+			break;
 		}
-		avg1 *=0.944;
-		pResult->throughput = avg1;
-		pIceLemonDlg->PrintlnToMemo("");
-		DisplayWord.Format(" throughput: %3.2f Mbps", avg1);
-		pIceLemonDlg->PrintlnToMemo(DisplayWord);
-		for (k=1; k<=pairNum; k++)
-			CHR_pair_delete(pair[k]);
+	case 2:  //E1<->E2
+		{
 
-		CHR_test_delete(test);
+			pIceLemonDlg->PrintlnToMemo("");
+			pIceLemonDlg->PrintlnToMemo("--- Down&Up Link test ---");
 
+			avg3 = 0;
+
+			for (k=1; k<=pairNum; k++)
+			{
+				avg = 0;
+				rc = CHR_pair_results_get_average(pair[k], CHR_RESULTS_THROUGHPUT, &avg);
+
+				if (rc != CHR_OK)
+					avg = 0;
+
+				avg3 = avg3 + avg;
+			}
+
+			if ( (avg3 < 0.0001) || (avg3 > 1000) )
+			{
+				avg3 = 0;
+			}
+			avg3 *=0.944;
+			pResult->throughput = avg3;
+			pIceLemonDlg->PrintlnToMemo("");
+			DisplayWord.Format("Endpoint1 -> Endpoint2 throughput: %3.2f Mbps", avg3);
+			pIceLemonDlg->PrintlnToMemo(DisplayWord);
+			avg4 = 0;
+
+			for (k=pairNum+1; k<=pairNum*2; k++)
+			{
+				avg = 0;
+				rc = CHR_pair_results_get_average(pair[k], CHR_RESULTS_THROUGHPUT, &avg);
+
+				if (rc != CHR_OK)
+					avg = 0;
+
+				avg4 = avg4 + avg;
+			}
+
+			if ( (avg4 < 0.0001) || (avg4 > 1000) )
+			{
+				avg4 = 0;
+			}
+			avg4 *=0.944;
+			pResult->throughput1 = avg4;
+			pIceLemonDlg->PrintlnToMemo("");
+			DisplayWord.Format("Endpoint2 -> Endpoint1 throughput: %3.2f Mbps", avg4);
+			pIceLemonDlg->PrintlnToMemo(DisplayWord);
+
+			pIceLemonDlg->PrintlnToMemo("");
+			DisplayWord.Format("Sum of Bi-direction throughput: %3.2f Mbps", avg3+avg4);
+			pIceLemonDlg->PrintlnToMemo(DisplayWord);
+
+			if ((avg3 + avg4) > pIceLemonDlg->maxThroughput)
+			{
+				pIceLemonDlg->maxThroughput = avg3 + avg4;
+			}
+
+			for (k=1; k<=pairNum*2; k++)
+				CHR_pair_delete(pair[k]);
+
+			CHR_test_delete(test);
+
+			break;
+		}
+	}
 	//pIceLemonDlg->SendMessage(WM_UPDATEUSERDATA, false, 0);
 }
 
@@ -1788,14 +1902,17 @@ void RunThread::SaveTmpDataOneTimes(unsigned long j, int k)
 		txtResult.pszSSID = result.SSID;
 		if(ssid_match(txtResult.pszSSID, p,m_vec_Result.size()))
 			continue;
-		strcpy_s(*q++, result.SSID);
+		memcpy(*q++, result.SSID, 256);
 		for (l= 0; l < m_vec_Result.size();l++){
 			if(strcmp(result.SSID,m_vec_Result[l].SSID) == 0){
 				txtResult.kcnt = m_vec_Result[l].kcnt;
-				if(m_vec_Result[l].TorR){
+				if(m_vec_Result[l].TorR == 1){
 					txtResult.TxThroughput = m_vec_Result[l].throughput;
-				}else{
+				}else if(m_vec_Result[l].TorR == 0){
 					txtResult.RxThroughput = m_vec_Result[l].throughput;
+				}else if(m_vec_Result[l].TorR == 2){
+					txtResult.TxThroughput = m_vec_Result[l].throughput;
+					txtResult.RxThroughput = m_vec_Result[l].throughput1;
 				}
 
 			}
@@ -2364,7 +2481,7 @@ int RunThread::Run2()
 	int j = 0;
 	int t = 0;// index of m_chariot2_List 
 	int outLoop = false;
-	
+	int tCntSec = 0;
 	list<Chariot2_Item> *pC2List  = &sTest.clist;
 	loopCount = sTest.total_time / sTest.single_time;
 	loopCount = loopCount > 0 ? loopCount:1;
@@ -2403,6 +2520,7 @@ int RunThread::Run2()
 			CHR_test_start(test);  //  Start Test!!
 			time(&tStart);
 			time(&tNow);
+			tCntSec = 0;
 			GetDateTime(tStart, re_info.start_time, 3);
 			//tCntSec = 0;
 			pIceLemonDlg->CorrectTimeRemain2(&xItem);
@@ -2419,6 +2537,15 @@ int RunThread::Run2()
 						state = 6;
 						break;
 					}else{
+						if(difftime(tNow,tStart) > tCntSec) {
+							GetThroughput2(&xItem, j, &re_info, 0);
+							//GetThroughputMax(ChariotParameter.Test_Direction[i],h);
+							//SaveOneToDb();
+							th_curve.cur_idx = tCntSec;
+							pIceLemonDlg->SendMessage(WM_UPDATE_CHART,(WPARAM)&th_curve, NULL);
+							tCntSec++;
+
+						}
 						if ( (Flag.Halt == true) || (Flag.Abort == true) ) // if press halt, stop the current pair test!!
 						{
 							pIceLemonDlg->m_page_main.FreezeTimeRemain();
@@ -2478,7 +2605,7 @@ int RunThread::Run2()
 					if (xItem.testfile != "")
 						CHR_test_save(test); //save Chariot test file *.tst
 					//GetThroughput(j, ChariotParameter.Test_Direction[i], h); //Get Throughput ane delete test object
-					GetThroughput2(&xItem, j, &re_info); //Get Throughput ane delete test object
+					GetThroughput2(&xItem, j, &re_info,1); //Get Throughput ane delete test object
 					
 					state = 80;
 					break;

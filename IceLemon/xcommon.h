@@ -71,9 +71,10 @@ typedef struct _Chariot2_result
 	int report_id;
 	int item_id;
 	float throughput;
+	float throughput1;
 	char start_time[50];
 	char end_time[50];
-	int TorR;
+	int TorR;              // 0: Rx, 1: Tx, 2: Tx + Rx  
 	int linkRate;
 	int channel;
 	char testLog[256];
@@ -181,7 +182,7 @@ public:
 	 void GetThroughput(int x, int h);
 	 void GetThroughputMax(int x, int h);
 	 void GetThroughput(int AttIndex, int x, int h);
-	 void GetThroughput2(Chariot2_Item *item, int AttIndex, Chariot2_result *pResult);
+	 void GetThroughput2(Chariot2_Item *item, int AttIndex, Chariot2_result *pResult, int needPrint);
 	 void SaveOneToDb(unsigned long saveFormat);
 	 bool EndChariotTest();
 	 void Creat_Test();
