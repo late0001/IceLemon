@@ -239,13 +239,17 @@ DWORD CWlanOp::GetChCenterFrequency(
 
 	pWlanBssList = (PWLAN_BSS_LIST)GlobalAlloc(GMEM_ZEROINIT,sizeof(WLAN_BSS_LIST));
 	WlanGetNetworkBssList(hClientHandle, &Guid,pDot11Ssid,dot11BssType, bSecurityEnabled, NULL, &pWlanBssList);
-	str = "SSID           lRssi         uLinkQuality       ulChCenterFrequency     channel";
-	PrintlnToMemo(str, 1);
+
 	PWLAN_BSS_ENTRY  p;
 	for(int i=0; i < pWlanBssList->dwNumberOfItems; i++){
 		p = &pWlanBssList->wlanBssEntries[i];	
 		 channel = GetChannelByFrequency(p->ulChCenterFrequency/1000);
-		 str.Format("%s %ld %lu %lu %d", p->dot11Ssid.ucSSID, p->lRssi, p->uLinkQuality, p->ulChCenterFrequency, channel);
+		 str.Format("SSID: %s\n"
+					 "Rssi: %ld\n"
+					 "LinkQuality: %lu\n"
+					 "ChannelCenterFrequency: %lu\n"
+					 "Channel: %d\n",
+					 p->dot11Ssid.ucSSID, p->lRssi, p->uLinkQuality, p->ulChCenterFrequency, channel);
 		 PrintlnToMemo(str);
 		 if(i == 0){
 			 pApInfo->channel = channel;

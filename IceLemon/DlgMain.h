@@ -48,4 +48,6 @@ public:
 	CComboBox m_cb_profile;
 	afx_msg void OnCbnSelchangeCbProfile();
 	afx_msg void OnBnClickedBtnSaveresult();
+	int m_radio_method;
+	afx_msg void OnBnClickedRdoM1();
 };

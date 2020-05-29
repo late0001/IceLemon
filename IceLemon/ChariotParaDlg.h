@@ -48,4 +48,5 @@ public:
 	int m_radio_tr;
 	afx_msg void OnBnClickedRdoTx();
 	afx_msg void OnBnClickedRdoRx();
+	int m_pair_num;
 };

@@ -59,7 +59,7 @@ public:
 public:
 	void InitTabCtrl();
 	void InitDBConn();
-	void onBtnRun();
+	void onBtnRun(int m);
 	void Run1();
 	void Run2();
 	void OnKillfocusCbxProtocol();

@@ -13,6 +13,7 @@ IMPLEMENT_DYNAMIC(CDlgMain, CDialogEx)
 
 CDlgMain::CDlgMain(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CDlgMain::IDD, pParent)
+	, m_radio_method(1)
 {
 	AfxInitRichEdit2();
 	timeFreeze = false;
@@ -34,6 +35,7 @@ void CDlgMain::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BTN_ABORT, mBtnAbort);
 	DDX_Control(pDX, IDC_CB_ADAPTER, m_cb_WlInf);
 	DDX_Control(pDX, IDC_CB_PROFILE, m_cb_profile);
+	DDX_Radio(pDX, IDC_RDO_M1, m_radio_method);
 }
 int CDlgMain::setContext(CIceLemonDlg *context)
 {
@@ -52,6 +54,8 @@ BEGIN_MESSAGE_MAP(CDlgMain, CDialogEx)
 	ON_CBN_KILLFOCUS(IDC_CB_ADAPTER, &CDlgMain::OnKillfocusCbAdapter)
 	ON_CBN_SELCHANGE(IDC_CB_PROFILE, &CDlgMain::OnCbnSelchangeCbProfile)
 	ON_BN_CLICKED(IDC_BTN_SAVERESULT, &CDlgMain::OnBnClickedBtnSaveresult)
+	ON_BN_CLICKED(IDC_RDO_M1, &CDlgMain::OnBnClickedRdoM1)
+	ON_BN_CLICKED(IDC_RDO_M2, &CDlgMain::OnBnClickedRdoM1)
 END_MESSAGE_MAP()
 
 
@@ -67,7 +71,8 @@ bool CheckAdapterExistence()
 }
 void CDlgMain::OnBnClickedBtnRun()
 {
-	pIceLemonDlg->onBtnRun();
+
+	pIceLemonDlg->onBtnRun(m_radio_method);
 
 }
 
@@ -229,4 +234,19 @@ void CDlgMain::OnBnClickedBtnSaveresult()
 	file.Close();
 		
 	
+}
+
+
+void CDlgMain::OnBnClickedRdoM1()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	UpdateData(TRUE);
+	switch(m_radio_method){
+	case 0:
+		//AfxMessageBox("radio 1被选中");
+		break;
+	case 1:
+		//AfxMessageBox("radio 2被选中");
+		break;
+	}
 }

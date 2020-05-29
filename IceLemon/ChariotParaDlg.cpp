@@ -16,6 +16,7 @@ CChariotParaDlg::CChariotParaDlg(CWnd* pParent /*=NULL*/)
 	, m_min(0)
 	, m_sec(0)
 	, m_radio_tr(0)
+	, m_pair_num(0)
 {
 
 }
@@ -46,6 +47,7 @@ void CChariotParaDlg::DoDataExchange(CDataExchange* pDX)
 	DDV_MinMaxInt(pDX, m_min, 0, 60);
 	DDX_Text(pDX, IDC_EDT_SECC1, m_sec);
 	DDV_MinMaxInt(pDX, m_sec, 0, 60);
+	DDX_Text(pDX, IDC_EDT_C2PAIRNUM, m_pair_num);
 }
 
 
@@ -125,7 +127,7 @@ int CChariotParaDlg::CheckItem(Chariot2_Item *xItem)
 		return 0;
 	}
 
-	xItem->pairNum = 5;
+	xItem->pairNum = m_pair_num;
 	xItem->TorR = m_radio_tr;
 	//}
 	return 1;
@@ -141,8 +143,14 @@ int CChariotParaDlg::ShowItem(Chariot2_Item &xItem)
 
 	m_ip_e2.SetWindowText(xItem.e2);
 	m_cbo_e2_profile.SetWindowText(xItem.profile_e2);
-	
+	m_pair_num = xItem.pairNum;
 	caculTimeToUI(xItem.test_duration);
+	if(xItem.TorR == 0){
+		((CButton*)GetDlgItem(IDC_RDO_RX))->SetCheck(1);
+	} else{
+		((CButton*)GetDlgItem(IDC_RDO_TX))->SetCheck(1);
+	}
+	UpdateData(FALSE);
 	//sprintf_s(xItem.pszTestDuration, "%02d:%02d:%02d", m_hour, m_min, m_sec); 
 	
 	//}

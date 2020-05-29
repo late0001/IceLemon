@@ -311,7 +311,8 @@ void CDlgChariot2::OnBnClickedBtnC2ok()
 	int cnt = 0 ;
 	int cid;
 	int i = 0;
-	cid = GetIdFromDb()+1;
+	//cid = GetIdFromDb()+1;
+	cid = 16;
 	UpdateData(TRUE);
 	if(m_cbo_card.GetCurSel()== -1) {
 		MessageBox("Please choose card first", "Error", MB_OK|MB_ICONERROR);
@@ -511,7 +512,10 @@ void CDlgChariot2::OnBnClickedBtnAddci()
 void CDlgChariot2::OnBnClickedBtnC2update()
 {
 	// TODO: 在此添加控件通知处理程序代码
-
+	if(pPrfList ==NULL){
+		MessageBox("Please select net card first!", "Info", MB_OK | MB_ICONINFORMATION);
+		return ;
+	}
 	POSITION pos =  m_list.GetFirstSelectedItemPosition();   
 	int sel_index = m_list.GetNextSelectedItem(pos); 
 	if(sel_index == -1) {
@@ -656,7 +660,7 @@ void CDlgChariot2::OnBnClickedBtnSaveitems()
 	ar.Flush();
 	ar.Close();
 	tempFile.Close();
-	
+	MessageBox("Saved successfully!", "Save", MB_OK|MB_ICONINFORMATION);
 
 }
 
