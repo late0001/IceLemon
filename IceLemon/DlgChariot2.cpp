@@ -102,6 +102,8 @@ BEGIN_MESSAGE_MAP(CDlgChariot2, CDialogEx)
 	ON_WM_DESTROY()
 	ON_BN_CLICKED(IDC_BTN_SAVEITEMS, &CDlgChariot2::OnBnClickedBtnSaveitems)
 	ON_BN_CLICKED(IDC_BTN_LOADFROMFILE, &CDlgChariot2::OnBnClickedBtnLoadfromfile)
+	ON_BN_CLICKED(IDC_BTN_C2COPY, &CDlgChariot2::OnBnClickedBtnC2copy)
+	ON_BN_CLICKED(IDC_BTN_C2SWAP, &CDlgChariot2::OnBnClickedBtnC2swap)
 END_MESSAGE_MAP()
 
 
@@ -452,10 +454,12 @@ void CDlgChariot2::C2UpdateItem(Chariot2_Item *item,int i)
 	m_list.SetItemText(i, 4, item->profile_e2);
 	str.Format("%d",item->pairNum);
 	m_list.SetItemText(i, 5, str);
-	if(item->TorR){
+	if(item->TorR == 1){
 		str = "Tx";
-	}else{
+	}else if(item->TorR == 0){
 		str = "Rx";
+	}else {
+		str = "Tx + Rx";
 	}
 	m_list.SetItemText(i, 6, str);
 	m_list.SetItemText(i, 7, item->pszTestDuration);
@@ -688,4 +692,67 @@ void CDlgChariot2::OnBnClickedBtnLoadfromfile()
 	}
 	ar.Close();
 	tempFile.Close();
+}
+
+
+void CDlgChariot2::OnBnClickedBtnC2copy()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	POSITION pos =  m_list.GetFirstSelectedItemPosition();   
+	int sel_index = m_list.GetNextSelectedItem(pos); 
+	int count = m_list.GetItemCount();
+	if(sel_index == -1) {
+		MessageBox("Not selected", "Error", MB_OK|MB_ICONERROR);
+		return;
+	}
+	Chariot2_Item *sel_item=NULL;
+	list<Chariot2_Item>::iterator iter;
+	for(iter=m_chariot2_List.begin();iter !=m_chariot2_List.end(); iter++)
+	{
+		if(iter->lv_id == sel_index){
+			sel_item = &(*iter);
+		}
+	}
+	if(sel_item == NULL) {
+		MessageBox("No items to be copied are selected", NULL, MB_OK|MB_ICONERROR);
+		return;
+	}
+	sel_item->lv_id = count - 1;
+	C2AddItem(sel_item);
+}
+
+
+void CDlgChariot2::OnBnClickedBtnC2swap()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString str;
+	char prf[256]={0};
+	POSITION pos =  m_list.GetFirstSelectedItemPosition();   
+	int sel_index = m_list.GetNextSelectedItem(pos); 
+	int count = m_list.GetItemCount();
+	if(sel_index == -1) {
+		MessageBox("Not selected", "Error", MB_OK|MB_ICONERROR);
+		return;
+	}
+	Chariot2_Item *sel_item=NULL;
+	list<Chariot2_Item>::iterator iter;
+	for(iter=m_chariot2_List.begin();iter !=m_chariot2_List.end(); iter++)
+	{
+		if(iter->lv_id == sel_index){
+			sel_item = &(*iter);
+		}
+	}
+	if(sel_item == NULL) {
+		MessageBox("No items to be copied are selected", NULL, MB_OK|MB_ICONERROR);
+		return;
+	}
+	str = sel_item->e1;
+	sel_item->e1 = sel_item->e2;
+	sel_item->e2 = str;
+	memcpy(prf, sel_item->profile_e1, 256);
+	memcpy(sel_item->profile_e1, sel_item->profile_e2, 256);
+	memcpy(sel_item->profile_e2, prf, 256);
+	if (sel_item->TorR == 0) sel_item->TorR = 1;
+	else if(sel_item->TorR == 1) sel_item->TorR = 0;
+	C2UpdateItem(sel_item, sel_index);
 }

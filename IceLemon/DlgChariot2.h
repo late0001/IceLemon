@@ -67,4 +67,6 @@ public:
 	afx_msg void OnBnClickedBtnSaveitems();
 	afx_msg void OnBnClickedBtnLoadfromfile();
 
+	afx_msg void OnBnClickedBtnC2copy();
+	afx_msg void OnBnClickedBtnC2swap();
 };
