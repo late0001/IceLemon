@@ -332,6 +332,7 @@ void CDlgChariot2::OnBnClickedBtnC2ok()
 		str.Format("%d",pItem->id);
 		m_list.SetItemText(i, 0, str);
 		strcpy_s(pItem->script,script.GetBuffer(script.GetLength())); 
+		pItem->testfile = testfile;
 		pItem->protocol = CHR_PROTOCOL_TCP;
 		simple_test.single_time += pItem->test_duration;
 	}

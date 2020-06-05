@@ -58,7 +58,6 @@ public:
 	void DisplayPage(int i);
 public:
 	void InitTabCtrl();
-	void InitDBConn();
 	void onBtnRun(int m);
 	void Run1();
 	void Run2();
@@ -125,9 +124,6 @@ public:
 	GUID *pGuid;
 	int cur_is_connected;
 	PIL_PROFILE_INFO_LIST pPrfList;
-
-	_ConnectionPtr m_pConnection;
-	
 
 private:
 	unsigned long remainItem;

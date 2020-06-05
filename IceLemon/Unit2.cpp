@@ -476,17 +476,17 @@ void RunThread::Save_ChariotTestFile2(Chariot2_Item *item, unsigned loopcount,
 
 	if (loopcount >1)
 	{
-		DirectionName = DirectionName + "_Att%d_Round%d";
+		DirectionName = DirectionName + "_Att%d_Round%d_item%d";
 		ExtendName = DirectionName.GetBuffer(100);
 		DirectionName.ReleaseBuffer();
-		TypeName.Format(ExtendName, 0, k);
+		TypeName.Format(ExtendName, 0, k, item->id);
 	}
 	else
 	{
-		DirectionName = DirectionName + "_Att%d";
+		DirectionName = DirectionName + "_Att%d_item%d";
 		ExtendName = DirectionName.GetBuffer(100);
 		DirectionName.ReleaseBuffer();
-		TypeName.Format(ExtendName, 0);
+		TypeName.Format(ExtendName, 0, item->id);
 	}
 
 
