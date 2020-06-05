@@ -166,6 +166,7 @@ private:
 	 int result_cnt;
 public:
 	 CString dataFullName;
+	 CString svtodbName;
 	 int run_flag;
 public:
 	 RunThread();
@@ -194,7 +195,7 @@ public:
 		 unsigned long j, unsigned long k);
 	 int GetSaveDataFileName(unsigned long direction, unsigned loop_count,
 		 unsigned long j, unsigned long k, CString &fileName);
-	 void SetDataTmpFile2(unsigned long jj, unsigned long k, int t);
+	 void SetDataTmpFile2(Chariot2_result *pCRInfo, unsigned long jj, unsigned long k, int t);
 	 void TouchFile(int k);
 	 int SaveTPToFile();
 	 int GetDateTimeNow(char (&buf)[50], int fmt);

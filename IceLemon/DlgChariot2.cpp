@@ -336,72 +336,7 @@ void CDlgChariot2::OnBnClickedBtnC2ok()
 		pItem->protocol = CHR_PROTOCOL_TCP;
 		simple_test.single_time += pItem->test_duration;
 	}
-	simple_test.clist = m_chariot2_List;
-
-#if 0
-	if( m_ckb1.GetCheck()){
-		CheckItem(1, xItem,m_IPAddr1_e1,m_IPAddr1_e2, m_cbo_p1e1, m_cbo_p1e2, m_hour_c1, m_min_c1, m_sec_c1, IDC_EDT_SECC1);
-		m_chariot2_List.push_back(xItem);
-		cnt++;
-	}else{
-		return;
-	}
-	if( m_ckb2.GetCheck()){
-		CheckItem(2, xItem,m_IPAddr2_e1,m_IPAddr2_e2, m_cbo_p2e1, m_cbo_p2e2, m_hour_c2, m_min_c2, m_sec_c2, IDC_EDT_SECC2);
-		m_chariot2_List.push_back(xItem);
-		cnt++;
-	}else
-		return;
-	if( m_ckb3.GetCheck()){
-		CheckItem(3, xItem,m_IPAddr3_e1,m_IPAddr3_e2, m_cbo_p3e1, m_cbo_p3e2, m_hour_c3, m_min_c3, m_sec_c3, IDC_EDT_SECC3);
-		m_chariot2_List.push_back(xItem);
-		cnt++;
-	}else
-		return;
-	if( m_ckb4.GetCheck()){
-		CheckItem(4, xItem,m_IPAddr4_e1,m_IPAddr4_e2, m_cbo_p4e1, m_cbo_p4e2, m_hour_c4, m_min_c4, m_sec_c4, IDC_EDT_SECC4);
-		m_chariot2_List.push_back(xItem);
-		cnt++;
-	}else
-		return;
-	if( m_ckb5.GetCheck()){
-		CheckItem(5, xItem,m_IPAddr5_e1,m_IPAddr5_e2, m_cbo_p5e1, m_cbo_p5e2, m_hour_c5, m_min_c5, m_sec_c5, IDC_EDT_SECC5);
-		m_chariot2_List.push_back(xItem);
-		cnt++;
-	}else 
-		return;
-	if( m_ckb6.GetCheck()){
-		CheckItem(6, xItem,m_IPAddr6_e1,m_IPAddr6_e2, m_cbo_p6e1, m_cbo_p6e2, m_hour_c6, m_min_c6, m_sec_c6, IDC_EDT_SECC6);
-		m_chariot2_List.push_back(xItem);
-		cnt++;
-	}else
-		return;
-	if( m_ckb7.GetCheck()){
-		CheckItem(7, xItem,m_IPAddr7_e1,m_IPAddr7_e2, m_cbo_p7e1, m_cbo_p7e2, m_hour_c7, m_min_c7, m_sec_c7, IDC_EDT_SECC7);
-		m_chariot2_List.push_back(xItem);
-		cnt++;
-	}else
-		return;
-	if( m_ckb8.GetCheck()){
-		CheckItem(8, xItem,m_IPAddr8_e1,m_IPAddr8_e2, m_cbo_p8e1, m_cbo_p8e2, m_hour_c8, m_min_c8, m_sec_c8, IDC_EDT_SECC8);
-		m_chariot2_List.push_back(xItem);
-		cnt++;
-	}else
-		return;
-	if( m_ckb9.GetCheck()){
-		CheckItem(9, xItem,m_IPAddr9_e1,m_IPAddr9_e2, m_cbo_p9e1, m_cbo_p9e2, m_hour_c9, m_min_c9, m_sec_c9, IDC_EDT_SECC9);
-		m_chariot2_List.push_back(xItem);
-		cnt++;
-	}else
-		return;
-	if( m_ckb10.GetCheck()){
-		CheckItem(10, xItem,m_IPAddr10_e1,m_IPAddr10_e2, m_cbo_p10e1, m_cbo_p10e2, m_hour_c10, m_min_c10, m_sec_c10, IDC_EDT_SECC10);
-		m_chariot2_List.push_back(xItem);
-		cnt++;
-	}else
-		return;
-#endif	
-	
+	simple_test.clist = m_chariot2_List;	
 	
 }
 

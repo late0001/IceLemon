@@ -1551,7 +1551,7 @@ void RunThread::SetDataTmpFile(unsigned long jj, unsigned long k)
 
 }
 
-void RunThread::SetDataTmpFile2(unsigned long jj, unsigned long k, int t)
+void RunThread::SetDataTmpFile2(Chariot2_result *pCRInfo, unsigned long jj, unsigned long k, int t)
 {
    /* Define tmp file pointer for save data
     * Name Rule: FullName = HeadName + TypeName (if required) + TailName
@@ -1582,6 +1582,7 @@ void RunThread::SetDataTmpFile2(unsigned long jj, unsigned long k, int t)
           DisplayWord;
    int LoopCount, LoopType, ks;
    char *DataTmpFilename;
+   char *DbFormatFile;
    char datetime[50] = {0};
    FILE *tmpFile;
    errno_t err;
@@ -1619,14 +1620,17 @@ void RunThread::SetDataTmpFile2(unsigned long jj, unsigned long k, int t)
    //SetCurrentDir(Form1->WorkDictionary);
    dataFullName = pIceLemonDlg->workDirectory + "\\test_result\\" + HeadName + TypeName + datetime + TailName;
    DataTmpFilename = dataFullName.GetBuffer(dataFullName.GetLength());
- 
+   svtodbName = pIceLemonDlg->workDirectory + "\\test_result\\DbFomat" +  + TypeName + datetime + TailName;
+   DbFormatFile = svtodbName.GetBuffer(svtodbName.GetLength());
+  strcpy_s(pCRInfo->testLog ,dataFullName.GetBuffer(dataFullName.GetLength()));
    // Delete the existing data in tmp file & new a data tmp file
    if (jj == 1)       //create new file if the first att value
     {
-      err = fopen_s(&tmpFile, DataTmpFilename,"w+t");
-
+      err = fopen_s(&tmpFile, DataTmpFilename,"w+t"); 
       fclose(tmpFile);
 
+	  err = fopen_s(&tmpFile, DbFormatFile,"w+t");
+	  fclose(tmpFile);
       //Add DataTmpFile to DataTmpFileList
 
       sprintf_s(DataTmpFileList, "%s\\test_result\\DataTmpFileList.txt", pIceLemonDlg->workDirectory);
@@ -1790,6 +1794,7 @@ void RunThread::WriteResultCnt()
 	file.Write(&result_cnt,sizeof(int));
 	file.Close();
 }
+
 void RunThread::SaveTmpData2(Chariot2_result *pResult,unsigned long j, int k, int t)
 {
 	FILE *TmpFile;
@@ -1798,13 +1803,25 @@ void RunThread::SaveTmpData2(Chariot2_result *pResult,unsigned long j, int k, in
 	errno_t err;
 	char start_time[255]={0};
 	char end_time[255]={0};
+
 	CFile file;
+	CString slinkRate;
 //	DataTmpFilename = dataFullName.GetBuffer(dataFullName.GetLength());
-
-//	err = fopen_s(&TmpFile, DataTmpFilename,"a+t"); // open temp file for append data
-
-// 		if (j==1 && k==1 && t==1)
-// 		{
+	char *dbFormatFile = svtodbName.GetBuffer(svtodbName.GetLength());
+	err = fopen_s(&TmpFile, dbFormatFile,"a+t"); // open temp file for append data
+	
+ 		if (j==1 && k==1 && t==1)
+ 		{
+			
+			
+			fprintf(TmpFile, "ReportId, ItemId, Throughput, SSID, Channel, LinkRate, StartTime, EndTime, TestLog\n");
+		}
+		else{
+		
+			slinkRate.Format("%dM",pResult->linkRate/1000);
+			fprintf(TmpFile, "%d, %d, %.02f, %-20s, %d, %s, %s, %s, %s\n",pResult->report_id, pResult->item_id, pResult->throughput, pResult->SSID, pResult->channel, slinkRate,pResult->start_time, pResult->end_time, pResult->testLog );
+		}
+		fclose(TmpFile);
 // 			GetDateTimeNow(buf, 0);
 // 			fprintf(TmpFile, "Date: %s\n",buf);
 // 
@@ -2513,7 +2530,7 @@ int RunThread::Run2()
 				strcpy_s(re_info.SSID, xItem.profile_e2);
 				ConnectAndGetIP2(card_idx, xItem.profile_e2, xItem.e2, xItem.e1, &re_info);
 			}
-			SetDataTmpFile2(j,k,t);
+			SetDataTmpFile2(&re_info,j,k,t);
 			status = SetupChariot2(&xItem);
 			if (xItem.testfile != "")
 				Save_ChariotTestFile2(&xItem, loopCount, 0, k);
@@ -2631,8 +2648,6 @@ int RunThread::Run2()
 	errno_t err= fopen_s(&tmpFile, dataFullName.GetBuffer(dataFullName.GetLength()),"a+t");
 	fprintf(tmpFile,"### finish ###");  //how many att item in this loop
 	fclose(tmpFile);
-	
-
 	
 	return 0;
 }
